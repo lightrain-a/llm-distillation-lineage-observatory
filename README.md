@@ -15,11 +15,12 @@ A static, multi-page bilingual research website organized around the technical l
 ## Contents
 
 - 22 second-level research pages grouped under seven first-level sections
-- A long-form bilingual Preliminary survey chapter with formal definitions, equations, historical evolution, and sentence-level citations
+- A long-form bilingual Preliminary survey chapter with formal definitions, equations, historical evolution, sentence-level citations, and full-resolution English/Chinese overview figures
 - 63 curated papers, repositories, disclosures, reports, and policies with stable reference numbers `[1]`–`[63]`
 - Inline, clickable citations from technical statements to the master bibliography
 - Searchable and evidence-filtered literature cards with bilingual summaries
-- English/Chinese interface and page-content switching; original paper titles remain unchanged
+- English/Chinese interface, page-content switching, and language-matched diagrams; original paper titles remain unchanged
+- Worked methodological examples, including score-, ranking-, and pairwise-preference supervision in judge distillation
 - Automatic per-page H2/H3 table of contents
 - Open-weight/closed-model and black-box/white-box treated as orthogonal attributes
 - Evidence grades A–E

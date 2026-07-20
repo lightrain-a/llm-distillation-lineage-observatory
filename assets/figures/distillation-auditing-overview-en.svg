@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc">
+<title id="title">A Unified View of LLM Distillation and Distillation Auditing</title>
+<desc id="desc">A detailed overview connecting teacher models, distillation signals, student models, audit access, evidence, conclusion levels, four supervision mechanisms, and representative 2025–2026 research directions.</desc>
+<defs>
+  <style>
+    .bg{fill:#fff}.title{font:700 34px Georgia,serif;fill:#0b2c5f}.subtitle{font:16px Arial,sans-serif;fill:#253858}.head{font:700 19px Georgia,serif}.body{font:15px Arial,sans-serif;fill:#18243b}.small{font:13px Arial,sans-serif;fill:#27364f}.tiny{font:11px Arial,sans-serif;fill:#35435a}.bold{font-weight:700}.center{text-anchor:middle}.right{text-anchor:end}.box{fill:#fff;stroke-width:2}.soft{fill:#fafcff}.dash{stroke-dasharray:6 6}.arrow{stroke:#0b2c5f;stroke-width:3;fill:none;marker-end:url(#arrow)}.thin{stroke:#56657b;stroke-width:1.5;fill:none}.green{stroke:#3f7d44}.blue{stroke:#1c5ba7}.purple{stroke:#6d3a9c}.teal{stroke:#147b83}.orange{stroke:#bf5b16}.panelTitle{fill:#0b3b78}.white{fill:#fff}.tag{font:700 12px Arial,sans-serif}.caption{font:12px Arial,sans-serif;fill:#4b5568}.cite{font:11px Arial,sans-serif;fill:#9a3412}.pill{rx:9;ry:9}.node{fill:#efe7fb;stroke:#6d3a9c;stroke-width:2}.ladder{stroke:#5b6878;stroke-width:7}.rung{stroke:#5b6878;stroke-width:5}.cardTitle{font:700 14px Arial,sans-serif;fill:#0b2c5f}.cardBody{font:12px Arial,sans-serif;fill:#253858}
+  </style>
+  <marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 Z" fill="#0b2c5f"/></marker>
+  <linearGradient id="gBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f1f7ff"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
+  <linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3fbf1"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
+  <linearGradient id="gPurple" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#faf5ff"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
+  <linearGradient id="gTeal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#effafa"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
+  <linearGradient id="gOrange" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff7ed"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
+</defs>
+<rect class="bg" width="1920" height="1080"/>
+<text x="960" y="42" class="title center">Figure 1. A Unified View of LLM Distillation and Distillation Auditing</text>
+<text x="960" y="70" class="subtitle center">Knowledge signals, teacher roles, student inheritance, audit access, and the ladder of claims that evidence can support.</text>
+
+<!-- top row -->
+<rect x="20" y="95" width="300" height="285" rx="14" class="box green" fill="url(#gGreen)"/>
+<text x="170" y="124" class="head center" fill="#275d2f">1. Teacher Models</text>
+<line x1="20" y1="137" x2="320" y2="137" class="thin green"/>
+<circle cx="72" cy="182" r="27" fill="#e8f5e9" stroke="#3f7d44" stroke-width="2"/><text x="72" y="189" class="head center" fill="#275d2f">T</text>
+<text x="112" y="168" class="body"><tspan class="bold">Proprietary frontier LLMs</tspan><tspan x="112" dy="20">GPT-4o, Claude, Gemini, etc.</tspan></text>
+<circle cx="72" cy="240" r="27" fill="#e8f5e9" stroke="#3f7d44" stroke-width="2"/><text x="72" y="247" class="head center" fill="#275d2f">O</text>
+<text x="112" y="226" class="body"><tspan class="bold">Open-weight LLMs</tspan><tspan x="112" dy="20">Llama, Qwen, Mistral, etc.</tspan></text>
+<circle cx="72" cy="298" r="27" fill="#e8f5e9" stroke="#3f7d44" stroke-width="2"/><text x="72" y="305" class="head center" fill="#275d2f">D</text>
+<text x="112" y="284" class="body"><tspan class="bold">Specialized models</tspan><tspan x="112" dy="20">code, math, tools, safety</tspan></text>
+<line x1="40" y1="337" x2="300" y2="337" class="thin green dash"/>
+<text x="170" y="361" class="small center bold" fill="#275d2f">Single teacher or multiple teachers</text>
+
+<path d="M320 238 H345" class="arrow"/>
+<rect x="355" y="95" width="430" height="285" rx="14" class="box blue" fill="url(#gBlue)"/>
+<text x="570" y="124" class="head center" fill="#174a8b">2. Distillation Signals</text>
+<line x1="355" y1="137" x2="785" y2="137" class="thin blue"/>
+<g class="body">
+  <rect x="372" y="151" width="396" height="39" rx="8" fill="#fff" stroke="#8eb5e4"/><text x="390" y="174" class="bold" fill="#174a8b">Response / Instruction</text><text x="590" y="166" class="tiny"><tspan>outputs, soft targets,</tspan><tspan x="590" dy="15">token probabilities</tspan></text>
+  <rect x="372" y="198" width="396" height="39" rx="8" fill="#fff" stroke="#8eb5e4"/><text x="390" y="221" class="bold" fill="#174a8b">Reasoning / Process</text><text x="590" y="213" class="tiny"><tspan>rationales, CoT,</tspan><tspan x="590" dy="15">solution paths</tspan></text>
+  <rect x="372" y="245" width="396" height="39" rx="8" fill="#fff" stroke="#8eb5e4"/><text x="390" y="268" class="bold" fill="#174a8b">Preference / Judge</text><text x="590" y="260" class="tiny"><tspan>ranking, scoring,</tspan><tspan x="590" dy="15">pairwise choices, critiques</tspan></text>
+  <rect x="372" y="292" width="396" height="39" rx="8" fill="#fff" stroke="#8eb5e4"/><text x="390" y="315" class="bold" fill="#174a8b">Data / Representation</text><text x="590" y="307" class="tiny"><tspan>synthetic data, hidden states,</tspan><tspan x="590" dy="15">attention, embeddings</tspan></text>
+  <rect x="372" y="339" width="396" height="30" rx="8" fill="#f5f3ff" stroke="#8eb5e4"/><text x="390" y="359" class="bold" fill="#174a8b">Hybrid / Composite</text><text x="590" y="359" class="tiny">multi-stage, multi-teacher pipelines</text>
+</g>
+
+<path d="M785 238 H810" class="arrow"/>
+<rect x="820" y="95" width="250" height="285" rx="14" class="box purple" fill="url(#gPurple)"/>
+<text x="945" y="124" class="head center" fill="#5a2b85">3. Student Model</text>
+<line x1="820" y1="137" x2="1070" y2="137" class="thin purple"/>
+<g transform="translate(0,5)">
+  <circle cx="900" cy="176" r="11" class="node"/><circle cx="945" cy="176" r="11" class="node"/><circle cx="990" cy="176" r="11" class="node"/>
+  <circle cx="900" cy="222" r="11" class="node"/><circle cx="945" cy="222" r="11" class="node"/><circle cx="990" cy="222" r="11" class="node"/>
+  <line x1="900" y1="176" x2="945" y2="222" class="thin purple"/><line x1="900" y1="222" x2="945" y2="176" class="thin purple"/><line x1="945" y1="176" x2="990" y2="222" class="thin purple"/><line x1="945" y1="222" x2="990" y2="176" class="thin purple"/>
+</g>
+<text x="945" y="277" class="body center"><tspan>Distilled, fine-tuned, or aligned</tspan><tspan x="945" dy="20">student that may inherit</tspan><tspan x="945" dy="20">capabilities, decision boundaries,</tspan><tspan x="945" dy="20">reasoning habits, or biases.</tspan></text>
+
+<path d="M1070 238 H1095" class="arrow"/>
+<rect x="1105" y="95" width="300" height="285" rx="14" class="box teal" fill="url(#gTeal)"/>
+<text x="1255" y="124" class="head center" fill="#0f6670">4. Audit Access</text>
+<line x1="1105" y1="137" x2="1405" y2="137" class="thin teal"/>
+<rect x="1122" y="151" width="266" height="66" rx="9" fill="#fff" stroke="#82c4c9"/><text x="1142" y="174" class="body bold" fill="#0f6670">White-box</text><text x="1142" y="194" class="small">weights, architecture, logs, routing</text>
+<rect x="1122" y="226" width="266" height="66" rx="9" fill="#fff" stroke="#82c4c9"/><text x="1142" y="249" class="body bold" fill="#0f6670">Gray-box</text><text x="1142" y="269" class="small"><tspan>APIs + metadata, partial weights,</tspan><tspan x="1142" dy="16">top-k logprobs or checkpoints</tspan></text>
+<rect x="1122" y="301" width="266" height="66" rx="9" fill="#fff" stroke="#82c4c9"/><text x="1142" y="324" class="body bold" fill="#0f6670">Black-box</text><text x="1142" y="344" class="small"><tspan>output-only access via prompts</tspan><tspan x="1142" dy="16">and interactions</tspan></text>
+
+<path d="M1405 238 H1430" class="arrow"/>
+<rect x="1440" y="95" width="460" height="285" rx="14" class="box orange" fill="url(#gOrange)"/>
+<text x="1670" y="124" class="head center" fill="#9a3e08">5. Evidence &amp; Conclusions</text>
+<line x1="1440" y1="137" x2="1900" y2="137" class="thin orange"/>
+<text x="1465" y="165" class="small"><tspan>Evidence may come from behavioral similarity, internal signals,</tspan><tspan x="1465" dy="17">training artifacts, public disclosures, or provider telemetry.</tspan></text>
+<line x1="1460" y1="202" x2="1880" y2="202" class="thin orange dash"/>
+<g class="body"><text x="1470" y="231">✓ <tspan class="bold">Support / no support</tspan> for distillation</text><text x="1470" y="261">✓ Attribution to specific teacher(s)</text><text x="1470" y="291">○ Role attribution: generator, judge, critic, filter</text><text x="1470" y="321">○ Mixture recovery across multiple teachers</text><text x="1470" y="351">○ Provenance reconstruction of the full pipeline</text></g>
+
+<!-- middle row -->
+<rect x="20" y="405" width="1365" height="365" rx="14" fill="#fff" stroke="#1c5ba7" stroke-width="2"/>
+<rect x="20" y="405" width="1365" height="36" rx="14" class="panelTitle"/><text x="702" y="430" class="head center white">Illustration: How Different Distillation Signals Are Generated</text>
+<!-- response -->
+<rect x="38" y="455" width="315" height="295" rx="12" fill="#f7fbff" stroke="#9dbfe7"/>
+<text x="195" y="482" class="cardTitle center">(a) Response Distillation</text><text x="195" y="500" class="tiny center">soft targets / logits</text>
+<rect x="62" y="530" width="67" height="35" rx="7" fill="#fff" stroke="#5b92d1"/><text x="95" y="552" class="small center">Prompt</text>
+<path d="M129 547 H170" class="arrow"/><circle cx="198" cy="547" r="27" fill="#e7f1ff" stroke="#1c5ba7" stroke-width="2"/><text x="198" y="553" class="body center bold" fill="#174a8b">T</text>
+<path d="M225 547 H265" class="arrow"/><rect x="267" y="520" width="63" height="56" rx="6" fill="#fff" stroke="#5b92d1"/><line x1="280" y1="561" x2="280" y2="540" class="blue"/><line x1="294" y1="561" x2="294" y2="532" class="blue"/><line x1="308" y1="561" x2="308" y2="545" class="blue"/><line x1="322" y1="561" x2="322" y2="525" class="blue"/>
+<text x="196" y="609" class="small center"><tspan>Teacher supplies token-level</tspan><tspan x="196" dy="17">probabilities or generated targets.</tspan></text>
+<path d="M196 630 V662" class="arrow"/><rect x="110" y="670" width="172" height="48" rx="8" fill="#eef6ff" stroke="#5b92d1"/><text x="196" y="690" class="small center"><tspan>Student learns to match</tspan><tspan x="196" dy="17">the teacher distribution.</tspan></text>
+<!-- reasoning -->
+<rect x="365" y="455" width="315" height="295" rx="12" fill="#f8fcf5" stroke="#9ec89e"/>
+<text x="522" y="482" class="cardTitle center" fill="#275d2f">(b) Reasoning Distillation</text><text x="522" y="500" class="tiny center">CoT / process supervision</text>
+<rect x="388" y="530" width="67" height="35" rx="7" fill="#fff" stroke="#69a36d"/><text x="421" y="552" class="small center">Prompt</text><path d="M455 547 H492" class="arrow"/>
+<circle cx="520" cy="547" r="27" fill="#edf8e9" stroke="#3f7d44" stroke-width="2"/><text x="520" y="553" class="body center bold" fill="#275d2f">T</text>
+<path d="M547 547 H585" class="arrow"/><rect x="587" y="516" width="74" height="105" rx="7" fill="#fff" stroke="#69a36d"/><text x="624" y="537" class="tiny center">Trace</text><text x="600" y="558" class="tiny">1. ...</text><text x="600" y="576" class="tiny">2. ...</text><text x="600" y="594" class="tiny">N. answer</text>
+<text x="522" y="646" class="small center"><tspan>Rationales, intermediate steps,</tspan><tspan x="522" dy="17">subgoals, or tool actions.</tspan></text>
+<path d="M522 672 V694" class="arrow"/><rect x="435" y="704" width="174" height="36" rx="8" fill="#eff8eb" stroke="#69a36d"/><text x="522" y="727" class="small center">Student learns a reasoning process.</text>
+<!-- preference -->
+<rect x="692" y="455" width="365" height="295" rx="12" fill="#fffaf0" stroke="#e7b866"/>
+<text x="874" y="482" class="cardTitle center" fill="#9a5a00">(c) Preference / Judge Distillation</text><text x="874" y="500" class="tiny center">ranking / scoring / rubric-based supervision</text>
+<rect x="833" y="517" width="82" height="31" rx="7" fill="#fff" stroke="#d39a39"/><text x="874" y="538" class="small center">Prompt</text>
+<path d="M874 548 V568" class="thin orange"/>
+<rect x="716" y="574" width="82" height="30" rx="6" fill="#fff" stroke="#d39a39"/><text x="757" y="594" class="small center">Candidate A</text><rect x="833" y="574" width="82" height="30" rx="6" fill="#fff" stroke="#d39a39"/><text x="874" y="594" class="small center">Candidate B</text><rect x="950" y="574" width="82" height="30" rx="6" fill="#fff" stroke="#d39a39"/><text x="991" y="594" class="small center">Candidate N</text>
+<path d="M757 604 V625 M874 604 V625 M991 604 V625" class="thin orange"/>
+<rect x="743" y="625" width="263" height="42" rx="7" fill="#fff7df" stroke="#d39a39"/><text x="874" y="643" class="small center bold">Teacher Judge</text><text x="874" y="659" class="tiny center">ranker / scorer / rule-based evaluator</text>
+<rect x="727" y="681" width="295" height="34" rx="7" fill="#fff" stroke="#d39a39"/><text x="874" y="703" class="small center">A &gt; B &gt; N · scores · pairwise preferences · critiques</text>
+<path d="M874 715 V727" class="arrow"/><text x="874" y="744" class="small center bold">Student learns the teacher's preference boundary.</text>
+<!-- hybrid -->
+<rect x="1069" y="455" width="298" height="295" rx="12" fill="#faf7ff" stroke="#b497d6"/>
+<text x="1218" y="482" class="cardTitle center" fill="#5a2b85">(d) Hybrid / Multi-signal</text><text x="1218" y="500" class="tiny center">multi-stage and multi-teacher pipelines</text>
+<circle cx="1118" cy="552" r="26" class="node"/><text x="1118" y="558" class="small center bold">T₁</text><circle cx="1218" cy="552" r="26" class="node"/><text x="1218" y="558" class="small center bold">T₂</text><circle cx="1318" cy="552" r="26" class="node"/><text x="1318" y="558" class="small center bold">Tₘ</text>
+<path d="M1144 552 H1190 M1244 552 H1290" class="arrow"/>
+<rect x="1100" y="607" width="236" height="54" rx="8" fill="#fff" stroke="#9d7ac5"/><text x="1218" y="629" class="small center bold"><tspan>Generator + reasoner + judge</tspan><tspan x="1218" dy="17">+ critic + filter</tspan></text>
+<path d="M1218 661 V692" class="arrow"/><rect x="1148" y="700" width="140" height="38" rx="8" fill="#f3ebff" stroke="#9d7ac5"/><text x="1218" y="724" class="small center bold">Student</text>
+
+<!-- ladder -->
+<rect x="1410" y="405" width="490" height="365" rx="14" fill="#fff" stroke="#1c5ba7" stroke-width="2"/>
+<rect x="1410" y="405" width="490" height="36" rx="14" class="panelTitle"/><text x="1655" y="430" class="head center white">Conclusion Ladder: What We Can Claim</text>
+<line x1="1470" y1="472" x2="1470" y2="720" class="ladder"/><line x1="1510" y1="472" x2="1510" y2="720" class="ladder"/>
+<line x1="1470" y1="500" x2="1510" y2="500" class="rung"/><line x1="1470" y1="548" x2="1510" y2="548" class="rung"/><line x1="1470" y1="596" x2="1510" y2="596" class="rung"/><line x1="1470" y1="644" x2="1510" y2="644" class="rung"/><line x1="1470" y1="692" x2="1510" y2="692" class="rung"/>
+<g class="small"><text x="1530" y="491" class="bold" fill="#9a3412">L1 Detection</text><text x="1530" y="509">Did distillation likely occur?</text><text x="1530" y="539" class="bold" fill="#9a3412">L2 Teacher Attribution</text><text x="1530" y="557">Which model supplied the signal?</text><text x="1530" y="587" class="bold" fill="#9a3412">L3 Role Attribution</text><text x="1530" y="605">Generator, judge, critic, filter, etc.</text><text x="1530" y="635" class="bold" fill="#9a3412">L4 Mixture Recovery</text><text x="1530" y="653">Relative contributions of multiple teachers.</text><text x="1530" y="683" class="bold" fill="#9a3412">L5 Provenance Reconstruction</text><text x="1530" y="701">Recover the pipeline and data flow.</text></g>
+<rect x="1530" y="724" width="340" height="30" rx="7" fill="#eef6ff" stroke="#8eb5e4"/><text x="1700" y="744" class="tiny center">Higher levels require stronger assumptions and more evidence.</text>
+
+<!-- bottom row -->
+<rect x="20" y="790" width="1880" height="236" rx="14" fill="#fff" stroke="#1c5ba7" stroke-width="2"/>
+<rect x="20" y="790" width="1880" height="36" rx="14" class="panelTitle"/><text x="960" y="815" class="head center white">Representative 2025–2026 Research Directions</text>
+<!-- five cards -->
+<g>
+<rect x="35" y="840" width="355" height="168" rx="10" fill="#f8fbff" stroke="#9dbfe7"/><text x="212" y="865" class="cardTitle center">1. Teacher Attribution (2025)</text><text x="212" y="884" class="tiny center">Who Taught You That? [1]</text><rect x="58" y="906" width="86" height="31" rx="6" fill="#fff" stroke="#5b92d1"/><text x="101" y="926" class="tiny center">Candidate T₁…Tₖ</text><path d="M144 922 H184" class="arrow"/><rect x="188" y="906" width="75" height="31" rx="6" fill="#fff" stroke="#5b92d1"/><text x="225" y="926" class="tiny center">Student S</text><path d="M263 922 H303" class="arrow"/><rect x="307" y="902" width="62" height="39" rx="6" fill="#eef6ff" stroke="#5b92d1"/><text x="338" y="917" class="tiny center"><tspan>teacher</tspan><tspan x="338" dy="14">classifier</tspan></text><text x="212" y="967" class="cardBody center"><tspan>Infer which black-box teacher left</tspan><tspan x="212" dy="16">lexical or syntactic footprints.</tspan></text>
+
+<rect x="405" y="840" width="355" height="168" rx="10" fill="#f8fbff" stroke="#9dbfe7"/><text x="582" y="865" class="cardTitle center">2. Provenance Testing (2025)</text><text x="582" y="884" class="tiny center">Model Provenance Testing [2]</text><rect x="428" y="905" width="90" height="35" rx="6" fill="#fff" stroke="#5b92d1"/><text x="473" y="927" class="tiny center">candidate models</text><rect x="548" y="905" width="70" height="35" rx="6" fill="#fff" stroke="#5b92d1"/><text x="583" y="927" class="tiny center">suspect S</text><path d="M518 922 H542 M618 922 H646" class="arrow"/><rect x="650" y="899" width="88" height="47" rx="6" fill="#eef6ff" stroke="#5b92d1"/><text x="694" y="916" class="tiny center"><tspan>multiple</tspan><tspan x="694" dy="14">hypothesis tests</tspan></text><text x="582" y="967" class="cardBody center"><tspan>Compare black-box behavioral similarity</tspan><tspan x="582" dy="16">against unrelated-model baselines.</tspan></text>
+
+<rect x="775" y="840" width="355" height="168" rx="10" fill="#f8fbff" stroke="#9dbfe7"/><text x="952" y="865" class="cardTitle center">3. Open-weight Detection (2025)</text><text x="952" y="884" class="tiny center">Knowledge Distillation Detection [3]</text><rect x="802" y="905" width="83" height="35" rx="6" fill="#fff" stroke="#5b92d1"/><text x="843" y="927" class="tiny center">teacher API</text><rect x="913" y="905" width="83" height="35" rx="6" fill="#fff" stroke="#5b92d1"/><text x="954" y="927" class="tiny center">student weights</text><path d="M885 922 H907 M996 922 H1020" class="arrow"/><rect x="1024" y="899" width="82" height="47" rx="6" fill="#eef6ff" stroke="#5b92d1"/><text x="1065" y="916" class="tiny center"><tspan>synthetic probes</tspan><tspan x="1065" dy="14">+ statistics</tspan></text><text x="952" y="967" class="cardBody center"><tspan>Combine generated probes with access</tspan><tspan x="952" dy="16">to the suspect model's parameters.</tspan></text>
+
+<rect x="1145" y="840" width="355" height="168" rx="10" fill="#f8fbff" stroke="#9dbfe7"/><text x="1322" y="865" class="cardTitle center">4. MoE Expert Signatures (2025)</text><text x="1322" y="884" class="tiny center">Detecting KD via Expert Signatures [4]</text><circle cx="1192" cy="922" r="18" class="node"/><circle cx="1240" cy="922" r="18" class="node"/><circle cx="1288" cy="922" r="18" class="node"/><path d="M1308 922 H1355" class="arrow"/><rect x="1360" y="902" width="112" height="40" rx="6" fill="#f3ebff" stroke="#9d7ac5"/><text x="1416" y="918" class="tiny center"><tspan>routing &amp; expert</tspan><tspan x="1416" dy="14">collaboration</tspan></text><text x="1322" y="967" class="cardBody center"><tspan>Use expert specialization and routing</tspan><tspan x="1322" dy="16">patterns as structural evidence.</tspan></text>
+
+<rect x="1515" y="840" width="370" height="168" rx="10" fill="#f8fbff" stroke="#9dbfe7"/><text x="1700" y="865" class="cardTitle center">5. Provenance Sets (2026)</text><text x="1700" y="884" class="tiny center">Provable Model Provenance Set [7]</text><rect x="1543" y="905" width="100" height="35" rx="6" fill="#fff" stroke="#5b92d1"/><text x="1593" y="927" class="tiny center">candidate pool</text><path d="M1643 922 H1680" class="arrow"/><rect x="1685" y="899" width="86" height="47" rx="6" fill="#eef6ff" stroke="#5b92d1"/><text x="1728" y="916" class="tiny center"><tspan>test and</tspan><tspan x="1728" dy="14">exclude</tspan></text><path d="M1771 922 H1800" class="arrow"/><rect x="1803" y="905" width="61" height="35" rx="6" fill="#f3ebff" stroke="#9d7ac5"/><text x="1833" y="927" class="tiny center">P(S)</text><text x="1700" y="967" class="cardBody center"><tspan>Return a controlled set of plausible</tspan><tspan x="1700" dy="16">sources instead of a forced winner.</tspan></text>
+</g>
+<text x="28" y="1060" class="caption">Source: created for the LLM Distillation &amp; Lineage Observatory (distill.lightrain.asia). Original conceptual illustration.</text>
+<text x="1890" y="1060" class="caption right">References [1], [2], [3], [4], and [7] correspond to the site's master bibliography.</text>
+</svg>
