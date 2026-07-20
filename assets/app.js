@@ -5,6 +5,15 @@ let language = localStorage.getItem("distill-observatory-language") || "en";
 
 const NAV_GROUPS = [
   {
+    title: "Next Paper",
+    pages: [
+      ["paper-problem.html", "Black-box Audit Problem"],
+      ["paper-method.html", "Method Candidates"],
+      ["paper-benchmark.html", "Benchmark & Experiments"],
+      ["paper-roadmap.html", "Paper Thesis & Roadmap"],
+    ],
+  },
+  {
     title: "Preliminary",
     pages: [
       ["preliminary.html", "Background & Definitions"],
@@ -58,7 +67,7 @@ const NAV_GROUPS = [
     pages: [
       ["repositories.html", "Repositories"],
       ["bibliography.html", "Master Bibliography"],
-      ["research-agenda.html", "Research Agenda"],
+      ["research-agenda.html", "Long-term Agenda"],
     ],
   },
 ];
@@ -93,6 +102,150 @@ const PAPER_FIGURES = {
 };
 
 const PAGE_CONFIG = {
+  "paper-problem": {
+    eyebrow: "Next Paper · Problem Formulation",
+    title: "Candidate-conditioned Black-box Distillation-Evidence Detection",
+    lead: "A paper-focused formulation for testing whether an API-only suspect exhibits candidate-specific behavioral evidence consistent with distillation after explicit non-distillation controls.",
+    callout: "Recommended primary task: candidate-wise distillation-evidence detection with calibrated three-state decisions. Unique teacher attribution is a controlled secondary summary; mechanism inference is auxiliary; full dependency-graph reconstruction remains future work.",
+    sections: [
+      {
+        title: "The single scientific question",
+        body: `<p>Let <em>S</em> be an API-only suspect model, <em>𝒯={T₁,…,Tₘ}</em> a finite candidate pool, <em>𝒞ᵢ</em> matched non-distillation controls for candidate <em>Tᵢ</em>, and <em>B</em> a query budget. For each candidate, test:</p><div class="equation">H<sub>0,i</sub>: S shows no more candidate-specific agreement with T<sub>i</sub> than matched controls; &nbsp; H<sub>1,i</sub>: the agreement exceeds that null. <span class="eq-label">(1)</span></div><div class="definition-box"><b>Candidate-conditioned black-box distillation-evidence detection</b>Return, for every candidate, a calibrated evidence score and one of three decisions: <em>evidence detected</em>, <em>no evidence detected at the preregistered effect size</em>, or <em>inconclusive</em> because the null, stability, or statistical power is inadequate.</div><p>The multi-candidate output is an <strong>evidence-supported candidate set</strong>, not a recovered teacher set and not causal provenance. Direct teacher tracing and provenance testing motivate candidate comparisons, while set-valued inference motivates multiplicity control; the paper's claim remains behavioral evidence rather than hidden training fact [[1,2,7]].</p>`
+      },
+      {
+        title: "A hierarchy of claims",
+        body: `<table class="matrix comparison-table"><thead><tr><th>Level</th><th>Question</th><th>Recommended role</th></tr></thead><tbody><tr><td>L1 · Candidate-conditioned evidence</td><td>Does S show excess candidate-specific evidence for Tᵢ relative to its matched null?</td><td><strong>Primary contribution</strong></td></tr><tr><td>L2 · Candidate summary</td><td>Which candidates have detected evidence after multiplicity correction?</td><td>Primary set-valued summary, not causal attribution</td></tr><tr><td>L3 · Unique attribution / teacher set</td><td>Can one or several true teachers be recovered?</td><td>Controlled closed-world auxiliary evaluation only</td></tr><tr><td>L4 · Mechanism / role</td><td>Which evidence channels are consistent with response, reasoning, preference, safety, or tool supervision?</td><td>Auxiliary profile under controlled ground truth</td></tr><tr><td>L5 · Dependency graph</td><td>What multi-stage directed graph generated the suspect?</td><td>Future work</td></tr></tbody></table><p>A single supported candidate does not prove that it was the causal teacher: unlisted sources, shared data, common teachers, or unmodeled post-training can remain. Each higher level requires stronger assumptions and separate evaluation [[9,59]].</p>`
+      },
+      {
+        title: "Threat model and access model",
+        body: `<p>The test-time method requires black-box outputs from the suspect and either live access to each candidate or a preregistered candidate-response archive collected under the same prompt protocol. Repeated sampling, token log-probabilities, or tool-call traces are optional access tiers; the core result must survive ordinary prediction APIs. The candidate pool may be incomplete.</p><p>White-box or open-weight models provide controlled training edges, minimum detectable effects, causal ablations, and stress tests. Their internal signals and pre-distillation checkpoints are never required by the final decision rule. Candidate-wise decisions must distinguish <em>no detected evidence</em> from <em>inconclusive</em>; failure to reject an underpowered or unstable null is not evidence of absence.</p>`
+      },
+      {
+        title: "Mechanism uncertainty",
+        body: `<p>A suspect may inherit different objects from a teacher: final responses, reasoning traces, pairwise preferences, critiques, safety decisions, or tool trajectories. Therefore one generic text-similarity score is unlikely to be uniformly diagnostic. The auditor should maintain a family of mechanism-conditioned evidence channels rather than assume one distillation objective.</p><p>The intended output is an evidence profile such as <em>response-consistent</em>, <em>preference-consistent</em>, or <em>reasoning-consistent</em>. On controlled students this profile can be evaluated against ground truth. On commercial APIs it must be reported as consistency evidence, not proof of a hidden training recipe.</p>`
+      },
+      {
+        title: "Confounders that define the paper",
+        body: `<p>The difficult negatives are not random independent models. They include models sharing a base checkpoint, tokenizer, public instruction corpus, common synthetic-data generator, third-party teacher, RLHF preference data, safety policy, architecture, or deployment wrapper. Capability convergence can also create common correct answers without any direct training edge.</p><p>Operational factors—system prompts, decoding temperature, routing among backend models, silent model updates, refusal wrappers, and API nondeterminism—must be modeled as nuisance variation. A credible paper is distinguished by its hard-negative design and abstention behavior, not by high similarity on easy model pairs.</p>`
+      },
+      {
+        title: "What commercial-API results may claim",
+        body: `<div class="claim-box"><b>Permitted conclusion</b>“Under a preregistered candidate pool, prompt protocol, matched-control null, effect size, and multiplicity correction, candidate-specific behavioral evidence for T was detected / not detected / remained inconclusive.”</div><div class="claim-box"><b>Not permitted without external ground truth</b>“T was the teacher,” “S was definitely distilled from or stole T,” “no distillation occurred,” “the exact mixture weight is x%,” or “the hidden training graph was reconstructed.”</div><p>Official disclosures may provide controlled observational cases, but provider telemetry and reporting remain separate evidence classes. Commercial API experiments validate the audit protocol's external behavior, not an unknown causal lineage [[45,47,49]].</p>`
+      },
+    ],
+    view: "research-agenda",
+  },
+  "paper-method": {
+    eyebrow: "Next Paper · Method Design",
+    title: "Mechanism-conditioned Distillation-Evidence Testing",
+    lead: "A candidate-wise black-box test built from mechanism-conditioned probes, matched non-distillation controls, and calibrated three-state decisions.",
+    callout: "Preferred design: separate probe discovery from held-out inference, normalize evidence against matched controls, correct across candidates, and return detected / not detected / inconclusive—not a causal teacher label.",
+    sections: [
+      {
+        title: "Candidate A · Mechanism-conditioned contrastive probing",
+        body: `<p>For each evidence family <em>r</em>, construct a discovery pool <em>𝒳ᵣ</em> where candidates make stable but different decisions. Probe families include final-answer disagreements, rare errors, reasoning-subgoal order, pairwise preference boundaries, safety thresholds, critique categories, and tool-choice trajectories.</p><p>For candidate <em>Tᵢ</em>, compute a control-normalized statistic on an independent inference set:</p><div class="equation">Δ<sub>i,r</sub> = sim<sub>r</sub>(S,T<sub>i</sub>) − E<sub>C∼𝒞<sub>i</sub></sub>[sim<sub>r</sub>(C,T<sub>i</sub>)]. <span class="eq-label">(2)</span></div><p>The controls should match capability, base family, public-data exposure, or alignment policy where possible. The statistic asks whether S–Tᵢ agreement exceeds the declared non-distillation null; it does not prove the training edge. Candidate disagreements are more informative than common correct answers [[1,2,14,15]].</p>`
+      },
+      {
+        title: "Adaptive query selection",
+        body: `<p>Split prompts and semantic templates into a <strong>probe-discovery set</strong> and a disjoint <strong>inference set</strong>, or use cross-fitting. Candidate disagreement and stability may select templates on the discovery split, but significance testing must use held-out instances or valid selective inference.</p><div class="equation">x* = arg max<sub>x∈𝒳<sub>discover</sub></sub> [ Disagree<sub>𝒯</sub>(x) · Stability(x) · (1 − Consensus<sub>𝒞</sub>(x)) ]. <span class="eq-label">(3)</span></div><p>Without this separation, adaptive prompt search overfits the same candidate outputs later used for testing. Compare against random, uncertainty-only, and semantic-diversity selection at equal discovery and inference budgets.</p>`
+      },
+      {
+        title: "Candidate-wise decisions and evidence-supported sets",
+        body: `<p>For every candidate, test <em>H</em><sub>0,i</sub> using dependence-aware resampling and family-wise-error or false-discovery control across candidates. Return a per-candidate score, adjusted significance value, stability diagnostic, and decision:</p><div class="equation">d<sub>i</sub> ∈ { detected, not-detected, inconclusive }, &nbsp; Ê<sub>α</sub>(S) = {T<sub>i</sub> : d<sub>i</sub>=detected}. <span class="eq-label">(4)</span></div><p><em>Ê</em><sub>α</sub> is an evidence-supported candidate set, not a provenance set. “Not detected” requires a preregistered minimum effect and adequate null stability; otherwise the result is “inconclusive.” On controlled lineages, unique-candidate and teacher-set metrics may be reported as secondary evaluation [[2,7]].</p>`
+      },
+      {
+        title: "Mechanism evidence profile",
+        body: `<p>Aggregate standardized residuals by evidence family to obtain a role profile <em>ρ(S,Tᵢ)</em>. For example, strong preference-boundary inheritance with weak free-generation similarity is consistent with judge-mediated supervision; stable reasoning-subgoal alignment with paraphrase-robust final answers is consistent with process supervision.</p><p>Mechanism classification is auxiliary. The primary test asks whether candidate-conditioned evidence is detected. The profile is validated against controlled training mechanisms and used on commercial APIs only as an explanatory decomposition, never as proof of the hidden recipe.</p>`
+      },
+      {
+        title: "Candidate B · Reference-normalized development diagnostic",
+        body: `<p>When an open-weight student and a pre-distillation or base checkpoint are available, measure the change induced during the suspected distillation stage:</p><div class="equation">R<sub>i,r</sub> = [sim<sub>r</sub>(S,T<sub>i</sub>) − sim<sub>r</sub>(S<sub>0</sub>,T<sub>i</sub>)]. <span class="eq-label">(4)</span></div><p>This design can validate whether mechanism-conditioned signatures respond causally to a known training edge and can diagnose shared-base confounding [[3,6]]. It is a development instrument and ablation baseline—not the final commercial-API requirement.</p>`
+      },
+      {
+        title: "Candidate C · Pairwise causal probe transformations",
+        body: `<p>For each informative prompt, generate controlled variants that preserve the task while changing wording, answer order, reasoning visibility, safety framing, or tool availability. A true inherited decision boundary should remain more stable across these interventions than superficial format imitation.</p><p>This extension is potentially novel but expensive. It should be introduced only after Candidate A establishes reliable evidence detection; otherwise the paper combines probe generation, causal invariance, mechanism inference, and hypothesis testing without a clear primary result.</p>`
+      },
+      {
+        title: "Novelty gate",
+        body: `<p>Existing work already provides black-box similarity tests, active fingerprints, teacher tracing, multiple-hypothesis provenance testing, and set-valued source inference [[1,2,7,14,15]]. The paper is novel only if the combination of <strong>mechanism-conditioned held-out probes</strong>, <strong>hard-negative matched residuals</strong>, and <strong>three-state candidate-wise decisions</strong> materially improves calibration, power, or query efficiency over those baselines.</p><div class="notice">If a generic provenance-testing score with random prompts matches the proposed method under shared-base, shared-data, and common-third-teacher controls, the method contribution is not sufficient.</div>`
+      },
+      {
+        title: "Recommended method boundary",
+        body: `<div class="survey-note"><b>Paper core</b>Candidate A with held-out adaptive probes, matched controls, multiplicity-corrected candidate tests, and detected / not-detected / inconclusive outputs.</div><div class="survey-note"><b>Controlled auxiliary result</b>Unique-candidate identification, two-teacher mixtures, and coarse mechanism evidence profiles.</div><div class="survey-note"><b>Ablation / validation</b>Candidate B on open-weight base and student checkpoints.</div><div class="survey-note"><b>Future extension</b>Causal teacher claims, unrestricted multi-stage graph reconstruction, and precise mixture-weight estimation.</div>`
+      },
+    ],
+    view: "research-agenda",
+  },
+  "paper-benchmark": {
+    eyebrow: "Next Paper · Benchmark",
+    title: "Benchmark and Experimental Protocol",
+    lead: "A three-layer evaluation separating controlled causal ground truth, simulated black-box access, and observational commercial-API evidence.",
+    callout: "The benchmark must make shared bases, shared data, common third teachers, and API instability first-class test conditions—not post-hoc caveats.",
+    sections: [
+      {
+        title: "Layer 1 · Controlled open-weight lineage",
+        body: `<p>Construct students with known edges while exposing only black-box outputs to the proposed method. Vary candidate identity and supervision mechanism: response/instruction, reasoning/process, preference/judge, safety/filtering, and optionally tool trajectories. Include single-teacher students first, then limited two-teacher students with role separation.</p><p>White-box training logs and checkpoints provide ground truth for evaluation and ablation. They are not method inputs. This layer answers whether the black-box evidence statistic responds to the causal training edge rather than merely to family similarity.</p>`
+      },
+      {
+        title: "Hard-negative matrix",
+        body: `<table class="matrix"><thead><tr><th>Negative type</th><th>Why it is difficult</th><th>Required control</th></tr></thead><tbody><tr><td>Shared base checkpoint</td><td>Inherited behavior exists without candidate-teacher distillation</td><td>Sibling students and base-normalized ablation</td></tr><tr><td>Shared public data</td><td>Models learn the same examples independently</td><td>Matched-data independent training</td></tr><tr><td>Common third teacher</td><td>Both models inherit correlated behavior</td><td>Candidate pool with the third teacher present/absent</td></tr><tr><td>Capability convergence</td><td>Strong models agree on easy correct answers</td><td>Disagreement and rare-error probes</td></tr><tr><td>Preference/safety convergence</td><td>Similar alignment policies mimic judge inheritance</td><td>Boundary-focused and policy-matched controls</td></tr><tr><td>Fine-tuning / merging / compression</td><td>Other lineage edges can resemble distillation</td><td>Typed derivative baselines</td></tr></tbody></table>`
+      },
+      {
+        title: "Layer 2 · Simulated API access",
+        body: `<p>Freeze the trained models and expose them through an API wrapper. Test deterministic and stochastic decoding, hidden system prompts, response truncation, repeated sampling, optional top-k log-probabilities, and routing among model versions. The method should be evaluated under the exact information available to real auditors.</p><p>Run query-budget curves and report performance at fixed budgets rather than only asymptotic accuracy. Measure how often repeated sampling or log-probabilities materially change the conclusion.</p>`
+      },
+      {
+        title: "Layer 3 · Real commercial APIs",
+        body: `<p>Use publicly disclosed distillation relationships when an API endpoint and relevant candidate models are available. Otherwise present observational case studies with preregistered candidate pools and controls. A real-API table should report evidence profiles, stability across dates and prompts, query cost, and whether the method abstains.</p><p>Commercial case studies are external-validity demonstrations, not the main ground-truth benchmark. No accusation should be made from model behavior alone.</p>`
+      },
+      {
+        title: "Metrics",
+        body: `<p><strong>Primary candidate-wise testing:</strong> TPR at fixed FPR, family-wise error or FDR across candidates, calibrated effect estimates, minimum-detectable-effect power, and inconclusive rate. <strong>Evidence-supported set:</strong> false inclusion, size, and controlled-lineage recall. <strong>Unique attribution:</strong> top-1/top-k accuracy only as a secondary closed-world metric. <strong>Mechanism evidence:</strong> macro-F1 and calibration on controlled students only. <strong>Efficiency:</strong> discovery and inference queries required for a fixed error/power target.</p><p>Every result is stratified by hard-negative type, mechanism, candidate-pool size, candidate-absent condition, access tier, and query budget.</p>`
+      },
+      {
+        title: "Core experiment matrix",
+        body: `<table class="matrix"><thead><tr><th>Axis</th><th>Required values</th></tr></thead><tbody><tr><td>Training relation</td><td>none, single teacher, limited two-teacher</td></tr><tr><td>Mechanism</td><td>response, reasoning, preference; safety/tool as extensions</td></tr><tr><td>Candidate pool</td><td>2, 5, 10+, true teacher absent</td></tr><tr><td>Controls</td><td>random, capability-matched, shared-base, shared-data, common-third-teacher</td></tr><tr><td>Selection protocol</td><td>random, adaptive with held-out inference, cross-fitted</td></tr><tr><td>Access</td><td>one output, repeated outputs, optional logprobs</td></tr><tr><td>Post-processing</td><td>continued SFT, paraphrasing, quantization, merging where applicable</td></tr><tr><td>Budget</td><td>separate fixed discovery and inference budgets</td></tr></tbody></table>`
+      },
+      {
+        title: "Negative-result rules",
+        body: `<div class="notice">If matched controls erase candidate-specific evidence, report no detected excess evidence; do not convert raw similarity into a distillation claim.</div><div class="notice">If the null is unstable, power is below the preregistered minimum, or the held-out effect is inconsistent, return inconclusive rather than no evidence.</div><div class="notice">If several candidates are detected, report the evidence-supported set; do not select a highest-score teacher.</div><div class="notice">If mechanism evidence does not survive held-out transformations, do not claim mechanism consistency.</div><div class="notice">If commercial API results change across dates or wrappers, report version sensitivity and treat the endpoint as a moving target.</div>`
+      },
+    ],
+    view: "research-agenda",
+  },
+  "paper-roadmap": {
+    eyebrow: "Next Paper · Thesis and Roadmap",
+    title: "Recommended Paper Thesis and Execution Plan",
+    lead: "A scoped candidate-conditioned evidence-detection paper with held-out probes, matched controls, calibrated decisions, and commercial-API case studies.",
+    callout: "Do not frame behavioral evidence as causal teacher attribution. First establish calibrated candidate-wise detection under hard negatives; unique attribution and multi-teacher recovery remain controlled secondary analyses.",
+    sections: [
+      {
+        title: "Recommended thesis",
+        body: `<div class="definition-box"><b>Thesis</b>Candidate-specific behavioral evidence consistent with distillation can be detected in black-box APIs when probe discovery is separated from held-out inference, evidence is normalized against explicit non-distillation controls, and each candidate receives a calibrated detected / not-detected / inconclusive decision.</div><p>A defensible title-style framing is <em>Candidate-Conditioned Black-box Distillation-Evidence Detection for Language Model APIs</em>. Titles implying verified provenance or “who taught” should be reserved for controlled-lineage experiments.</p>`
+      },
+      {
+        title: "Contribution structure",
+        body: `<ol><li><strong>Problem formulation.</strong> Candidate-conditioned black-box distillation-evidence detection, with three-state decisions and a claim ladder separating evidence from attribution and graph recovery.</li><li><strong>Method.</strong> Mechanism-conditioned probe discovery, held-out inference, and capability/family/data-matched control residuals.</li><li><strong>Inference.</strong> Multiplicity-corrected candidate-wise tests and an evidence-supported candidate set, with explicit no-detection and inconclusive outcomes.</li><li><strong>Evaluation.</strong> Controlled lineage ground truth, hard negatives, simulated APIs, and terms-compliant commercial observational cases.</li></ol>`
+      },
+      {
+        title: "Suggested paper outline",
+        body: `<div class="steps"><div class="step"><strong>Introduction.</strong> Commercial models expose outputs but hide training dependencies; behavioral similarity cannot establish causal provenance.</div><div class="step"><strong>Problem and threat model.</strong> Candidate-conditioned nulls, matched controls, query budgets, three-state decisions, and claim hierarchy.</div><div class="step"><strong>Method.</strong> Mechanism probe families, discovery/inference separation, residual evidence, and multiplicity correction.</div><div class="step"><strong>Controlled benchmark.</strong> Known training relations, candidate-absent cases, and hard negatives.</div><div class="step"><strong>Results.</strong> Candidate-wise detection, error control, power, inconclusive decisions, query efficiency, and auxiliary identification/mechanism results.</div><div class="step"><strong>Commercial API case studies.</strong> Observational evidence with explicit claim limits.</div></div>`
+      },
+      {
+        title: "Staged execution plan",
+        body: `<table class="matrix"><thead><tr><th>Stage</th><th>Deliverable</th><th>Decision</th></tr></thead><tbody><tr><td>P0 · Signal audit</td><td>Test disagreement, rare-error, preference, and reasoning signals on known single-teacher students</td><td>Continue only if at least one channel beats shared-base and capability-matched controls</td></tr><tr><td>P1 · Evidence-test core</td><td>Held-out adaptive probes + matched residual test + three-state decisions</td><td>Require calibrated error and power across families and mechanisms</td></tr><tr><td>P2 · Hard negatives</td><td>Shared data, third teacher, sibling checkpoints, alternative derivatives</td><td>Reject the thesis if evidence collapses to family similarity</td></tr><tr><td>P3 · Limited teacher sets</td><td>Two-teacher students with distinct roles</td><td>Keep as auxiliary unless coverage and set size are reliable</td></tr><tr><td>P4 · API simulation</td><td>Decoding, wrappers, nondeterminism, query budgets</td><td>Core method must remain output-only</td></tr><tr><td>P5 · Commercial cases</td><td>Disclosed positives and observational unknowns</td><td>Report evidence and abstention, not hidden ground truth</td></tr></tbody></table>`
+      },
+      {
+        title: "Go / no-go criteria",
+        body: `<div class="property-grid"><div class="property-card"><b>GO</b>Candidate-wise tests control false positives and retain power against shared-base, capability-matched, shared-data, and common-third-teacher controls; inconclusive cases are calibrated; query budgets are practical.</div><div class="property-card"><b>CONDITIONAL GO</b>Candidate-conditioned evidence detection works, but unique identification, teacher sets, or mechanism profiles are weak. Publish the narrower evidence-detection paper.</div><div class="property-card"><b>NO-GO</b>Performance is driven by family, benchmark accuracy, style, or public-data overlap; held-out effects vanish; the method requires student weights; or null calibration is unstable.</div><div class="property-card"><b>CLAIM DOWNGRADE</b>Commercial cases show candidate-specific consistency without causal ground truth. Report only observational evidence decisions.</div></div>`
+      },
+      {
+        title: "How the observatory should support the paper",
+        body: `<p>The four “Next Paper” pages are the entry point. Existing taxonomy pages remain supporting background. Direct detection and output-only auditing should link to the primary evidence-test formulation; teacher attribution and multi-teacher recovery should be labeled controlled secondary tasks; confounders, benchmarks, and disclosures support the null and external-validity design.</p><p>White-box distillation and internal-signal auditing remain useful, but should be labeled <em>controlled development evidence</em>. Attacks, defenses, repositories, and industry reports should be demoted to reference material unless they directly change the threat model, probe design, or evaluation protocol.</p>`
+      },
+    ],
+    view: "research-agenda",
+  },
   home: {
     eyebrow: "Research map · mechanism-first taxonomy",
     title: "LLM Distillation & Lineage Observatory",
@@ -100,10 +253,14 @@ const PAGE_CONFIG = {
     callout: "The organizing axis is the transferred knowledge signal—not whether a source is open, closed, academic, or commercial. Access level, model availability, evidence grade, and code availability are treated as orthogonal attributes.",
     stats: [
       ["63", "curated papers, tools, disclosures, and reports"],
-      ["7", "research stages from preliminary concepts to evaluation"],
+      ["4", "paper-facing workspaces from problem to execution"],
       ["5", "evidence grades separating disclosure from allegation"],
     ],
     sections: [
+      {
+        title: "Next-paper workspace",
+        body: `<div class="framework-grid"><a class="framework-card paper-card" href="paper-problem.html"><b>1. Black-box Audit Problem</b><span>Define candidate-conditioned evidence detection and defensible commercial-API claims.</span></a><a class="framework-card paper-card" href="paper-method.html"><b>2. Method Candidates</b><span>Held-out mechanism probes, matched-control residuals, and calibrated three-state tests.</span></a><a class="framework-card paper-card" href="paper-benchmark.html"><b>3. Benchmark & Experiments</b><span>Controlled lineages, hard negatives, simulated APIs, and observational commercial cases.</span></a><a class="framework-card paper-card" href="paper-roadmap.html"><b>4. Thesis & Roadmap</b><span>Contribution boundary, staged execution, negative-result rules, and go/no-go criteria.</span></a></div>`,
+      },
       {
         title: "Mechanism-first research map",
         body: `<div class="framework-grid">
@@ -112,7 +269,7 @@ const PAGE_CONFIG = {
           <a class="framework-card" href="unauthorized-distillation.html"><b>3. Attacks & Defenses</b><span>How capabilities are harvested, protected, laundered, or removed.</span></a>
           <a class="framework-card" href="benchmarks.html"><b>4. Evaluation</b><span>How to measure detection, attribution, calibration, robustness, and false accusation.</span></a>
           <a class="framework-card" href="model-family-compression.html"><b>5. Real-world Pipelines</b><span>Documented model-family, response, reasoning, and production distillation.</span></a>
-          <a class="framework-card" href="research-agenda.html"><b>6. Research Agenda</b><span>Multi-teacher, multi-role, access-adaptive lineage auditing.</span></a>
+          <a class="framework-card" href="research-agenda.html"><b>6. Long-term Agenda</b><span>Multi-teacher, multi-role, and multi-stage reconstruction after the first evidence-detection paper.</span></a>
         </div>`,
       },
       {
@@ -125,7 +282,7 @@ const PAGE_CONFIG = {
       },
       {
         title: "Recommended reading path",
-        body: `<ol class="reading-path"><li>Start with <a href="preliminary.html">Background & Definitions</a>.</li><li>Read the three <a href="white-box-distillation.html">Distillation Methods</a> pages.</li><li>Move to <a href="output-only-auditing.html">Distillation Auditing</a>.</li><li>Use <a href="benchmarks.html">Evaluation</a> to judge evidence quality.</li><li>End with the <a href="research-agenda.html">Research Agenda</a>.</li></ol>`,
+        body: `<ol class="reading-path"><li>For the next-paper direction, begin with <a href="paper-problem.html">Black-box Audit Problem</a> and follow the four-page workspace.</li><li>Use <a href="preliminary.html">Background & Definitions</a> for terminology.</li><li>Read <a href="black-box-distillation.html">Black-box Distillation</a> and <a href="output-only-auditing.html">Output-only Auditing</a> as the primary literature path.</li><li>Use <a href="confounders-robustness.html">Confounders & Robustness</a> and <a href="benchmarks.html">Benchmarks</a> to judge feasibility.</li><li>Treat the <a href="research-agenda.html">Long-term Agenda</a> as follow-up work beyond the first paper.</li></ol>`,
       },
     ],
   },
@@ -499,16 +656,16 @@ const PAGE_CONFIG = {
     view: "all",
   },
   "research-agenda": {
-    eyebrow: "Resources",
-    title: "Research Agenda",
-    lead: "The strongest open problem is access-adaptive, evidence-calibrated recovery of multi-teacher, multi-role, multi-stage model dependencies.",
-    callout: "Proposed direction: DistillGraph — recover a teacher set, role assignment, evidence channel, confidence level, and explicit abstention under output-only through weight-level access.",
+    eyebrow: "Resources · Longer-term Direction",
+    title: "Long-term Research Agenda",
+    lead: "Structured multi-teacher, multi-role, and multi-stage dependency recovery is a longer-term direction built on reliable candidate-conditioned evidence tests.",
+    callout: "First establish the scoped paper in the Next Paper workspace. DistillGraph becomes a follow-up program only after candidate-wise tests control error and power under hard negatives, missing candidates, and API-only evaluation.",
     sections: [
-      { title: "Research gaps", body: "Current methods often assume one teacher, one final distillation stage, a known reference checkpoint, or one evidence channel. Industrial pipelines violate all four assumptions." },
-      { title: "Proposed problem", body: "Given a suspect model, candidate teachers, optional reference checkpoints, and an access budget, infer whether distillation occurred, which teachers contributed, what roles they played, and when the evidence is insufficient." },
-      { title: "DistillGraph framework", body: `<div class="steps"><div class="step"><strong>Disagreement probe selection.</strong> Find inputs where candidate teachers separate in decisions, preferences, critiques, or tool policies.</div><div class="step"><strong>Role-conditioned signatures.</strong> Build generator, reasoner, judge, critic, safety, and tool evidence.</div><div class="step"><strong>Access-adaptive escalation.</strong> Add logits, representations, routing, and weight trajectories as access increases.</div><div class="step"><strong>Open-world inference.</strong> Return a calibrated teacher set or abstain.</div></div>` },
-      { title: "Benchmark design", body: "Construct single- and multi-teacher students, role-specialized pipelines, multi-stage laundering, hard negatives, disclosed real models, and commercial observational cases." },
-      { title: "Experimental roadmap", body: "Begin with two teachers and three roles on open-weight models, validate against publicly disclosed distilled families, then add output-only commercial APIs under low-query and terms-compliant protocols." },
+      { title: "What remains after the first paper", body: "The first paper targets candidate-conditioned black-box distillation-evidence detection. Remaining questions include causal teacher identification, larger teacher sets, role separation, influence estimation, repeated distillation, missing intermediate models, and multi-stage laundering." },
+      { title: "Future structured problem", body: "Given a suspect, candidate and unknown teachers, optional reference checkpoints, and heterogeneous access budgets, recover a typed dependency structure with uncertainty. This problem is strictly harder than candidate attribution and should not be claimed from the same evidence." },
+      { title: "DistillGraph as a follow-up framework", body: `<div class="steps"><div class="step"><strong>Start from calibrated candidate tests.</strong> Use the first paper's evidence-detection decisions as an edge-screening primitive, not as proven edges.</div><div class="step"><strong>Add role-conditioned signatures.</strong> Separate generator, reasoner, judge, critic, safety, and tool evidence only where controlled ground truth exists.</div><div class="step"><strong>Escalate access when available.</strong> Add logits, references, representations, routing, and weights as optional corroboration rather than core requirements.</div><div class="step"><strong>Return uncertain graphs.</strong> Preserve unknown-source nodes, alternative edges, and explicit abstention.</div></div>` },
+      { title: "Future benchmark expansion", body: "After single-teacher attribution is stable, extend controlled benchmarks to role-specialized two-teacher pipelines, repeated distillation, missing intermediate nodes, laundering, and larger incomplete candidate pools." },
+      { title: "Dependency on the first paper", body: "Do not start graph reconstruction unless the output-only evidence tests control false positives and power under shared bases, shared data, common third teachers, API nondeterminism, and absent candidates. Failure at that stage is a no-go for DistillGraph." },
     ],
     view: "research-agenda",
   },
@@ -728,7 +885,14 @@ function validateSiteData() {
     if (!SITE_CONTENT.summaryZh?.[record.id]) errors.push(`Missing Chinese summary: ${record.id}`);
   });
   Object.keys(PAGE_CONFIG).forEach((key) => {
-    if (!SITE_CONTENT.zhPages?.[key]) errors.push(`Missing Chinese page: ${key}`);
+    const enSections = PAGE_CONFIG[key]?.sections || [];
+    const zhPage = SITE_CONTENT.zhPages?.[key];
+    const zhSections = zhPage?.sections || [];
+    const refRows = SITE_CONTENT.sectionRefs?.[key] || [];
+    if (!zhPage) errors.push(`Missing Chinese page: ${key}`);
+    if (zhPage && zhSections.length !== enSections.length) errors.push(`Bilingual section-count mismatch for ${key}: ${enSections.length} EN vs ${zhSections.length} ZH`);
+    if (refRows.length !== enSections.length) errors.push(`Citation-row mismatch for ${key}: ${refRows.length} rows vs ${enSections.length} sections`);
+    if (!SITE_CONTENT.pageDetails?.[key]?.en || !SITE_CONTENT.pageDetails?.[key]?.zh) errors.push(`Missing bilingual page details: ${key}`);
   });
   const checkRef = (value, context) => {
     if (!Number.isInteger(value) || value < 1 || value > DATA.length) errors.push(`Invalid reference ${value} in ${context}`);

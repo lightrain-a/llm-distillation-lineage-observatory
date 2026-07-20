@@ -54,6 +54,11 @@ export const SITE_CONTENT = {
     },
   },
   navZh: {
+    "Next Paper": "下一篇论文",
+    "Black-box Audit Problem": "黑盒审计问题",
+    "Method Candidates": "方法候选",
+    "Benchmark & Experiments": "基准与实验",
+    "Paper Thesis & Roadmap": "论文主张与路线",
     "Preliminary": "基础概念",
     "Distillation Methods": "蒸馏方法",
     "Distillation Auditing": "蒸馏审计",
@@ -83,8 +88,13 @@ export const SITE_CONTENT = {
     "Repositories": "代码仓库",
     "Master Bibliography": "参考文献总表",
     "Research Agenda": "研究议程",
+    "Long-term Agenda": "长期研究议程",
   },
   sectionRefs: {
+    "paper-problem": [[1,2,7],[1,2,7,9,59],[2,3,6],[36,38,39,44,47,49,56],[7,9,14,15,16,33],[45,47,49,59]],
+    "paper-method": [[1,2,14,15],[1,2,15],[2,7],[38,39,44,47,49,56],[3,6],[1,2,15],[1,2,7,14,15],[2,3,6,7]],
+    "paper-benchmark": [[3,6,36,38,39,44,47],[7,9,16,33,59],[2,14,15],[45,47,49],[2,7,16],[2,3,6,7,9,16],[7,9,16,33]],
+    "paper-roadmap": [[1,2,7,14,15],[1,2,7],[2,3,6,7,9],[3,6,7,9,16],[7,9,16,33,45,47,49],[1,2,3,6,7,9]],
     preliminary: [[60,61,62,63,36,38,40,41,44],[60,62,63,36,37,38,39,42,44,45,46,47,49,56],[29,30,31,32,33,44,9,59],[60,61,62,63,36,37,38,40,41,42,44,45,47,56],[7,9,54,59],[2,3,4,6,7,8,10,11,12,14,15,49,59]],
     taxonomy: [[40,38,44,56],[41,38,54],[2,3,6,8],[44,45,46,47],[47,48,49,53],[9,16,59]],
     "white-box-distillation": [[40,41,45],[42,43,11],[10,12,13],[4],[42,45]],
@@ -107,9 +117,25 @@ export const SITE_CONTENT = {
     repositories: [[3,9,10,12,13,14,16,19,40,56]],
     bibliography: [[17,18,28,54,55]],
     "research-agenda": [[1,3,6,7,9],[1,6,7],[1,4,6,7,9],[16,44,45],[44,47,57,58]],
-    home: [[40,41,54],[2,3,6,7,9],[16,17,54]],
+    home: [[],[40,41,54],[2,3,6,7,9],[16,17,54]],
   },
   pageDetails: {
+    "paper-problem": {
+      en: { overview: "The paper-facing task is candidate-conditioned black-box distillation-evidence detection. For each candidate, it tests whether suspect–candidate agreement exceeds a preregistered matched-control null, returning detected, not detected at a specified effect size, or inconclusive. A multi-candidate evidence-supported set is a summary of tests, not causal provenance.", terms: ["candidate-conditioned test", "matched-control null", "minimum detectable effect", "evidence-supported candidate set", "mechanism uncertainty", "inconclusive decision"], questions: ["Which candidate-specific behavior survives matched controls and held-out testing?", "When is a non-rejection informative versus underpowered?", "What claim level is justified on commercial APIs?"] },
+      zh: { overview: "面向论文的核心任务是“候选条件黑盒蒸馏证据检测”。对每个候选模型，检验待审计模型与候选的一致性是否显著超过预注册的匹配控制零分布，并返回“检测到证据”“在指定效应量下未检测到证据”或“结论不充分”。多候选证据集合只是多个检验的摘要，不是因果来源证明。", terms: ["候选条件检验", "匹配控制零假设", "最小可检测效应", "证据支持候选集合", "机制不确定性", "结论不充分"], questions: ["哪些候选特异行为能通过匹配控制和留出检验？", "何时未拒绝零假设具有信息，何时只是功效不足？", "商业 API 上允许支持到哪一级结论？"] },
+    },
+    "paper-method": {
+      en: { overview: "The recommended method separates mechanism-conditioned probe discovery from held-out inference, normalizes suspect–candidate evidence against matched non-distillation controls, and produces multiplicity-corrected three-state decisions. Mechanism channels guide where to test; they do not convert behavioral evidence into a causal teacher label.", terms: ["disagreement probe", "held-out inference", "matched-control residual", "minimum detectable effect", "multiple testing", "three-state decision"], questions: ["Which probe family yields candidate-specific excess evidence?", "How should dependent channels be tested without selection bias?", "When should the method return inconclusive?"] },
+      zh: { overview: "推荐方法将机制条件探针发现与独立留出检验分开，把待审计模型—候选模型证据相对于匹配的非蒸馏控制进行归一化，并输出经过多重比较校正的三态结论。机制通道决定在哪里检验，但不能把行为证据自动转化为因果教师标签。", terms: ["分歧探针", "留出检验", "匹配控制残差", "最小可检测效应", "多重检验", "三态结论"], questions: ["哪类探针产生候选特异的超额证据？", "相关通道如何在避免选择偏差的条件下检验？", "方法何时应返回结论不充分？"] },
+    },
+    "paper-benchmark": {
+      en: { overview: "The benchmark must separate causal ground truth from observational deployment evidence. Controlled open-weight lineages establish whether the black-box statistic responds to known training edges; simulated APIs test realistic observation limits; commercial APIs provide external-validity case studies without unverifiable ground-truth claims.", terms: ["controlled lineage", "hard negative", "simulated API", "missing-teacher split", "query-budget curve", "observational case study"], questions: ["Do shared-base and common-third-teacher negatives break the method?", "How does attribution scale with candidate-pool size and budget?", "Which commercial cases have defensible ground truth?"] },
+      zh: { overview: "基准必须把因果真实关系与部署环境中的观察性证据分开。受控开源谱系用于检验黑盒统计量是否真正响应已知训练边；模拟 API 用于复现现实观测限制；商业 API 只承担外部有效性案例，不支持无法验证的隐藏谱系结论。", terms: ["受控谱系", "困难负样本", "模拟 API", "缺失教师划分", "查询预算曲线", "观察性案例"], questions: ["共享基础模型与共同第三教师会不会使方法失效？", "候选池和查询预算增大时归因性能如何变化？", "哪些商业案例具有可辩护的真实关系？"] },
+    },
+    "paper-roadmap": {
+      en: { overview: "The first paper should establish reliable candidate-conditioned black-box evidence detection with controlled false positives, adequate power, and explicit inconclusive outcomes. Unique candidate identification, limited two-teacher recovery, and coarse mechanism evidence are auxiliary; causal teacher claims and graph reconstruction remain future work.", terms: ["paper thesis", "candidate-wise evidence test", "controlled auxiliary task", "negative-result rule", "go/no-go criterion", "claim downgrade"], questions: ["What minimum evidence-test result is publishable?", "Which failure invalidates the thesis rather than one component?", "How should commercial evidence be reported without causal overclaiming?"] },
+      zh: { overview: "第一篇论文应先建立可靠的候选条件黑盒证据检测，并控制误报、保证检验功效、明确输出结论不充分。唯一候选识别、受限双教师恢复和粗粒度机制证据属于辅助任务；因果教师声明和依赖图重建留作未来工作。", terms: ["论文主张", "逐候选证据检验", "受控辅助任务", "负结果规则", "继续/停止标准", "结论降级"], questions: ["什么最低证据检验结果足以投稿？", "哪些失败会推翻整体主张，而不仅是某个模块？", "商业 API 证据应如何避免因果过度结论？"] },
+    },
     home: {
       en: { overview: "The observatory separates three questions that are often conflated: how knowledge is transferred during training, how a released model can be audited, and what strength of evidence supports a real-world lineage claim. The site therefore uses the transferred supervision signal as the primary taxonomy and treats model openness, auditor access, and evidence grade as orthogonal metadata.", terms: ["knowledge distillation (KD)", "teacher–student edge", "knowledge signal", "model provenance", "open-set attribution"], questions: ["Which supervision signal was transferred?", "What alternative lineage mechanisms explain the same similarity?", "What evidence justifies detection, attribution, or abstention?"] },
       zh: { overview: "本网站将三个经常被混用的问题分开：训练阶段究竟传递了什么知识、模型发布后如何开展审计，以及现实模型谱系结论由何种强度的证据支持。因此，网站以“被传递的监督信号”为主分类轴，把模型开放性、审计访问权限和证据等级作为正交属性。", terms: ["知识蒸馏（knowledge distillation, KD）", "教师—学生关系（teacher–student edge）", "知识信号（knowledge signal）", "模型来源（model provenance）", "开放集归因（open-set attribution）"], questions: ["训练中传递了哪一种监督信号？", "哪些替代谱系机制也能解释观察到的相似性？", "现有证据足以支持检测、归因，还是应当拒绝判断？"] },
@@ -199,21 +225,75 @@ export const SITE_CONTENT = {
       zh: { overview: "参考文献总表是全站编号的唯一权威来源。编号按照策展数据顺序固定，并在所有分类页面保持不变。每张卡片记录来源类型、年份、访问假设、证据等级、功能标签、原始来源和可用代码仓库。", terms: ["固定参考文献编号", "原始来源", "证据等级", "访问假设", "代码可用性", "来源类型"], questions: ["所引用内容是同行评审论文、预印本、官方披露还是行业报告？", "证据支持一般方法，还是支持特定现实模型结论？", "结果能否被独立复现？"] },
     },
     "research-agenda": {
-      en: { overview: "The proposed DistillGraph problem treats provenance as access-adaptive structured inference. Output-only probes provide screening; logits and reference checkpoints isolate training-induced change; representations, routing, and weights escalate evidence when available. The final output should include a teacher set, per-role attribution, unknown-source mass, confidence, and abstention—not a forced single label.", terms: ["access-adaptive auditing", "role-conditioned signature", "teacher-set inference", "unknown-source component", "evidence escalation", "calibrated abstention"], questions: ["What is the minimum access needed for each evidence claim?", "How should role-conditioned probes be selected under a query budget?", "Which benchmark can demonstrate low false attribution under multi-teacher, missing-source conditions?"] },
-      zh: { overview: "拟议的 DistillGraph 将来源审计定义为访问自适应的结构化推断。仅输出探针用于初筛；logit 和参考检查点用于隔离训练引起的变化；在条件允许时，再使用表示、路由和权重升级证据。最终输出应包括教师集合、逐角色归因、未知来源分量、置信度与拒绝判断，而不是强制单标签。", terms: ["访问自适应审计", "角色条件签名", "教师集合推断", "未知来源分量", "证据升级（evidence escalation）", "校准拒绝（calibrated abstention）"], questions: ["每一种证据声明最低需要什么访问权限？", "固定查询预算下如何选择角色条件探针？", "什么基准能够证明多教师、缺失来源条件下的低误归因？"] },
+      en: { overview: "DistillGraph is now treated as a follow-up research program rather than the first paper. It assumes reliable candidate-conditioned evidence tests and then asks how detected evidence, role-conditioned channels, unknown-source components, and optional internal signals can support uncertain multi-stage structures without treating detected candidates as proven edges.", terms: ["follow-up research program", "candidate evidence test", "role-conditioned signature", "unknown-source component", "evidence escalation", "uncertain dependency graph"], questions: ["Do the first-paper tests control error and power before graph expansion?", "Which roles are identifiable under controlled ground truth?", "How should missing intermediate models appear in an uncertain graph?"] },
+      zh: { overview: "DistillGraph 现在被定位为后续研究计划，而不是第一篇论文。它以前提“候选条件证据检验已经可靠”为基础，再研究检测到的证据、角色条件通道、未知来源分量和可选内部信号如何支持带不确定性的多阶段结构，同时不能把检测到的候选直接当成已证明的边。", terms: ["后续研究计划", "候选证据检验", "角色条件签名", "未知来源分量", "证据升级", "不确定依赖图"], questions: ["在扩展到图重建前，第一篇检验是否控制误报与功效？", "哪些角色能够在受控真实关系下被识别？", "缺失中间模型应如何出现在不确定依赖图中？"] },
     },
   },
   zhPages: {
+    "paper-problem": {
+      eyebrow: "下一篇论文 · 问题定义",
+      title: "候选条件黑盒蒸馏证据检测",
+      lead: "检验 API 黑盒待审计模型是否呈现相对于匹配非蒸馏控制的候选特异行为证据。",
+      callout: "推荐主任务：逐候选蒸馏证据检测，并输出“检测到 / 未检测到 / 结论不充分”。唯一教师归因是受控辅助结果；机制推断属于辅助证据；完整依赖图重建留作未来工作。",
+      sections: [
+        { title: "唯一核心科学问题", body: `<p>设 <em>S</em> 为只能通过 API 查询的待审计模型，<em>𝒯={T₁,…,Tₘ}</em> 为有限候选池，<em>𝒞ᵢ</em> 为候选 <em>Tᵢ</em> 对应的匹配非蒸馏控制集合，<em>B</em> 为查询预算。对每个候选检验：</p><div class="equation">H<sub>0,i</sub>：S 与 T<sub>i</sub> 的候选特异一致性不高于匹配控制；&nbsp; H<sub>1,i</sub>：该一致性显著超过零分布。 <span class="eq-label">(1)</span></div><div class="definition-box"><b>候选条件黑盒蒸馏证据检测</b>对每个候选返回校准证据分数，并输出“检测到证据”“在预注册效应量下未检测到证据”或“因零分布、稳定性或检验功效不足而结论不充分”。</div><p>多候选结果形成的是<strong>证据支持候选集合</strong>，不是恢复出的真实教师集合，更不是因果来源证明。教师追踪、来源检验和集合值推断提供候选比较、多重检验和错误控制基础 [[1,2,7]]。</p>` },
+        { title: "结论层级", body: `<table class="matrix comparison-table"><thead><tr><th>层级</th><th>问题</th><th>建议角色</th></tr></thead><tbody><tr><td>L1 · 逐候选证据</td><td>S 是否相对 Tᵢ 的匹配零分布呈现超额候选特异证据？</td><td><strong>主要贡献</strong></td></tr><tr><td>L2 · 候选摘要</td><td>多重比较校正后哪些候选检测到证据？</td><td>主要集合值摘要，不作因果归因</td></tr><tr><td>L3 · 唯一归因 / 教师集合</td><td>能否恢复一个或多个真实教师？</td><td>仅在受控闭集实验中作为辅助评价</td></tr><tr><td>L4 · 机制 / 角色</td><td>哪些证据通道与响应、推理、偏好、安全或工具监督一致？</td><td>受控真实关系下的辅助画像</td></tr><tr><td>L5 · 依赖图</td><td>哪个多阶段有向图生成待审计模型？</td><td>未来工作</td></tr></tbody></table><p>即使只有一个候选检测到证据，也不能证明它就是因果教师；候选池外来源、共享数据、共同教师和未建模后训练仍可能存在 [[9,59]]。</p>` },
+        { title: "威胁模型与访问条件", body: `<p>测试阶段需要待审计模型的黑盒输出，以及候选模型的实时查询接口或使用同一提示协议预先采集的候选响应档案。重复采样、token log-probability 和工具调用轨迹只是附加访问层；核心结果必须在普通预测 API 下成立，候选池也允许不完整。</p><p>白盒或开源模型仅用于构造受控训练边、估计最小可检测效应、开展因果消融和压力测试。内部信号和蒸馏前检查点不能成为最终规则的必要输入。必须区分“未检测到证据”和“结论不充分”；功效不足时未拒绝零假设，不等于证据不存在。</p>` },
+        { title: "机制不确定性", body: `<p>学生可能从教师继承最终响应、推理轨迹、成对偏好、批评、安全判定或工具策略，因此单一文本相似度不可能对所有蒸馏目标都同样有效。审计器应维护机制条件证据通道，而不是预设唯一训练目标。</p><p>机制输出可以是“响应一致”“偏好边界一致”“推理策略一致”等证据画像。受控学生上可以评价其机制识别准确率；商业 API 上只能报告“与某机制一致的证据”，不能把它写成隐藏训练配方的证明。</p>` },
+        { title: "决定论文难度的混杂因素", body: `<p>真正困难的负样本不是随机独立模型，而是共享基础检查点、tokenizer、公开指令数据、共同合成数据生成器、共同第三教师、RLHF 偏好数据、安全政策、架构或部署包装的模型。能力收敛也会在不存在直接训练边时产生共同正确答案。</p><p>系统提示词、解码温度、后端路由、静默版本更新、拒答包装和 API 随机性都应作为干扰变量。论文的可信度主要来自困难负样本、预注册效应量和三态结论，而不是简单模型对上的高相似度。</p>` },
+        { title: "商业 API 上允许的结论", body: `<div class="claim-box"><b>允许的结论</b>“在预注册候选池、提示协议、匹配控制零分布、效应量和多重比较校正下，对候选 T 检测到 / 未检测到候选特异行为证据，或因功效与稳定性不足而结论不充分。”</div><div class="claim-box"><b>没有外部真实关系时不能声称</b>“T 是教师”“S 确定蒸馏或窃取了 T”“没有发生蒸馏”“混合比例为 x%”或“隐藏训练图已经恢复”。</div><p>官方披露可以提供观察性案例，但平台遥测和新闻报道必须与可复现模型证据分开。商业 API 实验验证的是审计协议在现实端点上的行为，而不是未知因果谱系 [[45,47,49]]。</p>` },
+      ],
+    },
+    "paper-method": {
+      eyebrow: "下一篇论文 · 方法设计", title: "机制条件蒸馏证据检验", lead: "由机制条件探针、匹配非蒸馏控制和校准三态结论构成的逐候选黑盒检验。", callout: "首选设计：探针发现与留出检验分离，证据相对于匹配控制归一化，跨候选进行多重比较校正，最终输出“检测到 / 未检测到 / 结论不充分”，而不是因果教师标签。",
+      sections: [
+        { title: "候选 A · 机制条件对比探测", body: `<p>针对每类证据通道 <em>r</em> 构建候选模型能够稳定产生不同决策的发现探针池 <em>𝒳ᵣ</em>。探针包括最终答案分歧、罕见错误、推理子目标顺序、成对偏好边界、安全阈值、批评类别和工具策略轨迹。</p><p>在独立检验集上对候选 <em>Tᵢ</em> 计算控制归一化统计量：</p><div class="equation">Δ<sub>i,r</sub> = sim<sub>r</sub>(S,T<sub>i</sub>) − E<sub>C∼𝒞<sub>i</sub></sub>[sim<sub>r</sub>(C,T<sub>i</sub>)]. <span class="eq-label">(2)</span></div><p>控制集合应尽可能匹配能力、基础家族、公开数据暴露或对齐策略。该统计量检验的是 S–Tᵢ 一致性是否超过声明的非蒸馏零分布，而不是证明训练边。候选分歧比共同正确答案更有信息 [[1,2,14,15]]。</p>` },
+        { title: "自适应查询选择", body: `<p>将提示词和语义模板划分为<strong>探针发现集</strong>与互不重叠的<strong>推断集</strong>，或使用交叉拟合。发现集可以根据候选分歧和稳定性选择模板，但显著性检验必须使用留出实例或有效的选择后推断。</p><div class="equation">x* = arg max<sub>x∈𝒳<sub>discover</sub></sub> [ Disagree<sub>𝒯</sub>(x) · Stability(x) · (1 − Consensus<sub>𝒞</sub>(x)) ]. <span class="eq-label">(3)</span></div><p>否则自适应搜索会过拟合随后用于检验的同一批候选输出。应在相同发现与推断预算下，与随机、不确定性和语义多样性基线比较。</p>` },
+        { title: "逐候选结论与证据支持集合", body: `<p>对每个候选使用依赖感知重采样，并在候选间控制 family-wise error 或 FDR。输出逐候选分数、校正后的显著性、稳定性诊断和三态结论：</p><div class="equation">d<sub>i</sub> ∈ { 检测到, 未检测到, 结论不充分 }, &nbsp; Ê<sub>α</sub>(S) = {T<sub>i</sub> : d<sub>i</sub>=检测到}. <span class="eq-label">(4)</span></div><p><em>Ê</em><sub>α</sub> 是证据支持候选集合，不是来源集合。“未检测到”需要预注册最小效应量和充分稳定的零分布；其他情况必须标为结论不充分。唯一候选与教师集合指标只在受控谱系中作为辅助评价 [[2,7]]。</p>` },
+        { title: "机制证据画像", body: `<p>按证据家族聚合标准化残差，得到角色画像 <em>ρ(S,Tᵢ)</em>。例如，偏好边界高度一致但自由生成风格不相似，可能与评判监督一致；推理子目标顺序稳定一致且最终答案对改写鲁棒，可能与过程监督一致。</p><p>机制分类应保持辅助地位。主要检验是是否检测到候选条件证据。画像在受控学生上根据真实训练方式评价，在商业 API 上只作为解释性分解，不能证明隐藏训练配方。</p>` },
+        { title: "候选 B · 参考检查点归一化开发诊断", body: `<p>当受控实验拥有开源学生与蒸馏前基础检查点时，可以测量疑似训练阶段带来的相对变化：</p><div class="equation">R<sub>i,r</sub> = sim<sub>r</sub>(S,T<sub>i</sub>) − sim<sub>r</sub>(S<sub>0</sub>,T<sub>i</sub>). <span class="eq-label">(5)</span></div><p>这一设计用于验证机制条件信号是否响应真实训练边，并诊断共享基础模型混杂 [[3,6]]。它是开发和消融工具，不是商业 API 判定所需条件。</p>` },
+        { title: "候选 C · 成对因果探针变换", body: `<p>对每个信息量高的提示构造保持任务不变、但改变措辞、答案顺序、推理可见性、安全框架或工具可用性的受控变体。真正继承的决策边界应比表面格式模仿更稳定。</p><p>这一扩展具有潜在创新性，但成本很高。只有候选 A 已经实现可靠证据检测后才应加入，否则论文会同时承担探针生成、因果不变性、机制识别和统计检验，主贡献容易失焦。</p>` },
+        { title: "创新性门槛", body: `<p>现有工作已经包含黑盒相似性检验、主动指纹、教师追踪、多重假设来源检验和集合值来源推断 [[1,2,7,14,15]]。只有当<strong>机制条件留出探针</strong>、<strong>困难负样本匹配残差</strong>和<strong>三态逐候选结论</strong>显著改善校准、检验功效或查询效率时，论文才具有充分的方法创新。</p><div class="notice">如果随机提示词上的通用来源检验在共享基础、共享数据和共同第三教师条件下与拟议方法相当，则方法贡献不足。</div>` },
+        { title: "推荐的方法边界", body: `<div class="survey-note"><b>论文核心</b>候选 A：留出自适应探针、匹配控制、多重比较校正，以及“检测到 / 未检测到 / 结论不充分”。</div><div class="survey-note"><b>受控辅助结果</b>唯一候选识别、有限双教师混合和粗粒度机制证据画像。</div><div class="survey-note"><b>消融 / 验证</b>在开源基础检查点与学生检查点上使用候选 B。</div><div class="survey-note"><b>未来扩展</b>因果教师声明、不受约束的多阶段图重建和精确混合权重估计。</div>` },
+
+      ],
+    },
+    "paper-benchmark": {
+      eyebrow: "下一篇论文 · 基准", title: "基准与实验协议", lead: "三层评价体系：受控因果真实关系、模拟黑盒访问和商业 API 观察性证据。", callout: "共享基础模型、共享数据、共同第三教师和 API 不稳定性必须成为主要实验条件，而不是讨论部分的补充说明。",
+      sections: [
+        { title: "第一层 · 受控开源谱系", body: `<p>构造具有已知训练边的学生，但拟议方法只能观察黑盒输出。系统改变候选教师身份与监督机制：响应 / 指令、推理 / 过程、偏好 / 评判、安全 / 过滤，以及可选的工具轨迹。先完成单教师，再加入角色分离的有限双教师学生。</p><p>训练日志与检查点只用于提供真实关系和消融，不是方法输入。这一层检验黑盒统计量响应的是因果训练边，而不是模型家族相似性。</p>` },
+        { title: "困难负样本矩阵", body: `<table class="matrix"><thead><tr><th>负样本类型</th><th>难点</th><th>必要控制</th></tr></thead><tbody><tr><td>共享基础检查点</td><td>不存在候选教师蒸馏也会继承相似行为</td><td>兄弟学生与基础归一化消融</td></tr><tr><td>共享公开数据</td><td>独立模型学习相同样本</td><td>数据匹配的独立训练</td></tr><tr><td>共同第三教师</td><td>两个模型继承相关行为</td><td>候选池包含 / 缺失第三教师</td></tr><tr><td>能力收敛</td><td>强模型在简单正确答案上高度一致</td><td>分歧和罕见错误探针</td></tr><tr><td>偏好 / 安全收敛</td><td>相似对齐政策模拟评判继承</td><td>边界探针与政策匹配控制</td></tr><tr><td>微调 / 合并 / 压缩</td><td>其他谱系边可能类似蒸馏</td><td>带类型的派生基线</td></tr></tbody></table>` },
+        { title: "第二层 · 模拟 API 访问", body: `<p>冻结训练后的模型并通过 API 包装暴露。测试确定性与随机解码、隐藏系统提示词、响应截断、重复采样、可选 top-k log-probability，以及后端模型路由。方法必须在真实审计者可获得的信息条件下评价。</p><p>报告固定预算曲线，而不能只给无限查询下的结果；同时评价重复采样和 logprob 是否真正改变结论。</p>` },
+        { title: "第三层 · 商业 API", body: `<p>优先选择公开披露蒸馏关系且相关端点可用的案例；其他模型只做候选池与控制集合预注册的观察性案例。真实 API 表格应报告证据画像、跨日期和提示词的稳定性、查询成本以及是否拒绝判断。</p><p>商业案例只验证外部适用性，不是主要真实关系基准；不能仅凭行为证据作出指控。</p>` },
+        { title: "评价指标", body: `<p><strong>主要逐候选检验：</strong>固定 FPR 下的 TPR、候选间 family-wise error 或 FDR、校准效应估计、最小可检测效应对应的检验功效，以及结论不充分率。<strong>证据支持集合：</strong>错误纳入率、集合大小和受控谱系召回率。<strong>唯一归因：</strong>只作为受控闭集辅助指标报告 top-1/top-k。<strong>机制证据：</strong>只在受控学生上报告 macro-F1 与校准。<strong>效率：</strong>达到固定错误率和功效目标所需的发现与检验查询数。</p><p>所有结果都要按困难负样本、机制、候选池大小、候选缺失、访问层和查询预算分层。</p>` },
+        { title: "核心实验矩阵", body: `<table class="matrix"><thead><tr><th>实验轴</th><th>必要取值</th></tr></thead><tbody><tr><td>训练关系</td><td>无教师、单教师、有限双教师</td></tr><tr><td>机制</td><td>响应、推理、偏好；安全和工具作为扩展</td></tr><tr><td>候选池</td><td>2、5、10+，以及真实教师缺失</td></tr><tr><td>控制模型</td><td>随机、能力匹配、共享基础、共享数据、共同第三教师</td></tr><tr><td>选择协议</td><td>随机、带留出检验的自适应选择、交叉拟合</td></tr><tr><td>访问</td><td>单输出、重复输出、可选 logprob</td></tr><tr><td>后处理</td><td>继续 SFT、改写、量化、模型合并</td></tr><tr><td>预算</td><td>分别固定发现预算和检验预算</td></tr></tbody></table>` },
+        { title: "负结果规则", body: `<div class="notice">匹配控制消除候选特异证据时，应报告“未检测到超额证据”，不能把原始相似度转写为蒸馏结论。</div><div class="notice">零分布不稳定、检验功效低于预注册标准或留出效应不一致时，应返回“结论不充分”，而不是“未检测到”。</div><div class="notice">多个候选检测到证据时，应报告证据支持集合，不能强行选择最高分教师。</div><div class="notice">机制证据无法通过留出变换测试时，不能声称机制一致性。</div><div class="notice">商业 API 结果随日期或包装变化时，应报告版本敏感性，并把端点视为动态对象。</div>` },
+
+      ],
+    },
+    "paper-roadmap": {
+      eyebrow: "下一篇论文 · 主张与路线", title: "推荐论文主张与执行路线", lead: "以逐候选证据检测、留出机制探针、匹配控制和商业 API 观察性案例为核心的黑盒论文。", callout: "不能把行为证据包装成因果教师归因。第一篇论文先证明逐候选证据检验在困难负样本下具有校准误报率、足够功效和明确的结论不充分输出。",
+      sections: [
+        { title: "推荐论文主张", body: `<div class="definition-box"><b>核心主张</b>当探针发现与留出检验相互独立、证据相对于明确的非蒸馏匹配控制进行归一化，并为每个候选输出“检测到 / 未检测到 / 结论不充分”时，可以在黑盒 API 中检测与候选模型特异相关、且与蒸馏一致的行为证据。</div><p>更稳妥的标题方向是 <em>Candidate-Conditioned Black-box Distillation-Evidence Detection for Language Model APIs</em>。具有“谁教了模型”或“来源证明”含义的标题只适合具有真实谱系的受控实验。</p>` },
+        { title: "贡献结构", body: `<ol><li><strong>问题定义：</strong>候选条件黑盒蒸馏证据检测，采用三态结论，并明确区分行为证据、受控归因、教师集合、机制画像和图重建。</li><li><strong>方法：</strong>机制条件探针发现、独立留出检验，以及能力、家族与数据匹配的控制残差。</li><li><strong>推断：</strong>跨候选多重比较校正和证据支持候选集合，同时区分未检测到与结论不充分。</li><li><strong>评价：</strong>具有真实训练关系的受控基准、困难负样本、模拟 API 和合规商业观察性案例。</li></ol>` },
+        { title: "建议论文结构", body: `<div class="steps"><div class="step"><strong>Introduction：</strong>商业模型只暴露输出、隐藏训练依赖；行为相似性无法证明因果来源。</div><div class="step"><strong>Problem and threat model：</strong>逐候选零假设、匹配控制、查询预算、三态结论和结论层级。</div><div class="step"><strong>Method：</strong>机制探针家族、发现/检验分离、残差信号和多重比较校正。</div><div class="step"><strong>Controlled benchmark：</strong>已知训练关系、候选缺失和困难负样本。</div><div class="step"><strong>Results：</strong>逐候选检测、错误控制、检验功效、结论不充分、查询效率和辅助识别/机制结果。</div><div class="step"><strong>Commercial API cases：</strong>明确限制结论的观察性证据。</div></div>` },
+        { title: "分阶段执行计划", body: `<table class="matrix"><thead><tr><th>阶段</th><th>交付物</th><th>决策标准</th></tr></thead><tbody><tr><td>P0 · 信号审计</td><td>在已知单教师学生上测试分歧、罕见错误、偏好和推理信号</td><td>至少一个通道超过共享基础与能力匹配控制</td></tr><tr><td>P1 · 证据检验核心</td><td>留出自适应探针 + 匹配残差检验 + 三态结论</td><td>跨家族和机制控制误报并保持足够功效</td></tr><tr><td>P2 · 困难负样本</td><td>共享数据、第三教师、兄弟检查点、其他派生关系</td><td>若信号退化为家族相似性，则否定主张</td></tr><tr><td>P3 · 受控辅助任务</td><td>唯一候选识别、角色不同的有限双教师学生</td><td>只在覆盖率和错误纳入可靠时保留</td></tr><tr><td>P4 · API 模拟</td><td>解码、包装、随机性和发现/检验预算</td><td>核心方法必须保持仅输出</td></tr><tr><td>P5 · 商业案例</td><td>披露案例与观察性未知案例</td><td>报告候选条件证据结论，不声称隐藏真实关系</td></tr></tbody></table>` },
+        { title: "继续 / 停止标准", body: `<div class="property-grid"><div class="property-card"><b>继续</b>逐候选检验在共享基础、能力匹配、共享数据和共同第三教师控制下保持误报控制与检验功效；结论不充分得到校准；查询预算可接受。</div><div class="property-card"><b>有条件继续</b>候选条件证据检测成立，但唯一识别、教师集合或机制画像较弱。发表更窄的证据检测论文。</div><div class="property-card"><b>停止</b>性能主要由模型家族、基准准确率、表达风格或公开数据重叠驱动；留出效应消失；方法必须使用学生权重；或零分布无法稳定校准。</div><div class="property-card"><b>结论降级</b>商业案例只显示候选特异一致性但没有因果真实关系，只能报告观察性证据结论。</div></div>` },
+        { title: "网站如何服务这篇论文", body: `<p>“下一篇论文”四页应成为网站入口。直接检测与仅输出审计页面应链接到主要证据检验任务；教师归因与多教师恢复必须标记为受控辅助任务；混杂因素、基准与真实披露用于设计零假设和外部有效性评价。</p><p>白盒蒸馏与内部信号审计仍有价值，但应标记为“受控开发证据”。攻击、防御、代码仓库和行业报告只有在直接影响威胁模型、探针设计或评价协议时才进入主线。</p>` },
+
+      ],
+    },
     home: {
       eyebrow: "研究地图 · 机制优先分类",
       title: "大语言模型蒸馏与谱系研究观测站",
       lead: "以蒸馏机制为中心，系统整理大语言模型如何传递知识、这些依赖关系如何被审计，以及真实工业流程应如何评价。",
       callout: "网站的主分类轴是被传递的知识信号，而不是来源是否开源、闭源、学术或商业。访问权限、模型开放性、证据等级和代码可用性被视为正交属性。",
-      stats: [["63","篇论文、工具、官方披露和行业报告"],["7","个从基础概念到评价的研究阶段"],["5","级区分官方披露、实验和报道的证据体系"]],
+      stats: [["63","篇论文、工具、官方披露和行业报告"],["4","个从问题定义到执行计划的论文工作区"],["5","级区分官方披露、实验和报道的证据体系"]],
       sections: [
-        { title: "以机制为主线的研究地图", body: `<div class="framework-grid"><a class="framework-card" href="white-box-distillation.html"><b>1. 蒸馏方法</b><span>传递什么信号，教师具有何种访问条件？</span></a><a class="framework-card" href="output-only-auditing.html"><b>2. 蒸馏审计</b><span>输出、logit、表示、路由和权重中留下什么证据？</span></a><a class="framework-card" href="unauthorized-distillation.html"><b>3. 攻击与防御</b><span>能力如何被采集、保护、洗白或移除。</span></a><a class="framework-card" href="benchmarks.html"><b>4. 蒸馏评价</b><span>如何评价检测、归因、校准、鲁棒性和误指控。</span></a><a class="framework-card" href="model-family-compression.html"><b>5. 真实工业流程</b><span>模型家族、响应、推理和生产级蒸馏案例。</span></a><a class="framework-card" href="research-agenda.html"><b>6. 研究议程</b><span>多教师、多角色、访问自适应的谱系审计。</span></a></div>` },
+        { title: "下一篇论文工作区", body: `<div class="framework-grid"><a class="framework-card paper-card" href="paper-problem.html"><b>1. 黑盒审计问题</b><span>定义候选条件蒸馏证据检测，以及商业 API 上允许支持的结论。</span></a><a class="framework-card paper-card" href="paper-method.html"><b>2. 方法候选</b><span>留出机制探针、匹配控制残差和校准三态检验。</span></a><a class="framework-card paper-card" href="paper-benchmark.html"><b>3. 基准与实验</b><span>受控谱系、困难负样本、模拟 API 与商业观察性案例。</span></a><a class="framework-card paper-card" href="paper-roadmap.html"><b>4. 论文主张与路线</b><span>贡献边界、分阶段执行、负结果规则与继续/停止标准。</span></a></div>` },
+        { title: "以机制为主线的研究地图", body: `<div class="framework-grid"><a class="framework-card" href="white-box-distillation.html"><b>1. 蒸馏方法</b><span>传递什么信号，教师具有何种访问条件？</span></a><a class="framework-card" href="output-only-auditing.html"><b>2. 蒸馏审计</b><span>输出、logit、表示、路由和权重中留下什么证据？</span></a><a class="framework-card" href="unauthorized-distillation.html"><b>3. 攻击与防御</b><span>能力如何被采集、保护、洗白或移除。</span></a><a class="framework-card" href="benchmarks.html"><b>4. 蒸馏评价</b><span>如何评价检测、归因、校准、鲁棒性和误指控。</span></a><a class="framework-card" href="model-family-compression.html"><b>5. 真实工业流程</b><span>模型家族、响应、推理和生产级蒸馏案例。</span></a><a class="framework-card" href="research-agenda.html"><b>6. 长期研究议程</b><span>在第一篇证据检测论文之后，再研究多教师、多角色和多阶段依赖重建。</span></a></div>` },
         { title: "三个正交分类轴", body: `<table class="matrix"><thead><tr><th>分类轴</th><th>核心问题</th><th>示例</th></tr></thead><tbody><tr><td>知识信号</td><td>传递了什么？</td><td>logit、表示、响应、推理、偏好、轨迹</td></tr><tr><td>教师拓扑</td><td>谁教谁，经过多少阶段？</td><td>自蒸馏、单教师、多教师、渐进式、多阶段、跨架构</td></tr><tr><td>审计访问</td><td>审计者能观察什么？</td><td>输出、top-k logprob、完整 logit、隐藏状态、路由、权重</td></tr></tbody></table>` },
-        { title: "推荐阅读路径", body: `<ol class="reading-path"><li>从<a href="preliminary.html">背景与定义</a>开始。</li><li>阅读三个<a href="white-box-distillation.html">蒸馏方法</a>页面。</li><li>进入<a href="output-only-auditing.html">蒸馏审计</a>。</li><li>使用<a href="benchmarks.html">蒸馏评价</a>判断证据质量。</li><li>最后阅读<a href="research-agenda.html">研究议程</a>。</li></ol>` },
+        { title: "推荐阅读路径", body: `<ol class="reading-path"><li>围绕下一篇论文，先从<a href="paper-problem.html">黑盒审计问题</a>开始，并依次阅读四个论文工作区页面。</li><li>使用<a href="preliminary.html">背景与定义</a>统一术语。</li><li>把<a href="black-box-distillation.html">黑盒蒸馏</a>和<a href="output-only-auditing.html">仅输出审计</a>作为主要文献路径。</li><li>使用<a href="confounders-robustness.html">混杂因素与鲁棒性</a>和<a href="benchmarks.html">基准</a>判断方法可行性。</li><li>把<a href="research-agenda.html">长期研究议程</a>视为第一篇论文之后的扩展。</li></ol>` },
       ],
     },
     preliminary: {
@@ -448,12 +528,12 @@ export const SITE_CONTENT = {
     ]},
     repositories: { eyebrow: "资源与研究议程", title: "代码仓库", lead: "蒸馏训练、教师归因、模型谱系、来源防御和评价实现。", sections: [{ title: "仓库组织方式", body: "仓库卡片按照功能而不是发表来源分类：训练流程、检测与归因、谱系与指纹、防御以及基准。" }] },
     bibliography: { eyebrow: "资源与研究议程", title: "参考文献总表", lead: "全站论文、代码仓库、官方披露、政策和行业报告的可搜索索引。", sections: [{ title: "搜索与证据筛选", body: "可以搜索标题、方法、访问假设、教师信号、模型和证据等级。A–E 筛选保持官方披露、实验、平台遥测和新闻报道之间的区别。" }] },
-    "research-agenda": { eyebrow: "资源与研究议程", title: "研究议程", lead: "最重要的开放问题是访问自适应、证据校准的多教师、多角色、多阶段依赖恢复。", callout: "建议方向：DistillGraph——在仅输出到权重级访问条件下，恢复教师集合、角色分配、证据通道、置信等级并支持明确拒绝判断。", sections: [
-      { title: "研究缺口", body: "现有方法常假设单教师、单个最终蒸馏阶段、已知参考检查点或单一证据通道，而工业流程通常违反这些假设。" },
-      { title: "问题定义", body: "给定待审计模型、候选教师、可选参考检查点和访问预算，推断是否发生蒸馏、哪些教师参与、承担何种角色，以及何时证据不足。" },
-      { title: "DistillGraph 框架", body: `<div class="steps"><div class="step"><strong>分歧探针选择。</strong>寻找候选教师在决策、偏好、批评或工具策略上分离的输入。</div><div class="step"><strong>角色条件签名。</strong>构建生成、推理、评判、批评、安全和工具证据。</div><div class="step"><strong>访问自适应升级。</strong>随着访问增加，引入 logit、表示、路由和权重轨迹。</div><div class="step"><strong>开放世界推断。</strong>返回校准教师集合或拒绝判断。</div></div>` },
-      { title: "基准设计", body: "构建单教师与多教师学生、角色专用流程、多阶段洗白、困难负样本、公开真实模型和商业观察性案例。" },
-      { title: "实验路线", body: "先在开放权重模型上构建两个教师和三个角色，使用公开披露蒸馏家族进行验证，再在低查询和条款合规条件下加入商业 API。" },
+    "research-agenda": { eyebrow: "资源 · 长期研究方向", title: "长期研究议程", lead: "多教师、多角色和多阶段依赖恢复是建立在可靠候选条件证据检验之上的后续问题。", callout: "第一篇论文先完成“下一篇论文”工作区中的受限任务。只有逐候选检验在困难负样本、候选缺失和 API 黑盒评价下控制误报与功效后，DistillGraph 才进入后续计划。", sections: [
+      { title: "第一篇论文之后仍未解决的问题", body: "第一篇论文聚焦候选条件黑盒蒸馏证据检测。后续问题包括因果教师识别、更大教师集合、角色分离、相对影响、重复蒸馏、缺失中间模型和多阶段信号洗白。" },
+      { title: "未来结构化问题", body: "给定待审计模型、候选与未知教师、可选参考检查点和异质访问预算，恢复带类型且具有不确定性的依赖结构。该任务严格难于候选归因，不能由同一组证据直接支持。" },
+      { title: "作为后续框架的 DistillGraph", body: `<div class="steps"><div class="step"><strong>从校准候选检验开始。</strong>把第一篇论文的证据检测结论作为边筛选信号，而不是已证明的边。</div><div class="step"><strong>加入角色条件证据。</strong>只在具有受控真实关系时区分生成、推理、评判、批评、安全和工具角色。</div><div class="step"><strong>按可用访问条件升级。</strong>把 logit、参考检查点、表示、路由和权重作为可选佐证，而不是核心要求。</div><div class="step"><strong>输出不确定依赖图。</strong>保留未知来源节点、替代边和明确拒绝判断。</div></div>` },
+      { title: "未来基准扩展", body: "单教师归因稳定后，再扩展到角色专用双教师流程、重复蒸馏、缺失中间节点、信号洗白和更大的不完整候选池。" },
+      { title: "对第一篇论文的依赖", body: "如果仅输出证据检验无法在共享基础模型、共享数据、共同第三教师、API 随机性和候选缺失条件下控制误报与功效，就不应启动 DistillGraph 图重建。" },
     ]},
   },
   summaryZh: {

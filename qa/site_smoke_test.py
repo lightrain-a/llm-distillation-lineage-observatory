@@ -76,6 +76,9 @@ def run_desktop_checks(base_url: str) -> None:
         require("this page" in search.get_attribute("aria-label").lower(), "Search scope is not exposed accessibly")
         require(driver.find_element(By.CSS_SELECTOR, "main").get_attribute("role") == "main", "Main landmark missing")
         require(driver.find_element(By.CSS_SELECTOR, "nav").get_attribute("aria-label"), "Navigation landmark lacks a label")
+        next_paper_group = driver.find_elements(By.CSS_SELECTOR, ".nav-group")[0]
+        require("Next Paper" in next_paper_group.get_attribute("textContent"), "Next Paper is not the first navigation group")
+        require(len(next_paper_group.find_elements(By.CSS_SELECTOR, ".nav-level2")) == 4, "Next Paper navigation does not contain four workspaces")
 
         headings = driver.find_elements(By.CSS_SELECTOR, "#dynamic-page h2, #dynamic-page h3")
         require(len(headings) >= 8, "Preliminary does not expose the expected survey structure")
@@ -90,6 +93,32 @@ def run_desktop_checks(base_url: str) -> None:
         require(abs(after_top - before_top) < 70, f"Language switch lost reading context: {before_top} -> {after_top}")
         require(driver.find_element(By.CSS_SELECTOR, ".overview-figure img").get_attribute("src").endswith("distillation-auditing-overview-zh.svg"), "Chinese overview figure did not switch")
         require(driver.find_element(By.TAG_NAME, "html").get_attribute("lang") == "zh-CN", "Document language metadata did not switch")
+
+        driver.get(f"{base_url}/paper-problem.html")
+        wait_until(driver, lambda d: d.find_element(By.CSS_SELECTOR, "h1").text == "候选条件黑盒蒸馏证据检测", "Next-paper problem page did not preserve Chinese")
+        require(len(driver.find_elements(By.CSS_SELECTOR, "#dynamic-page .topic-section")) == 6, "Paper problem page has the wrong section count")
+        problem_text = driver.find_element(By.ID, "dynamic-page").text
+        require("候选条件黑盒蒸馏证据检测" in problem_text, "Primary black-box task is missing")
+        require(all(label in problem_text for label in ["检测到证据", "未检测到证据", "结论不充分"]), "Three-state decision boundary is incomplete")
+
+        driver.get(f"{base_url}/paper-method.html")
+        wait_until(driver, lambda d: d.find_element(By.CSS_SELECTOR, "h1").text == "机制条件蒸馏证据检验", "Paper method page did not load in Chinese")
+        method_text = driver.find_element(By.ID, "dynamic-page").text
+        require("匹配控制" in method_text, "Matched-control method core is missing")
+        require("留出检验" in method_text and "创新性门槛" in method_text, "Held-out inference or novelty gate is missing")
+
+        driver.get(f"{base_url}/paper-benchmark.html")
+        wait_until(driver, lambda d: d.find_element(By.CSS_SELECTOR, "h1").text == "基准与实验协议", "Paper benchmark page did not load in Chinese")
+        require("共同第三教师" in driver.find_element(By.ID, "dynamic-page").text, "Hard-negative benchmark is missing")
+
+        driver.get(f"{base_url}/paper-roadmap.html")
+        wait_until(driver, lambda d: d.find_element(By.CSS_SELECTOR, "h1").text == "推荐论文主张与执行路线", "Paper roadmap page did not load in Chinese")
+        roadmap_text = driver.find_element(By.ID, "dynamic-page").text
+        require("不能把行为证据包装成因果教师归因" in roadmap_text, "First-paper causal-claim boundary is missing")
+        require("Candidate-Conditioned Black-box Distillation-Evidence Detection" in roadmap_text, "Recommended paper framing is missing")
+
+        driver.get(f"{base_url}/research-agenda.html")
+        wait_until(driver, lambda d: d.find_element(By.CSS_SELECTOR, "h1").text == "长期研究议程", "Long-term agenda was not demoted")
 
         driver.get(f"{base_url}/black-box-distillation.html")
         wait_until(driver, lambda d: d.find_element(By.CSS_SELECTOR, "h1").text == "黑盒蒸馏", "Language preference did not persist across pages")
