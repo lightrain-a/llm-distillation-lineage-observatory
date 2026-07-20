@@ -70,7 +70,7 @@ const PAGE_CONFIG = {
     lead: "A mechanism-centered map of how large language models transfer knowledge, how those dependencies can be audited, and how real-world pipelines should be evaluated.",
     callout: "The organizing axis is the transferred knowledge signal—not whether a source is open, closed, academic, or commercial. Access level, model availability, evidence grade, and code availability are treated as orthogonal attributes.",
     stats: [
-      ["59", "curated papers, tools, disclosures, and reports"],
+      ["63", "curated papers, tools, disclosures, and reports"],
       ["7", "research stages from preliminary concepts to evaluation"],
       ["5", "evidence grades separating disclosure from allegation"],
     ],
@@ -101,16 +101,96 @@ const PAGE_CONFIG = {
     ],
   },
   preliminary: {
-    eyebrow: "Preliminary",
+    eyebrow: "Preliminary · survey chapter",
     title: "Background & Definitions",
-    lead: "Core concepts needed to distinguish distillation from fine-tuning, model extraction, compression, and general lineage.",
+    lead: "A formal and historical introduction to LLM distillation, its relationship to fine-tuning and model extraction, and the evidentiary requirements of post-release lineage auditing.",
     sections: [
-      { title: "What is LLM distillation?", body: "LLM distillation transfers selected behavior or internal knowledge from a teacher into a student through a training objective or a teacher-generated data pipeline. The transferred object may be a probability distribution, hidden representation, final response, reasoning trace, preference judgment, critique, or tool trajectory." },
-      { title: "Teacher, student, and distillation signal", body: "The teacher is the model producing supervision; the student is the model updated from that supervision. The distillation signal is the actual training target. A model name alone does not specify the mechanism: the same teacher can provide logits in a white-box pipeline, responses through an API, or rankings as a judge." },
-      { title: "Distillation vs. fine-tuning", body: "Fine-tuning describes parameter updating on a downstream objective. Distillation is defined by the source of supervision. A student may be fine-tuned on teacher outputs, but ordinary fine-tuning on human or public data does not create a teacher–student distillation edge." },
-      { title: "Distillation vs. model extraction", body: "Model extraction is the attacker or auditor perspective: queries are used to recover functionality or behavior. Response distillation is one mechanism for training the extracted substitute. Extraction can therefore contain distillation, but the two terms are not interchangeable." },
-      { title: "Distillation vs. model lineage", body: "Lineage is broader than distillation. It includes direct checkpoint inheritance, continued pre-training, supervised fine-tuning, merging, pruning, quantization, and distillation. A reliable audit must distinguish these edge types rather than infer all derivation from behavioral similarity." },
-      { title: "Why distillation auditing matters", body: "Industrial concerns include API abuse, unauthorized capability transfer, license compliance, supply-chain transparency, safety-policy inheritance, and false attribution. The practical requirement is calibrated evidence with an explicit abstention option—not forced accusations." },
+      {
+        title: "What Is LLM Distillation?",
+        body: `<p><strong>Knowledge distillation (KD)</strong> is a training paradigm in which a <em>student model</em> is optimized using supervision produced by a <em>teacher model</em>. The defining property is therefore the <strong>source and form of supervision</strong>, not merely that the student is smaller. A student can have fewer parameters, a different architecture, the same architecture as the teacher, or even be a later checkpoint of the same model. Conversely, pruning or quantization alone is not distillation unless teacher-derived supervision is used during recovery or post-training.</p>
+        <p>For an autoregressive language model with parameters θ, an output sequence <em>y</em> conditioned on an input <em>x</em> is factorized token by token:</p>
+        <div class="equation">p<sub>θ</sub>(y | x) = ∏<sub>t=1</sub><sup>|y|</sup> p<sub>θ</sub>(y<sub>t</sub> | x, y<sub>&lt;t</sub>). <span class="eq-label">(1)</span></div>
+        <p>A teacher can supervise any object exposed by this computation. In classical KD, the teacher supplies a softened probability distribution rather than only a hard target. Given teacher logits <em>z</em><sub>T</sub> and temperature τ, the softened distribution is</p>
+        <div class="equation">q<sub>T</sub><sup>τ</sup>(v | x, y<sub>&lt;t</sub>) = exp(z<sub>T,v</sub>/τ) / ∑<sub>u</sub> exp(z<sub>T,u</sub>/τ). <span class="eq-label">(2)</span></div>
+        <p>The student is then trained to match this distribution, commonly through a divergence term combined with the ordinary language-modeling objective. Hinton et al. introduced the modern soft-target formulation and temperature scaling, emphasizing that non-maximum probabilities encode similarities that hard labels discard [[60]]. A simplified objective is</p>
+        <div class="equation">L<sub>KD</sub> = λτ² D(q<sub>T</sub><sup>τ</sup> || q<sub>S</sub><sup>τ</sup>) + (1 − λ)L<sub>LM</sub>. <span class="eq-label">(3)</span></div>
+        <p>For generative models, however, “knowledge” is not limited to a token distribution. Sequence-level KD replaces or augments dense probabilities with teacher-decoded target sequences [[61]]. DistilBERT combines language-modeling, distillation, and cosine-distance losses during pre-training [[62]], while TinyBERT transfers embeddings, hidden states, attention matrices, and prediction-layer outputs in a two-stage framework [[63]]. Modern LLM pipelines further use sampled responses, explanation traces, preference rankings, critiques, safety decisions, and tool trajectories as supervision [[36,38,39,44]].</p>
+        <div class="definition-box"><b>Working definition used in this observatory</b>LLM distillation is any training process in which a student update is causally conditioned on supervision generated by one or more teacher models. The supervision may be distributional, representational, sequence-level, process-level, preference-based, or trajectory-based. Terms such as <em>knowledge-signal taxonomy</em> are survey terminology introduced here to organize these mechanisms; they are not presented as names universally adopted by the literature.</div>`
+      },
+      {
+        title: "Why Distillation Matters in the LLM Ecosystem",
+        body: `<p>The original motivation for KD was economical deployment: compress an ensemble or a high-capacity model into a cheaper student without discarding all of the teacher's learned structure [[60]]. This motivation remains central for LLMs because inference latency, accelerator memory, serving throughput, and energy cost scale poorly with model size. DistilBERT and TinyBERT established that distillation can be integrated into language-model pre-training rather than applied only to a downstream classifier [[62,63]]. Recent family-compression pipelines combine teacher supervision with structured pruning or architecture reduction, as in Minitron and Meta's disclosed Llama 3.2 1B/3B pipeline [[42,45]].</p>
+        <p>LLM distillation also became a <strong>data-construction mechanism</strong>. Self-Instruct bootstraps instructions, inputs, and outputs from a language model and filters invalid or redundant generations before fine-tuning [[36]]. Stanford Alpaca used 52K instruction-following demonstrations generated by text-davinci-003 to fine-tune LLaMA 7B [[37]]. These systems do not require access to teacher weights or logits; the teacher is valuable because it supplies a scalable synthetic supervision channel.</p>
+        <p>The transferred object has since expanded from answers to <strong>process supervision</strong>. Orca trains on complex explanation traces and uses progressive learning from different teacher strengths [[38]]. Orca 2 focuses on task-appropriate reasoning strategies rather than imitation of a single fixed reasoning style [[39]]. DeepSeek-R1 publicly identifies six dense Qwen- and Llama-based students trained on reasoning data generated by R1 [[44]]. These examples motivate a distinction between <em>response distillation</em>, which imitates visible outputs, and <em>reasoning or process distillation</em>, which attempts to transfer intermediate solution behavior.</p>
+        <p>Finally, distillation is now a production workflow rather than only a research loss. Google states that Gemini 1.5 Flash was trained through distillation from Gemini 1.5 Pro [[46]], while OpenAI provides an authorized hosted workflow that combines frontier-model outputs, evaluations, dataset construction, and fine-tuning of lower-cost models [[47]]. Multi-model data pipelines can assign generation, critique, scoring, filtering, and safety roles to different models; toolkits such as distilabel operationalize this orchestration [[56]].</p>
+        <div class="claim-box"><b>Why auditing follows from deployment</b>Once teacher-generated supervision can be collected through an API, the same mechanism supports authorized compression, reproducible research, contractual use, or unauthorized capability harvesting. The technical question—whether and how a teacher influenced a student—must therefore be separated from the policy question of whether that use was permitted. Provider telemetry may support claims about coordinated collection campaigns [[49]], but it is a different evidence channel from post-release analysis of the resulting model.</div>`
+      },
+      {
+        title: "Distillation, Fine-tuning, Extraction, and Lineage",
+        body: `<p>Several adjacent concepts are routinely conflated because they can occur in the same engineering pipeline. The distinctions below are operational rather than purely semantic: each concept defines a different causal claim and therefore requires different evidence.</p>
+        <table class="matrix comparison-table"><thead><tr><th>Concept</th><th>What it describes</th><th>Minimum evidence for the claim</th></tr></thead><tbody>
+          <tr><td>Fine-tuning</td><td>A parameter-update stage on a selected objective and dataset.</td><td>Training configuration, checkpoint change, or task-adaptation evidence.</td></tr>
+          <tr><td>Knowledge distillation</td><td>Teacher-generated supervision used to update a student.</td><td>Evidence that the supervision was causally produced by the candidate teacher.</td></tr>
+          <tr><td>Model extraction</td><td>An attack or acquisition objective that recovers functionality through queries.</td><td>A victim-query process and a substitute whose functionality is recovered from those responses.</td></tr>
+          <tr><td>Model compression</td><td>Reduction of serving or storage cost by pruning, quantization, architecture reduction, or distillation.</td><td>A measured efficiency change; distillation is only one possible mechanism.</td></tr>
+          <tr><td>Model lineage</td><td>The broader graph of checkpoint inheritance, continued training, merging, compression, and teacher influence.</td><td>Evidence that distinguishes the relevant edge type from plausible alternatives.</td></tr>
+        </tbody></table>
+        <h3>Fine-tuning is an optimization operation; distillation identifies the supervision source</h3>
+        <p>A student trained on teacher-generated answers is both fine-tuned and distilled. A model trained on human labels or a public corpus may be fine-tuned without being distilled. Likewise, <em>self-distillation</em> is possible when a later model or checkpoint learns from supervision generated by itself or an earlier version. The phrase “fine-tuned from model X” generally describes weight ancestry, whereas “distilled from model Y” describes a supervision dependency; the two models need not be the same.</p>
+        <h3>Model extraction is a threat objective, not a synonym for distillation</h3>
+        <p>Prediction-API extraction work established that an adversary can query a target and train a substitute from the returned labels or scores [[29]]. Knockoff Nets extended this idea using adaptively constructed transfer sets [[30]], and later work demonstrated extraction against NLP and sequence-generation APIs [[31,32]]. Response distillation is one training mechanism available to an extractor, but extraction additionally includes query selection, coverage, account infrastructure, and the target functionality being recovered.</p>
+        <p>This distinction matters because visible imitation does not guarantee broad capability transfer. The False Promise of Imitating Proprietary LLMs reports that imitation data can reproduce style while failing to transfer capability outside the sampled task distribution [[33]]. An audit should therefore avoid treating surface phrasing as sufficient evidence of teacher dependence.</p>
+        <h3>Lineage is a typed graph, not a nearest-neighbor label</h3>
+        <p>A released student may inherit its tokenizer and weights from one base family, receive responses or reasoning data from a second model, and receive preference judgments from a third. DeepSeek-R1-Distill, for example, discloses Qwen- and Llama-based students trained on R1-generated reasoning data [[44]]. In this case the <em>weight parent</em> and the <em>output teacher</em> are different. Reliable provenance analysis must identify the edge type—checkpoint inheritance, continued pre-training, supervised fine-tuning, merging, or distillation—rather than simply report the candidate with the highest behavioral similarity [[9,59]].</p>`
+      },
+      {
+        title: "From Classical KD to LLM Data Factories",
+        body: `<p>The evolution of language-model distillation can be read as a progressive expansion of the supervision interface. Early work assumed direct access to a teacher's predictive distribution. Sequence modeling introduced teacher-decoded targets. Pre-trained language models made intermediate representations and pre-training objectives central. Contemporary LLM pipelines can obtain supervision from closed APIs, use the student distribution to choose training contexts, and assign different supervision roles to different models.</p>
+        <div class="method-timeline">
+          <div class="timeline-item"><div class="timeline-year">2015</div><div><strong>Soft-target knowledge distillation.</strong><p>Temperature-scaled class distributions transfer information beyond the hard label [[60]].</p></div></div>
+          <div class="timeline-item"><div class="timeline-year">2016</div><div><strong>Sequence-level knowledge distillation.</strong><p>Teacher-decoded sequences become supervision for structured generation rather than independent class decisions [[61]].</p></div></div>
+          <div class="timeline-item"><div class="timeline-year">2019–2020</div><div><strong>Pre-trained language-model compression.</strong><p>DistilBERT integrates KD into pre-training; TinyBERT transfers embedding, hidden-state, attention, and prediction-layer knowledge [[62,63]].</p></div></div>
+          <div class="timeline-item"><div class="timeline-year">2022–2023</div><div><strong>Synthetic instruction and explanation data.</strong><p>Self-Instruct and Alpaca scale instruction supervision; Orca transfers complex explanation traces [[36,37,38]].</p></div></div>
+          <div class="timeline-item"><div class="timeline-year">2023–2024</div><div><strong>Generative and on-policy objectives.</strong><p>MiniLLM replaces standard forward KL with reverse KL for generative KD, while Generalized Knowledge Distillation trains on student-generated output sequences [[40,41]].</p></div></div>
+          <div class="timeline-item"><div class="timeline-year">2024–2026</div><div><strong>Family compression and production pipelines.</strong><p>Pruning-assisted, reasoning-data, hosted, and multi-model pipelines make the true object of provenance a dependency graph rather than a single teacher–student pair [[42,44,45,47,56]].</p></div></div>
+        </div>
+        <p>Two methodological shifts are particularly important. First, the training distribution can become <strong>on-policy</strong>. Standard supervised KD trains on a fixed corpus, creating a mismatch between contexts observed during training and sequences produced by the student at inference. MiniLLM minimizes reverse Kullback–Leibler divergence and uses student-sampled sequences to reduce exposure bias [[40]]. Generalized Knowledge Distillation explicitly queries the teacher on student-generated output sequences and supports multiple divergence objectives [[41]].</p>
+        <p>Second, teacher identity no longer determines teacher role. The same model may generate candidate answers, or a different model may critique, rank, rewrite, filter, or provide a reward signal. These operations can transfer decision boundaries without copying final text. Consequently, a modern audit must ask not only <em>which model contributed</em>, but also <em>through which supervision role and at which stage</em>.</p>
+        <div class="survey-note"><b>Terminology discipline</b><em>Sequence-level knowledge distillation</em>, <em>reverse KL distillation</em>, <em>Generalized Knowledge Distillation</em>, <em>explanation traces</em>, and <em>progressive learning</em> are terms tied to specific papers [[61,40,41,38]]. By contrast, this observatory uses <em>composite distillation</em> as an umbrella label for multi-teacher, role-specialized, progressive, and multi-stage pipelines. The label is organizational and should be introduced as “we use the term,” not cited as an established consensus category.</div>`
+      },
+      {
+        title: "A Unified Taxonomy and Threat Model",
+        body: `<p>A useful taxonomy must separate dimensions that answer different questions. Calling a method merely “black-box distillation” identifies the teacher-access condition but does not say whether the student learned from final responses, reasoning traces, rankings, or tool trajectories. Similarly, “multi-teacher” describes topology but not the transferred signal. We therefore organize a pipeline along four axes.</p>
+        <table class="matrix"><thead><tr><th>Axis</th><th>Question</th><th>Representative values</th></tr></thead><tbody>
+          <tr><td>Knowledge signal</td><td>What supervision is transferred?</td><td>Logits, hidden representations, responses, explanation traces, preferences, critiques, tool trajectories</td></tr>
+          <tr><td>Teacher topology</td><td>How are models connected?</td><td>Self-, single-, multi-teacher; progressive; role-specialized; multi-stage</td></tr>
+          <tr><td>Audit access</td><td>What can the auditor observe?</td><td>Outputs, top-k logprobs, full logits, hidden states, routing, gradients, weights, training records</td></tr>
+          <tr><td>Claim evidence</td><td>What supports the real-world conclusion?</td><td>Official disclosure, public artifact, controlled experiment, private telemetry, or reporting</td></tr>
+        </tbody></table>
+        <p>Formally, let a model supply chain be a directed attributed graph <em>G</em> = (<em>V</em>, <em>E</em>). Each node is a model checkpoint or service. A directed edge <em>e</em><sub>i→j</sub> records an influence from model <em>M</em><sub>i</sub> to model <em>M</em><sub>j</sub>, together with an edge type <em>z</em> (for example, weight inheritance, response distillation, reasoning distillation, preference supervision, or merging), a teacher role <em>r</em>, and an access condition <em>a</em>.</p>
+        <div class="equation">e<sub>i→j</sub> = (M<sub>i</sub>, M<sub>j</sub>, z, r, a, w), &nbsp; G = (V, E). <span class="eq-label">(4)</span></div>
+        <p>The optional quantity <em>w</em> denotes an estimated influence strength. It should not automatically be interpreted as the exact proportion of training examples contributed by a teacher: behavioral influence, optimization weighting, filtering, and data volume are not generally identifiable from the final model alone.</p>
+        <h3>Threat model</h3>
+        <p>The suspect model may be open-weight or API-only. Candidate teachers may likewise be local models, public APIs, or undisclosed sources. The auditor may receive only final text, or progressively stronger evidence such as token probabilities, an earlier student checkpoint, hidden states, expert routing, parameters, or training manifests. The true teacher may be absent from the candidate pool, and several candidates may have contributed through different roles.</p>
+        <p>These conditions imply an <strong>open-world, typed attribution problem</strong>. The desired output is not always a single label. It may be a provenance set with coverage guarantees [[7]], a dependency graph [[9]], or an abstention when the evidence cannot distinguish teacher influence from shared ancestry, public data, common third teachers, or ordinary capability convergence. The Model Provenance Constitution provides useful standardized relationship and reporting concepts, but such specifications should be kept distinct from empirical proof [[59]].</p>`
+      },
+      {
+        title: "Requirements of a Reliable Distillation Audit",
+        body: `<p>Distillation auditing asks whether observations from a suspect model are better explained by a candidate teacher relationship than by plausible alternatives. For a candidate teacher <em>T</em> and suspect student <em>S</em>, the basic decision can be written as</p>
+        <div class="equation">H<sub>0</sub>: T did not supply distillation supervision to S &nbsp;&nbsp; versus &nbsp;&nbsp; H<sub>1</sub>: T supplied distillation supervision to S. <span class="eq-label">(5)</span></div>
+        <p>The hard part is specifying <em>H</em><sub>0</sub>. Unrelated models are often too easy. A credible null must include models with the same base family, overlapping public data, similar capability, shared tokenizers, common third teachers, and comparable post-training. Model Provenance Testing treats output-only attribution as a multiple-hypothesis-testing problem against a baseline of unrelated-model similarities [[2]], while later provenance-set work replaces a forced winner with a statistically controlled set of plausible sources [[7]].</p>
+        <div class="property-grid">
+          <div class="property-card"><b>Construct validity</b>The score must measure teacher-induced dependence rather than generic answer quality, model size, style, tokenizer overlap, or shared ancestry.</div>
+          <div class="property-card"><b>Discriminability and specificity</b>The method should separate the true teacher from hard negatives and distinguish distillation from checkpoint inheritance, merging, or ordinary fine-tuning.</div>
+          <div class="property-card"><b>Robustness</b>The conclusion should remain stable after decoding changes, prompt wrappers, continued fine-tuning, pruning, quantization, merging, paraphrasing, or multi-stage rewriting.</div>
+          <div class="property-card"><b>Calibration and abstention</b>Reported confidence should match empirical error, account for multiple candidates, and support “unknown teacher” or “insufficient evidence” decisions.</div>
+          <div class="property-card"><b>Efficiency</b>Black-box methods should report query cost at a fixed confidence or false-positive level; white-box methods should report required checkpoints, memory, and compute.</div>
+          <div class="property-card"><b>Reproducibility and claim discipline</b>Training edges, hard negatives, prompts, access assumptions, and evidence sources must be documented. Provider telemetry and news reports cannot be presented as independently reproduced model-lineage proof.</div>
+        </div>
+        <p>Evidence channels have different strengths and failure modes. Output-only fingerprints and active probes can operate against APIs [[14,15]], but may be confounded by shared capability or prompt wrappers. Access to student weights and a teacher API enables data-free synthesis and stronger statistical scoring [[3]]. Reference checkpoints can isolate behavior acquired during a specific training interval [[6]], while representations, expert routing, gradients, and weight trajectories can provide more specific white-box traces [[4,8,10,11,12]]. Provider telemetry can reveal coordinated collection infrastructure unavailable to an external auditor, but it supports an operational campaign claim rather than a self-contained forensic result [[49]].</p>
+        <div class="claim-box"><b>Claim ladder</b><strong>Detection</strong> asks whether some distillation occurred. <strong>Attribution</strong> asks which candidate teacher contributed. <strong>Role attribution</strong> asks whether the teacher generated, judged, critiqued, filtered, or rewarded. <strong>Mixture recovery</strong> estimates a teacher set or relative influence. <strong>Provenance reconstruction</strong> infers a typed multi-stage graph. Each step requires stronger assumptions than the previous one, and a paper should not report a higher-level claim using only a lower-level experiment.</div>
+        <p>The remainder of this observatory follows this distinction. Distillation-method pages explain how supervision is produced; auditing pages study what traces survive; attacks and defenses examine collection and signal manipulation; evaluation pages define hard negatives, calibration, and robustness; and real-world pages separate official disclosure from experimental inference and allegation.</p>`
+      }
     ],
     view: "preliminary",
   },
@@ -418,7 +498,7 @@ function matchesView(record, view) {
   const cats = record.categories || [];
   if (!view || view === "none") return false;
   if (view === "all") return true;
-  if (view === "preliminary") return cats.includes("surveys-tools") || includesAny(t, ["survey", "constitution", "copy, right", "model provenance testing"]);
+  if (view === "preliminary") return ["r60", "r61", "r62", "r63"].includes(record.id) || cats.includes("surveys-tools") || includesAny(t, ["survey", "constitution", "copy, right", "model provenance testing"]);
   if (view === "taxonomy") return cats.includes("surveys-tools") || cats.includes("datasets-benchmarks") || includesAny(t, ["taxonomy", "provenance constitution", "sok:"]);
   if (view === "white-box-distillation") return (cats.includes("distillation-methods") || cats.includes("open-disclosures") || cats.includes("closed-disclosures")) && includesAny(t, ["logit", "probabilities", "distribution", "weights", "representation", "routing", "pruning", "recurrent", "mamba", "on-policy", "minillm", "minitron", "llama 3.2", "gemini 1.5 flash"]);
   if (view === "black-box-distillation") return (cats.includes("distillation-methods") || cats.includes("open-disclosures") || cats.includes("closed-disclosures")) && includesAny(t, ["outputs", "response", "instruction", "reasoning", "explanation", "gpt-4", "text-davinci", "teacher-generated", "hosted", "critique", "feedback", "synthetic"]);
@@ -456,7 +536,21 @@ const citationHtml = (refs = []) => {
   if (!unique.length) return "";
   return `<span class="inline-citations">${unique.map((n) => `<a href="${referenceHref(n)}" title="Reference ${n}">[${n}]</a>`).join(" ")}</span>`;
 };
-const pageReferenceNumbers = () => [...new Set((SITE_CONTENT.sectionRefs?.[pageKey] || []).flat())];
+const citationTokenPattern = /\[\[([0-9,\s]+)\]\]/g;
+const expandCitationTokens = (html = "") => String(html).replace(citationTokenPattern, (_, raw) => citationHtml(raw.split(",").map((value) => Number(value.trim()))));
+const inlineReferenceNumbers = (html = "") => {
+  const refs = [];
+  String(html).replace(citationTokenPattern, (_, raw) => {
+    raw.split(",").map((value) => Number(value.trim())).filter(Number.isInteger).forEach((value) => refs.push(value));
+    return "";
+  });
+  return refs;
+};
+const pageReferenceNumbers = () => {
+  const configured = (SITE_CONTENT.sectionRefs?.[pageKey] || []).flat();
+  const inline = (config?.sections || []).flatMap((section) => inlineReferenceNumbers(section.body));
+  return [...new Set([...configured, ...inline])];
+};
 let tocObserver = null;
 
 function buildChrome() {
@@ -517,7 +611,10 @@ function renderPage() {
   const sectionRefRows = SITE_CONTENT.sectionRefs?.[pageKey] || [];
   const sections = (config.sections || []).map((section, index) => {
     const refs = sectionRefRows[index] || [];
-    return `<section class="panel topic-section"><h2>${section.title}</h2><div class="section-body">${section.body}${citationHtml(refs)}</div>${refs.length ? `<div class="section-reference-note"><span>${esc(ui.citedReferences || "References")}</span>${citationHtml(refs)}</div>` : ""}</section>`;
+    const hasInlineCitations = citationTokenPattern.test(section.body);
+    citationTokenPattern.lastIndex = 0;
+    const renderedBody = expandCitationTokens(section.body);
+    return `<section class="panel topic-section"><h2>${section.title}</h2><div class="section-body">${renderedBody}${hasInlineCitations ? "" : citationHtml(refs)}</div>${refs.length && !hasInlineCitations ? `<div class="section-reference-note"><span>${esc(ui.citedReferences || "References")}</span>${citationHtml(refs)}</div>` : ""}</section>`;
   }).join("");
   const questions = details?.questions?.length ? `<section class="panel questions-panel"><h2>${esc(ui.researchQuestions || "Research questions")}</h2><ol>${details.questions.map((question) => `<li>${esc(question)}</li>`).join("")}</ol></section>` : "";
   const hasResources = Boolean(config.view);

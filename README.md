@@ -15,7 +15,8 @@ A static, multi-page bilingual research website organized around the technical l
 ## Contents
 
 - 22 second-level research pages grouped under seven first-level sections
-- 59 curated papers, repositories, disclosures, reports, and policies with stable reference numbers `[1]`–`[59]`
+- A long-form bilingual Preliminary survey chapter with formal definitions, equations, historical evolution, and sentence-level citations
+- 63 curated papers, repositories, disclosures, reports, and policies with stable reference numbers `[1]`–`[63]`
 - Inline, clickable citations from technical statements to the master bibliography
 - Searchable and evidence-filtered literature cards with bilingual summaries
 - English/Chinese interface and page-content switching; original paper titles remain unchanged

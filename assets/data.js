@@ -1302,5 +1302,98 @@ window.RESOURCE_DATA=[
       "specification",
       "terminology"
     ]
+  },
+  {
+    "id": "r60",
+    "title": "Distilling the Knowledge in a Neural Network",
+    "year": 2015,
+    "venue": "NeurIPS Deep Learning Workshop / arXiv",
+    "kind": "Foundational Paper",
+    "categories": [
+      "distillation-methods",
+      "surveys-tools"
+    ],
+    "access": [
+      "Teacher probability distributions"
+    ],
+    "evidence": "C — foundational controlled experiments",
+    "url": "https://arxiv.org/abs/1503.02531",
+    "repo": "",
+    "summary": "Formalizes modern knowledge distillation through softened teacher distributions and temperature-scaled training, establishing the canonical teacher–student compression objective.",
+    "tags": [
+      "soft targets",
+      "temperature scaling",
+      "classical KD"
+    ]
+  },
+  {
+    "id": "r61",
+    "title": "Sequence-Level Knowledge Distillation",
+    "year": 2016,
+    "venue": "EMNLP 2016",
+    "kind": "Foundational Paper",
+    "categories": [
+      "distillation-methods",
+      "open-disclosures"
+    ],
+    "access": [
+      "Teacher-generated sequences"
+    ],
+    "evidence": "C — controlled sequence-model experiments",
+    "url": "https://aclanthology.org/D16-1139/",
+    "repo": "",
+    "summary": "Extends distillation from token or class distributions to teacher-decoded target sequences, creating a foundational sequence-level supervision paradigm for generation models.",
+    "tags": [
+      "sequence-level KD",
+      "teacher decoding",
+      "generation"
+    ]
+  },
+  {
+    "id": "r62",
+    "title": "DistilBERT, a Distilled Version of BERT: Smaller, Faster, Cheaper and Lighter",
+    "year": 2019,
+    "venue": "NeurIPS 2019 Workshop / arXiv",
+    "kind": "Paper",
+    "categories": [
+      "distillation-methods",
+      "open-disclosures"
+    ],
+    "access": [
+      "Teacher logits and representations"
+    ],
+    "evidence": "C — controlled pre-training distillation",
+    "url": "https://arxiv.org/abs/1910.01108",
+    "repo": "https://github.com/huggingface/transformers",
+    "summary": "Applies knowledge distillation during language-model pre-training with a triple objective combining language modeling, distillation, and cosine-distance losses.",
+    "tags": [
+      "pre-training distillation",
+      "cosine loss",
+      "BERT compression"
+    ]
+  },
+  {
+    "id": "r63",
+    "title": "TinyBERT: Distilling BERT for Natural Language Understanding",
+    "year": 2020,
+    "venue": "Findings of EMNLP 2020",
+    "kind": "Paper + Code",
+    "categories": [
+      "distillation-methods",
+      "open-disclosures",
+      "repositories"
+    ],
+    "access": [
+      "Teacher embeddings, hidden states, attention, and logits"
+    ],
+    "evidence": "C — controlled Transformer distillation",
+    "url": "https://aclanthology.org/2020.findings-emnlp.372/",
+    "repo": "https://github.com/huawei-noah/Pretrained-Language-Model/tree/master/TinyBERT",
+    "summary": "Introduces a two-stage Transformer distillation framework that transfers embedding, hidden-state, attention, and prediction-layer knowledge during general and task-specific learning.",
+    "tags": [
+      "Transformer distillation",
+      "two-stage learning",
+      "intermediate representations"
+    ]
   }
 ];
