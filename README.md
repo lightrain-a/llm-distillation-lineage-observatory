@@ -19,8 +19,9 @@ A static, multi-page bilingual research website organized around the technical l
 - 63 curated papers, repositories, disclosures, reports, and policies with stable reference numbers `[1]`–`[63]`
 - Inline, clickable citations from technical statements to the master bibliography
 - Searchable and evidence-filtered literature cards with bilingual summaries
-- English/Chinese interface, page-content switching, and language-matched diagrams; original paper titles remain unchanged
+- English/Chinese interface, cross-page language persistence, reading-position preservation, and language-matched diagrams; original paper titles remain unchanged
 - Worked methodological examples, including score-, ranking-, and pairwise-preference supervision in judge distillation
+- Accessible mobile navigation with backdrop dismissal, Escape handling, focus trapping, and focus restoration
 - Automatic per-page H2/H3 table of contents
 - Open-weight/closed-model and black-box/white-box treated as orthogonal attributes
 - Evidence grades A–E
@@ -30,6 +31,16 @@ A static, multi-page bilingual research website organized around the technical l
 ```bash
 python -m http.server 8000
 ```
+
+## Quality assurance
+
+```bash
+node --check assets/app.js
+node --check assets/content.mjs
+python qa/site_smoke_test.py
+```
+
+The browser test verifies bilingual rendering, reference-data integrity, reading-position preservation, accessible landmarks, mobile navigation behavior, and remote-figure fallback handling in headless Microsoft Edge.
 
 ## Deployment
 

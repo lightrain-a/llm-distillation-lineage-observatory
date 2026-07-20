@@ -581,6 +581,177 @@ const pageReferenceNumbers = () => {
   return [...new Set([...configured, ...inline])];
 };
 let tocObserver = null;
+let lastSidebarTrigger = null;
+let integrityReport = { ok: false, errors: [] };
+
+const isMobileNav = () => window.matchMedia("(max-width: 820px)").matches;
+const getFocusable = (container) => [...container.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), summary, [tabindex]:not([tabindex="-1"])')].filter((el) => !el.hidden && el.offsetParent !== null);
+
+function captureReadingContext() {
+  const headings = [...document.querySelectorAll("#dynamic-page h2, #dynamic-page h3")];
+  if (!headings.length) return null;
+  let index = 0;
+  let best = Infinity;
+  headings.forEach((heading, i) => {
+    const distance = Math.abs(heading.getBoundingClientRect().top - 110);
+    if (distance < best) {
+      best = distance;
+      index = i;
+    }
+  });
+  return { index, viewportTop: headings[index].getBoundingClientRect().top };
+}
+
+function restoreReadingContext(context) {
+  if (!context) return;
+  const headings = [...document.querySelectorAll("#dynamic-page h2, #dynamic-page h3")];
+  const target = headings[Math.min(context.index, headings.length - 1)];
+  if (!target) return;
+  window.scrollBy({ top: target.getBoundingClientRect().top - context.viewportTop, behavior: "auto" });
+}
+
+function ensureAccessibilityChrome() {
+  const body = document.body;
+  const sidebar = document.querySelector(".sidebar");
+  const main = document.querySelector(".main");
+  const nav = document.querySelector(".nav");
+  const toggle = document.querySelector(".mobile-toggle");
+  const search = document.getElementById("site-search");
+  if (!body || !sidebar || !main) return;
+
+  if (!document.querySelector(".skip-link")) {
+    const skip = document.createElement("a");
+    skip.className = "skip-link";
+    skip.href = "#dynamic-page";
+    body.prepend(skip);
+  }
+  const skip = document.querySelector(".skip-link");
+  skip.textContent = language === "zh" ? "跳到正文" : "Skip to main content";
+
+  sidebar.id = "site-sidebar";
+  sidebar.setAttribute("aria-label", language === "zh" ? "站点导航" : "Site navigation");
+  main.id = "main-content";
+  main.setAttribute("role", "main");
+  nav?.setAttribute("aria-label", language === "zh" ? "研究主题" : "Research topics");
+  const root = document.getElementById("dynamic-page");
+  root?.setAttribute("tabindex", "-1");
+
+  if (!sidebar.querySelector(".sidebar-close")) {
+    const close = document.createElement("button");
+    close.type = "button";
+    close.className = "sidebar-close";
+    close.textContent = "×";
+    sidebar.prepend(close);
+  }
+  const close = sidebar.querySelector(".sidebar-close");
+  close.setAttribute("aria-label", language === "zh" ? "关闭导航" : "Close navigation");
+
+  if (!document.querySelector(".sidebar-overlay")) {
+    const overlay = document.createElement("button");
+    overlay.type = "button";
+    overlay.className = "sidebar-overlay";
+    overlay.hidden = true;
+    body.appendChild(overlay);
+  }
+  const overlay = document.querySelector(".sidebar-overlay");
+  overlay.setAttribute("aria-label", language === "zh" ? "关闭导航" : "Close navigation");
+
+  if (toggle) {
+    toggle.type = "button";
+    toggle.setAttribute("aria-controls", "site-sidebar");
+    toggle.setAttribute("aria-expanded", sidebar.classList.contains("open") ? "true" : "false");
+  }
+  if (search) {
+    search.setAttribute("aria-label", language === "zh" ? "搜索当前页面的参考文献" : "Search references shown on this page");
+    search.setAttribute("title", language === "zh" ? "只筛选当前页面展示的文献；全部记录请查看参考文献总表。" : "Filters only the references shown on this page; use Master Bibliography for all records.");
+  }
+  sidebar.setAttribute("aria-hidden", isMobileNav() && !sidebar.classList.contains("open") ? "true" : "false");
+}
+
+function openSidebar(trigger) {
+  if (!isMobileNav()) return;
+  const sidebar = document.querySelector(".sidebar");
+  const overlay = document.querySelector(".sidebar-overlay");
+  const toggle = document.querySelector(".mobile-toggle");
+  if (!sidebar || !overlay) return;
+  lastSidebarTrigger = trigger || document.activeElement;
+  sidebar.classList.add("open");
+  sidebar.setAttribute("aria-hidden", "false");
+  overlay.hidden = false;
+  document.body.classList.add("mobile-nav-open");
+  toggle?.setAttribute("aria-expanded", "true");
+  requestAnimationFrame(() => sidebar.querySelector(".sidebar-close")?.focus());
+}
+
+function closeSidebar({ restoreFocus = true } = {}) {
+  const sidebar = document.querySelector(".sidebar");
+  const overlay = document.querySelector(".sidebar-overlay");
+  const toggle = document.querySelector(".mobile-toggle");
+  if (!sidebar || !overlay) return;
+  sidebar.classList.remove("open");
+  sidebar.setAttribute("aria-hidden", isMobileNav() ? "true" : "false");
+  overlay.hidden = true;
+  document.body.classList.remove("mobile-nav-open");
+  toggle?.setAttribute("aria-expanded", "false");
+  if (restoreFocus && lastSidebarTrigger instanceof HTMLElement) lastSidebarTrigger.focus();
+}
+
+function handleSidebarKeydown(event) {
+  const sidebar = document.querySelector(".sidebar");
+  if (!sidebar?.classList.contains("open")) return;
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closeSidebar();
+    return;
+  }
+  if (event.key !== "Tab") return;
+  const focusable = getFocusable(sidebar);
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
+function validateSiteData() {
+  const errors = [];
+  const ids = new Set();
+  DATA.forEach((record, index) => {
+    if (record.refNo !== index + 1) errors.push(`Reference sequence mismatch at ${record.id || index + 1}`);
+    if (!record.id || ids.has(record.id)) errors.push(`Duplicate or missing reference id: ${record.id || index + 1}`);
+    ids.add(record.id);
+    if (!SITE_CONTENT.summaryZh?.[record.id]) errors.push(`Missing Chinese summary: ${record.id}`);
+  });
+  Object.keys(PAGE_CONFIG).forEach((key) => {
+    if (!SITE_CONTENT.zhPages?.[key]) errors.push(`Missing Chinese page: ${key}`);
+  });
+  const checkRef = (value, context) => {
+    if (!Number.isInteger(value) || value < 1 || value > DATA.length) errors.push(`Invalid reference ${value} in ${context}`);
+  };
+  Object.entries(SITE_CONTENT.sectionRefs || {}).forEach(([key, rows]) => rows.flat().forEach((value) => checkRef(value, `sectionRefs.${key}`)));
+  Object.entries(PAGE_CONFIG).forEach(([key, page]) => (page.sections || []).flatMap((section) => inlineReferenceNumbers(section.body)).forEach((value) => checkRef(value, `PAGE_CONFIG.${key}`)));
+  Object.entries(SITE_CONTENT.zhPages || {}).forEach(([key, page]) => (page.sections || []).flatMap((section) => inlineReferenceNumbers(section.body)).forEach((value) => checkRef(value, `zhPages.${key}`)));
+  integrityReport = { ok: errors.length === 0, errors };
+  window.__SITE_INTEGRITY_REPORT__ = integrityReport;
+  document.documentElement.dataset.integrity = integrityReport.ok ? "pass" : "fail";
+  if (errors.length) console.error("Site integrity errors:", errors);
+  return integrityReport;
+}
+
+function configurePaperFigureFallbacks() {
+  document.querySelectorAll(".paper-figure-image img").forEach((image) => {
+    const fallback = image.closest(".paper-figure-panel")?.querySelector(".paper-figure-fallback");
+    image.addEventListener("error", () => {
+      image.hidden = true;
+      if (fallback) fallback.hidden = false;
+    }, { once: true });
+  });
+}
 
 function buildChrome() {
   const ui = getUi();
@@ -598,10 +769,12 @@ function buildChrome() {
     toggle.textContent = ui.languageButton || (language === "zh" ? "EN" : "中文");
     toggle.setAttribute("aria-label", language === "zh" ? "Switch to English" : "切换到中文");
     toggle.onclick = () => {
+      const readingContext = captureReadingContext();
       language = language === "zh" ? "en" : "zh";
       localStorage.setItem("distill-observatory-language", language);
       grade = "all";
       renderAll();
+      requestAnimationFrame(() => requestAnimationFrame(() => restoreReadingContext(readingContext)));
     };
   }
   const search = document.getElementById("site-search");
@@ -644,7 +817,7 @@ function renderPage() {
   const detailPanel = details ? `<section class="panel scope-panel"><h2>${esc(ui.scopeTerminology || "Scope and terminology")}</h2><p>${details.overview} ${detailRefs}</p><h3>${esc(ui.keyTerms || "Key terms")}</h3><div class="term-list">${(details.terms || []).map((term) => `<span class="term-chip">${esc(term)}</span>`).join("")}</div></section>` : "";
   const paperFigure = PAPER_FIGURES[pageKey];
   const paperFigureText = paperFigure ? (paperFigure[language] || paperFigure.en) : null;
-  const paperFigureBlock = paperFigure ? `<section class="panel paper-figure-panel"><div class="paper-figure-heading"><div><div class="eyebrow">${language === "zh" ? "2025 最新工作" : "Recent work · 2025"}</div><h2>${esc(paperFigureText.title)}</h2></div><a class="link-btn" href="${paperFigure.sourceHref}" target="_blank" rel="noopener">${language === "zh" ? "查看原论文 ↗" : "Open paper ↗"}</a></div><a class="paper-figure-image" href="${paperFigure.src}" target="_blank" rel="noopener"><img src="${paperFigure.src}" alt="${esc(paperFigureText.title)}" loading="lazy"></a><figcaption>${paperFigureText.caption} ${citationHtml([paperFigure.refNo])}</figcaption></section>` : "";
+  const paperFigureBlock = paperFigure ? `<section class="panel paper-figure-panel"><div class="paper-figure-heading"><div><div class="eyebrow">${language === "zh" ? "2025 最新工作" : "Recent work · 2025"}</div><h2>${esc(paperFigureText.title)}</h2></div><a class="link-btn" href="${paperFigure.sourceHref}" target="_blank" rel="noopener">${language === "zh" ? "查看原论文 ↗" : "Open paper ↗"}</a></div><a class="paper-figure-image" href="${paperFigure.src}" target="_blank" rel="noopener"><img src="${paperFigure.src}" alt="${esc(paperFigureText.title)}" loading="lazy" decoding="async" referrerpolicy="no-referrer"></a><div class="paper-figure-fallback" hidden><strong>${language === "zh" ? "原图暂时无法加载" : "The original figure is temporarily unavailable"}</strong><span>${language === "zh" ? "请通过论文入口查看原图和完整上下文。" : "Open the paper to view the figure and its full context."}</span><a class="link-btn" href="${paperFigure.sourceHref}" target="_blank" rel="noopener">${language === "zh" ? "查看原论文 ↗" : "Open paper ↗"}</a></div><figcaption>${paperFigureText.caption} ${citationHtml([paperFigure.refNo])}</figcaption></section>` : "";
   const sectionRefRows = SITE_CONTENT.sectionRefs?.[pageKey] || [];
   const sections = (config.sections || []).map((section, index) => {
     const refs = sectionRefRows[index] || [];
@@ -655,7 +828,8 @@ function renderPage() {
   }).join("");
   const questions = details?.questions?.length ? `<section class="panel questions-panel"><h2>${esc(ui.researchQuestions || "Research questions")}</h2><ol>${details.questions.map((question) => `<li>${esc(question)}</li>`).join("")}</ol></section>` : "";
   const hasResources = Boolean(config.view);
-  const resourceBlock = hasResources ? `<section class="literature-section"><h2>${esc(ui.selectedLiterature || "Selected literature and evidence")}</h2><p class="section-intro">${esc(ui.literatureIntro || "")}</p><p class="original-title-note">${esc(ui.originalTitleNote || "")}</p><div class="filters"><button class="filter-btn active" data-grade="all">${esc(ui.allEvidence || "All evidence")}</button><button class="filter-btn" data-grade="A">${esc(ui.evidenceA || "A")}</button><button class="filter-btn" data-grade="B">${esc(ui.evidenceB || "B")}</button><button class="filter-btn" data-grade="C">${esc(ui.evidenceC || "C")}</button><button class="filter-btn" data-grade="D">${esc(ui.evidenceD || "D")}</button><button class="filter-btn" data-grade="E">${esc(ui.evidenceE || "E")}</button></div><div id="resource-list" class="resource-list"></div></section>` : "";
+  const integrityBlock = pageKey === "bibliography" ? `<div class="integrity-status ${integrityReport.ok ? "pass" : "fail"}" role="status"><strong>${language === "zh" ? "自动完整性检查" : "Automated integrity check"}</strong><span>${integrityReport.ok ? (language === "zh" ? `通过：${DATA.length} 条编号连续，中文摘要、页面翻译和引用范围完整。` : `Passed: ${DATA.length} sequential records with complete Chinese summaries, page translations, and in-range citations.`) : (language === "zh" ? `发现 ${integrityReport.errors.length} 个问题，请查看浏览器控制台。` : `${integrityReport.errors.length} issues found; inspect the browser console.`)}</span></div>` : "";
+  const resourceBlock = hasResources ? `<section class="literature-section"><h2>${esc(ui.selectedLiterature || "Selected literature and evidence")}</h2><p class="section-intro">${esc(ui.literatureIntro || "")}</p><p class="original-title-note">${esc(ui.originalTitleNote || "")}</p>${integrityBlock}<div class="filters"><button class="filter-btn active" data-grade="all">${esc(ui.allEvidence || "All evidence")}</button><button class="filter-btn" data-grade="A">${esc(ui.evidenceA || "A")}</button><button class="filter-btn" data-grade="B">${esc(ui.evidenceB || "B")}</button><button class="filter-btn" data-grade="C">${esc(ui.evidenceC || "C")}</button><button class="filter-btn" data-grade="D">${esc(ui.evidenceD || "D")}</button><button class="filter-btn" data-grade="E">${esc(ui.evidenceE || "E")}</button></div><div id="resource-list" class="resource-list"></div></section>` : "";
   root.innerHTML = `<header><div class="eyebrow">${esc(config.eyebrow)}</div><h1>${esc(config.title)}</h1><p class="lead">${esc(config.lead)}</p></header>${overviewFigure}${callout}${stats}${detailPanel}${paperFigureBlock}${sections}${questions}${resourceBlock}`;
 }
 
@@ -716,6 +890,7 @@ function wireInteractions() {
   const search = document.getElementById("site-search");
   if (search) search.oninput = renderResources;
   document.querySelectorAll("[data-grade]").forEach((button) => {
+    button.type = "button";
     button.onclick = () => {
       document.querySelectorAll("[data-grade]").forEach((x) => x.classList.remove("active"));
       button.classList.add("active");
@@ -724,7 +899,27 @@ function wireInteractions() {
     };
   });
   const mobileToggle = document.querySelector(".mobile-toggle");
-  if (mobileToggle) mobileToggle.onclick = () => document.querySelector(".sidebar")?.classList.toggle("open");
+  if (mobileToggle) mobileToggle.onclick = () => {
+    const sidebar = document.querySelector(".sidebar");
+    if (sidebar?.classList.contains("open")) closeSidebar();
+    else openSidebar(mobileToggle);
+  };
+  const close = document.querySelector(".sidebar-close");
+  if (close) close.onclick = () => closeSidebar();
+  const overlay = document.querySelector(".sidebar-overlay");
+  if (overlay) overlay.onclick = () => closeSidebar();
+  document.querySelectorAll(".nav-level2").forEach((link) => {
+    link.addEventListener("click", () => closeSidebar({ restoreFocus: false }));
+  });
+  configurePaperFigureFallbacks();
+  if (!document.body.dataset.globalA11yHandlers) {
+    document.addEventListener("keydown", handleSidebarKeydown);
+    window.addEventListener("resize", () => {
+      if (!isMobileNav()) closeSidebar({ restoreFocus: false });
+      else document.querySelector(".sidebar")?.setAttribute("aria-hidden", document.querySelector(".sidebar")?.classList.contains("open") ? "false" : "true");
+    });
+    document.body.dataset.globalA11yHandlers = "true";
+  }
 }
 
 function renderAll() {
@@ -732,6 +927,7 @@ function renderAll() {
   buildChrome();
   buildNavigation();
   renderPage();
+  ensureAccessibilityChrome();
   buildPageToc();
   renderResources();
   wireInteractions();
@@ -739,13 +935,14 @@ function renderAll() {
 
 async function init() {
   try {
-    const module = await import(new URL("content.mjs?v=20260721-bilingual-fix", APP_ASSET_BASE).href);
+    const module = await import(new URL("content.mjs?v=20260721-review-round1", APP_ASSET_BASE).href);
     SITE_CONTENT = module.SITE_CONTENT || {};
   } catch (error) {
     console.warn("Bilingual content could not be loaded; falling back to English.", error);
     SITE_CONTENT = {};
     language = "en";
   }
+  validateSiteData();
   renderAll();
 }
 
