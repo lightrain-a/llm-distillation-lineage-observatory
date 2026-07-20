@@ -63,6 +63,35 @@ const NAV_GROUPS = [
   },
 ];
 
+const PAPER_FIGURES = {
+  "teacher-lineage-attribution": {
+    src: "https://arxiv.org/html/2502.06659/x1.png",
+    sourceHref: "https://aclanthology.org/2025.findings-acl.173/",
+    refNo: 1,
+    en: {
+      title: "Original overview: teacher model attribution",
+      caption: "Given a distilled student and a finite set of candidate teachers, identify which teacher supplied the supervision. The figure is reproduced unchanged from Wadhwa et al., Ref. [1], under CC BY 4.0.",
+    },
+    zh: {
+      title: "论文原图：教师模型归因",
+      caption: "给定一个蒸馏学生和有限候选教师集合，识别哪一个教师提供了训练监督。该图未经改绘，直接转载自 Wadhwa 等人的参考文献 [1]，许可协议为 CC BY 4.0。",
+    },
+  },
+  "output-only-auditing": {
+    src: "https://arxiv.org/html/2502.00706/figures/tester.png",
+    sourceHref: "https://openreview.net/forum?id=Iy4cAXotrf",
+    refNo: 2,
+    en: {
+      title: "Original overview: model provenance testing",
+      caption: "The tester compares a suspected parent–child pair against control models using black-box output similarity and multiple hypothesis testing. The figure is reproduced unchanged from Nikolić et al., Ref. [2], under CC BY 4.0.",
+    },
+    zh: {
+      title: "论文原图：模型来源检验",
+      caption: "该检验器利用黑盒输出相似性和多重假设检验，将疑似父模型—子模型关系与控制模型基线进行比较。该图未经改绘，直接转载自 Nikolić 等人的参考文献 [2]，许可协议为 CC BY 4.0。",
+    },
+  },
+};
+
 const PAGE_CONFIG = {
   home: {
     eyebrow: "Research map · mechanism-first taxonomy",
@@ -613,6 +642,9 @@ function renderPage() {
   const overviewFigure = pageKey === "preliminary" ? `<figure class="overview-figure"><a href="${overviewSrc}" target="_blank" rel="noopener"><img src="${overviewSrc}" alt="${esc(overviewCaption)}" loading="eager"></a><figcaption>${esc(overviewCaption)}</figcaption></figure>` : "";
   const detailRefs = citationHtml(pageReferenceNumbers().slice(0, 10));
   const detailPanel = details ? `<section class="panel scope-panel"><h2>${esc(ui.scopeTerminology || "Scope and terminology")}</h2><p>${details.overview} ${detailRefs}</p><h3>${esc(ui.keyTerms || "Key terms")}</h3><div class="term-list">${(details.terms || []).map((term) => `<span class="term-chip">${esc(term)}</span>`).join("")}</div></section>` : "";
+  const paperFigure = PAPER_FIGURES[pageKey];
+  const paperFigureText = paperFigure ? (paperFigure[language] || paperFigure.en) : null;
+  const paperFigureBlock = paperFigure ? `<section class="panel paper-figure-panel"><div class="paper-figure-heading"><div><div class="eyebrow">${language === "zh" ? "2025 最新工作" : "Recent work · 2025"}</div><h2>${esc(paperFigureText.title)}</h2></div><a class="link-btn" href="${paperFigure.sourceHref}" target="_blank" rel="noopener">${language === "zh" ? "查看原论文 ↗" : "Open paper ↗"}</a></div><a class="paper-figure-image" href="${paperFigure.src}" target="_blank" rel="noopener"><img src="${paperFigure.src}" alt="${esc(paperFigureText.title)}" loading="lazy"></a><figcaption>${paperFigureText.caption} ${citationHtml([paperFigure.refNo])}</figcaption></section>` : "";
   const sectionRefRows = SITE_CONTENT.sectionRefs?.[pageKey] || [];
   const sections = (config.sections || []).map((section, index) => {
     const refs = sectionRefRows[index] || [];
@@ -624,7 +656,7 @@ function renderPage() {
   const questions = details?.questions?.length ? `<section class="panel questions-panel"><h2>${esc(ui.researchQuestions || "Research questions")}</h2><ol>${details.questions.map((question) => `<li>${esc(question)}</li>`).join("")}</ol></section>` : "";
   const hasResources = Boolean(config.view);
   const resourceBlock = hasResources ? `<section class="literature-section"><h2>${esc(ui.selectedLiterature || "Selected literature and evidence")}</h2><p class="section-intro">${esc(ui.literatureIntro || "")}</p><p class="original-title-note">${esc(ui.originalTitleNote || "")}</p><div class="filters"><button class="filter-btn active" data-grade="all">${esc(ui.allEvidence || "All evidence")}</button><button class="filter-btn" data-grade="A">${esc(ui.evidenceA || "A")}</button><button class="filter-btn" data-grade="B">${esc(ui.evidenceB || "B")}</button><button class="filter-btn" data-grade="C">${esc(ui.evidenceC || "C")}</button><button class="filter-btn" data-grade="D">${esc(ui.evidenceD || "D")}</button><button class="filter-btn" data-grade="E">${esc(ui.evidenceE || "E")}</button></div><div id="resource-list" class="resource-list"></div></section>` : "";
-  root.innerHTML = `<header><div class="eyebrow">${esc(config.eyebrow)}</div><h1>${esc(config.title)}</h1><p class="lead">${esc(config.lead)}</p></header>${overviewFigure}${callout}${stats}${detailPanel}${sections}${questions}${resourceBlock}`;
+  root.innerHTML = `<header><div class="eyebrow">${esc(config.eyebrow)}</div><h1>${esc(config.title)}</h1><p class="lead">${esc(config.lead)}</p></header>${overviewFigure}${callout}${stats}${detailPanel}${paperFigureBlock}${sections}${questions}${resourceBlock}`;
 }
 
 let grade = "all";
