@@ -739,7 +739,7 @@ function renderAll() {
 
 async function init() {
   try {
-    const module = await import(new URL("content.mjs", APP_ASSET_BASE).href);
+    const module = await import(new URL("content.mjs?v=20260721-bilingual-fix", APP_ASSET_BASE).href);
     SITE_CONTENT = module.SITE_CONTENT || {};
   } catch (error) {
     console.warn("Bilingual content could not be loaded; falling back to English.", error);
