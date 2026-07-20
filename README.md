@@ -1,6 +1,6 @@
 # LLM Distillation & Lineage Observatory
 
-A static, multi-page English research website organized around the technical lifecycle of LLM distillation: definitions, distillation mechanisms, auditing, attacks and defenses, evaluation, real-world pipelines, and research gaps.
+A static, multi-page bilingual research website organized around the technical lifecycle of LLM distillation: definitions, distillation mechanisms, auditing, attacks and defenses, evaluation, real-world pipelines, and research gaps. English is the default language, with a persistent Chinese/English switch.
 
 ## Information architecture
 
@@ -15,8 +15,10 @@ A static, multi-page English research website organized around the technical lif
 ## Contents
 
 - 22 second-level research pages grouped under seven first-level sections
-- 59 curated papers, repositories, disclosures, reports, and policies
-- Searchable and evidence-filtered literature cards
+- 59 curated papers, repositories, disclosures, reports, and policies with stable reference numbers `[1]`–`[59]`
+- Inline, clickable citations from technical statements to the master bibliography
+- Searchable and evidence-filtered literature cards with bilingual summaries
+- English/Chinese interface and page-content switching; original paper titles remain unchanged
 - Automatic per-page H2/H3 table of contents
 - Open-weight/closed-model and black-box/white-box treated as orthogonal attributes
 - Evidence grades A–E

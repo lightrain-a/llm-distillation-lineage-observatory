@@ -1,4 +1,7 @@
-const DATA = window.RESOURCE_DATA || [];
+const APP_ASSET_BASE = new URL(".", document.currentScript.src);
+const DATA = (window.RESOURCE_DATA || []).map((record, index) => ({ ...record, refNo: index + 1 }));
+let SITE_CONTENT = {};
+let language = localStorage.getItem("distill-observatory-language") || "en";
 
 const NAV_GROUPS = [
   {
@@ -404,9 +407,9 @@ const PAGE_CONFIG = {
 
 const currentFile = (location.pathname.split("/").pop() || "index.html").toLowerCase();
 const pageKey = document.body.dataset.page || "home";
-const config = PAGE_CONFIG[pageKey] || PAGE_CONFIG.home;
+let config = PAGE_CONFIG[pageKey] || PAGE_CONFIG.home;
 const esc = (s) => String(s || "").replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
-const slugify = (s) => String(s || "section").toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+const slugify = (s) => String(s || "section").toLowerCase().replace(/&/g, "and").replace(/[^\p{L}\p{N}]+/gu, "-").replace(/(^-|-$)/g, "");
 const recordText = (r) => JSON.stringify(r).toLowerCase();
 const includesAny = (text, terms) => terms.some((term) => text.includes(term));
 
@@ -439,25 +442,87 @@ function matchesView(record, view) {
   return cats.includes(view);
 }
 
+const getUi = () => SITE_CONTENT.ui?.[language] || SITE_CONTENT.ui?.en || {};
+const getNavLabel = (label) => language === "zh" ? (SITE_CONTENT.navZh?.[label] || label) : label;
+const getActiveConfig = () => {
+  const base = PAGE_CONFIG[pageKey] || PAGE_CONFIG.home;
+  const translated = language === "zh" ? SITE_CONTENT.zhPages?.[pageKey] : null;
+  return translated ? { ...base, ...translated, view: base.view } : base;
+};
+const getPageDetails = () => SITE_CONTENT.pageDetails?.[pageKey]?.[language] || SITE_CONTENT.pageDetails?.[pageKey]?.en || null;
+const referenceHref = (refNo) => currentFile === "bibliography.html" ? `#ref-${refNo}` : `bibliography.html#ref-${refNo}`;
+const citationHtml = (refs = []) => {
+  const unique = [...new Set(refs.filter((n) => Number.isInteger(n) && n > 0 && n <= DATA.length))];
+  if (!unique.length) return "";
+  return `<span class="inline-citations">${unique.map((n) => `<a href="${referenceHref(n)}" title="Reference ${n}">[${n}]</a>`).join(" ")}</span>`;
+};
+const pageReferenceNumbers = () => [...new Set((SITE_CONTENT.sectionRefs?.[pageKey] || []).flat())];
+let tocObserver = null;
+
+function buildChrome() {
+  const ui = getUi();
+  document.documentElement.lang = language === "zh" ? "zh-CN" : "en";
+  const topbar = document.querySelector(".topbar");
+  const counter = document.getElementById("result-count");
+  let toggle = document.getElementById("language-toggle");
+  if (!toggle && topbar) {
+    toggle = document.createElement("button");
+    toggle.id = "language-toggle";
+    toggle.className = "language-toggle";
+    topbar.insertBefore(toggle, counter || null);
+  }
+  if (toggle) {
+    toggle.textContent = ui.languageButton || (language === "zh" ? "EN" : "中文");
+    toggle.setAttribute("aria-label", language === "zh" ? "Switch to English" : "切换到中文");
+    toggle.onclick = () => {
+      language = language === "zh" ? "en" : "zh";
+      localStorage.setItem("distill-observatory-language", language);
+      grade = "all";
+      renderAll();
+    };
+  }
+  const search = document.getElementById("site-search");
+  if (search) search.placeholder = ui.searchPlaceholder || "Search…";
+  const sidebarNote = document.querySelector(".sidebar-note");
+  if (sidebarNote) sidebarNote.innerHTML = `<a href="taxonomy.html">${language === "zh" ? "证据等级 A–E" : "Evidence grades A–E"}</a><br>${esc(ui.sidebarNote || "")}`;
+  const brandStrong = document.querySelector(".brand strong");
+  const brandSpan = document.querySelector(".brand span");
+  if (brandStrong) brandStrong.textContent = language === "zh" ? "蒸馏谱系" : "Distillation Lineage";
+  if (brandSpan) brandSpan.textContent = language === "zh" ? "研究观测站" : "Research Observatory";
+  const footer = document.querySelector(".footer");
+  if (footer) footer.textContent = language === "zh" ? "大语言模型蒸馏与谱系研究观测站" : "LLM Distillation & Lineage Observatory";
+}
+
 function buildNavigation() {
   const nav = document.querySelector(".nav");
   if (!nav) return;
   nav.innerHTML = NAV_GROUPS.map((group) => {
-    const links = group.pages.map(([href, label]) => `<a class="nav-level2${href === currentFile ? " active" : ""}" href="${href}">${esc(label)}</a>`).join("");
-    return `<details class="nav-group" open><summary class="nav-level1"><span>${esc(group.title)}</span><span class="nav-chevron">⌄</span></summary><div class="nav-children">${links}</div></details>`;
+    const isCurrentGroup = group.pages.some(([href]) => href === currentFile);
+    const links = group.pages.map(([href, label]) => `<a class="nav-level2${href === currentFile ? " active" : ""}" href="${href}">${esc(getNavLabel(label))}</a>`).join("");
+    return `<details class="nav-group"${isCurrentGroup || pageKey === "home" ? " open" : ""}><summary class="nav-level1"><span>${esc(getNavLabel(group.title))}</span><span class="nav-chevron">⌄</span></summary><div class="nav-children">${links}</div></details>`;
   }).join("");
 }
 
 function renderPage() {
   const root = document.getElementById("dynamic-page");
   if (!root) return;
-  document.title = pageKey === "home" ? config.title : `${config.title} · LLM Distillation Lineage Observatory`;
+  const ui = getUi();
+  config = getActiveConfig();
+  const details = getPageDetails();
+  document.title = pageKey === "home" ? config.title : `${config.title} · ${language === "zh" ? "大语言模型蒸馏与谱系研究观测站" : "LLM Distillation Lineage Observatory"}`;
   const stats = config.stats ? `<div class="grid">${config.stats.map(([n, label]) => `<div class="stat"><b>${esc(n)}</b><span>${esc(label)}</span></div>`).join("")}</div>` : "";
-  const callout = config.callout ? `<div class="callout"><strong>Core framing.</strong> ${config.callout}</div>` : "";
-  const sections = (config.sections || []).map((section) => `<section class="panel topic-section"><h2>${section.title}</h2><div class="section-body">${section.body}</div></section>`).join("");
+  const callout = config.callout ? `<div class="callout"><strong>${esc(ui.coreFraming || "Core framing.")}</strong> ${config.callout}</div>` : "";
+  const detailRefs = citationHtml(pageReferenceNumbers().slice(0, 10));
+  const detailPanel = details ? `<section class="panel scope-panel"><h2>${esc(ui.scopeTerminology || "Scope and terminology")}</h2><p>${details.overview} ${detailRefs}</p><h3>${esc(ui.keyTerms || "Key terms")}</h3><div class="term-list">${(details.terms || []).map((term) => `<span class="term-chip">${esc(term)}</span>`).join("")}</div></section>` : "";
+  const sectionRefRows = SITE_CONTENT.sectionRefs?.[pageKey] || [];
+  const sections = (config.sections || []).map((section, index) => {
+    const refs = sectionRefRows[index] || [];
+    return `<section class="panel topic-section"><h2>${section.title}</h2><div class="section-body">${section.body}${citationHtml(refs)}</div>${refs.length ? `<div class="section-reference-note"><span>${esc(ui.citedReferences || "References")}</span>${citationHtml(refs)}</div>` : ""}</section>`;
+  }).join("");
+  const questions = details?.questions?.length ? `<section class="panel questions-panel"><h2>${esc(ui.researchQuestions || "Research questions")}</h2><ol>${details.questions.map((question) => `<li>${esc(question)}</li>`).join("")}</ol></section>` : "";
   const hasResources = Boolean(config.view);
-  const resourceBlock = hasResources ? `<section class="literature-section"><h2>Selected literature and evidence</h2><p class="section-intro">Records are selected by the current mechanism or audit question. Use search and evidence filters to narrow the list.</p><div class="filters"><button class="filter-btn active" data-grade="all">All evidence</button><button class="filter-btn" data-grade="A">A · official</button><button class="filter-btn" data-grade="B">B · source-grounded</button><button class="filter-btn" data-grade="C">C · experimental</button><button class="filter-btn" data-grade="D">D · provider telemetry</button><button class="filter-btn" data-grade="E">E · reporting</button></div><div id="resource-list" class="resource-list"></div></section>` : "";
-  root.innerHTML = `<header><div class="eyebrow">${esc(config.eyebrow)}</div><h1>${esc(config.title)}</h1><p class="lead">${esc(config.lead)}</p></header>${callout}${stats}${sections}${resourceBlock}`;
+  const resourceBlock = hasResources ? `<section class="literature-section"><h2>${esc(ui.selectedLiterature || "Selected literature and evidence")}</h2><p class="section-intro">${esc(ui.literatureIntro || "")}</p><p class="original-title-note">${esc(ui.originalTitleNote || "")}</p><div class="filters"><button class="filter-btn active" data-grade="all">${esc(ui.allEvidence || "All evidence")}</button><button class="filter-btn" data-grade="A">${esc(ui.evidenceA || "A")}</button><button class="filter-btn" data-grade="B">${esc(ui.evidenceB || "B")}</button><button class="filter-btn" data-grade="C">${esc(ui.evidenceC || "C")}</button><button class="filter-btn" data-grade="D">${esc(ui.evidenceD || "D")}</button><button class="filter-btn" data-grade="E">${esc(ui.evidenceE || "E")}</button></div><div id="resource-list" class="resource-list"></div></section>` : "";
+  root.innerHTML = `<header><div class="eyebrow">${esc(config.eyebrow)}</div><h1>${esc(config.title)}</h1><p class="lead">${esc(config.lead)}</p></header>${callout}${stats}${detailPanel}${sections}${questions}${resourceBlock}`;
 }
 
 let grade = "all";
@@ -465,61 +530,89 @@ function renderResources() {
   const list = document.getElementById("resource-list");
   const search = document.getElementById("site-search");
   const count = document.getElementById("result-count");
+  const ui = getUi();
   if (!list) {
-    if (count) count.textContent = "Research guide";
+    if (count) count.textContent = ui.researchGuide || "Research guide";
     return;
   }
   const q = (search?.value || "").toLowerCase().trim();
   let rows = DATA.filter((record) => matchesView(record, config.view));
   if (grade !== "all") rows = rows.filter((record) => (record.evidence || "").startsWith(grade));
-  if (q) rows = rows.filter((record) => recordText(record).includes(q));
-  rows.sort((a, b) => (b.year - a.year) || a.title.localeCompare(b.title));
-  if (count) count.textContent = `${rows.length} item${rows.length === 1 ? "" : "s"}`;
-  list.innerHTML = rows.length ? rows.map((record) => `<article class="card"><div class="card-top"><div><h3>${esc(record.title)}</h3><div class="meta">${record.year} · ${esc(record.venue)} · ${esc(record.kind)}</div></div><div class="links">${record.url ? `<a class="link-btn" href="${record.url}" target="_blank" rel="noopener">Primary source ↗</a>` : ""}${record.repo ? `<a class="link-btn repo" href="${record.repo}" target="_blank" rel="noopener">Repository ↗</a>` : ""}</div></div><p>${esc(record.summary)}</p><div class="badges"><span class="badge evidence">${esc(record.evidence)}</span>${(record.access || []).map((x) => `<span class="badge">${esc(x)}</span>`).join("")}${(record.tags || []).map((x) => `<span class="badge">${esc(x)}</span>`).join("")}</div></article>`).join("") : `<div class="empty">No items match this page and filter.</div>`;
+  if (q) rows = rows.filter((record) => `${recordText(record)} ${SITE_CONTENT.summaryZh?.[record.id] || ""} ${record.refNo}`.toLowerCase().includes(q));
+  rows.sort((a, b) => a.refNo - b.refNo);
+  if (count) count.textContent = language === "zh" ? `${rows.length} ${ui.items || "篇参考文献"}` : `${rows.length} ${ui.items || "references"}`;
+  list.innerHTML = rows.length ? rows.map((record) => {
+    const summary = language === "zh" ? (SITE_CONTENT.summaryZh?.[record.id] || record.summary) : record.summary;
+    return `<article class="card reference-card" id="ref-${record.refNo}"><div class="card-top"><div><h3><a class="ref-number" href="#ref-${record.refNo}">[${record.refNo}]</a> ${esc(record.title)}</h3><div class="meta">${record.year} · ${esc(record.venue)} · ${esc(record.kind)}</div></div><div class="links">${record.url ? `<a class="link-btn" href="${record.url}" target="_blank" rel="noopener">${esc(ui.primarySource || "Primary source ↗")}</a>` : ""}${record.repo ? `<a class="link-btn repo" href="${record.repo}" target="_blank" rel="noopener">${esc(ui.repository || "Repository ↗")}</a>` : ""}</div></div><p>${esc(summary)}</p><div class="badges"><span class="badge reference-badge">${esc(ui.referenceNumber || "Reference")} [${record.refNo}]</span><span class="badge evidence">${esc(record.evidence)}</span>${(record.access || []).map((x) => `<span class="badge">${esc(x)}</span>`).join("")}${(record.tags || []).map((x) => `<span class="badge">${esc(x)}</span>`).join("")}</div></article>`;
+  }).join("") : `<div class="empty">${esc(ui.noItems || "No items match this page and filter.")}</div>`;
+  if (location.hash.startsWith("#ref-")) requestAnimationFrame(() => document.querySelector(location.hash)?.scrollIntoView({ block: "center" }));
 }
 
 function buildPageToc() {
   const toc = document.getElementById("page-toc");
   const content = document.getElementById("dynamic-page");
   if (!toc || !content) return;
+  tocObserver?.disconnect();
   const headings = [...content.querySelectorAll("h2, h3")];
   if (!headings.length) {
     toc.hidden = true;
     return;
   }
+  toc.hidden = false;
   const used = new Set();
   headings.forEach((heading) => {
-    let id = heading.id || slugify(heading.textContent);
+    let id = heading.id || slugify(heading.textContent) || `section-${used.size + 1}`;
     let unique = id;
     let n = 2;
     while (used.has(unique)) unique = `${id}-${n++}`;
     heading.id = unique;
     used.add(unique);
   });
-  toc.innerHTML = `<div class="toc-title">On this page</div><div class="toc-links">${headings.map((heading) => `<a class="toc-${heading.tagName.toLowerCase()}" href="#${heading.id}">${esc(heading.textContent)}</a>`).join("")}</div>`;
+  toc.innerHTML = `<div class="toc-title">${esc(getUi().onThisPage || "On this page")}</div><div class="toc-links">${headings.map((heading) => `<a class="toc-${heading.tagName.toLowerCase()}" href="#${heading.id}">${esc(heading.textContent)}</a>`).join("")}</div>`;
   const links = [...toc.querySelectorAll("a")];
-  const observer = new IntersectionObserver((entries) => {
+  tocObserver = new IntersectionObserver((entries) => {
     const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
     if (!visible) return;
     links.forEach((link) => link.classList.toggle("active", link.getAttribute("href") === `#${visible.target.id}`));
   }, { rootMargin: "-15% 0px -72% 0px", threshold: [0, 1] });
-  headings.forEach((heading) => observer.observe(heading));
+  headings.forEach((heading) => tocObserver.observe(heading));
 }
 
 function wireInteractions() {
   const search = document.getElementById("site-search");
-  search?.addEventListener("input", renderResources);
-  document.querySelectorAll("[data-grade]").forEach((button) => button.addEventListener("click", () => {
-    document.querySelectorAll("[data-grade]").forEach((x) => x.classList.remove("active"));
-    button.classList.add("active");
-    grade = button.dataset.grade;
-    renderResources();
-  }));
-  document.querySelector(".mobile-toggle")?.addEventListener("click", () => document.querySelector(".sidebar")?.classList.toggle("open"));
+  if (search) search.oninput = renderResources;
+  document.querySelectorAll("[data-grade]").forEach((button) => {
+    button.onclick = () => {
+      document.querySelectorAll("[data-grade]").forEach((x) => x.classList.remove("active"));
+      button.classList.add("active");
+      grade = button.dataset.grade;
+      renderResources();
+    };
+  });
+  const mobileToggle = document.querySelector(".mobile-toggle");
+  if (mobileToggle) mobileToggle.onclick = () => document.querySelector(".sidebar")?.classList.toggle("open");
 }
 
-buildNavigation();
-renderPage();
-buildPageToc();
-renderResources();
-wireInteractions();
+function renderAll() {
+  config = getActiveConfig();
+  buildChrome();
+  buildNavigation();
+  renderPage();
+  buildPageToc();
+  renderResources();
+  wireInteractions();
+}
+
+async function init() {
+  try {
+    const module = await import(new URL("content.mjs", APP_ASSET_BASE).href);
+    SITE_CONTENT = module.SITE_CONTENT || {};
+  } catch (error) {
+    console.warn("Bilingual content could not be loaded; falling back to English.", error);
+    SITE_CONTENT = {};
+    language = "en";
+  }
+  renderAll();
+}
+
+init();
