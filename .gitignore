@@ -1,2 +1,4 @@
 /-.png
 /NUL
+__pycache__/
+*.py[cod]
