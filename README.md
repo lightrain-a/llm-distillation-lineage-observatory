@@ -18,7 +18,7 @@ A static, multi-page bilingual research website organized around the technical l
 - 26 second-level research pages grouped under eight first-level sections
 - A four-page paper workspace centered on candidate-conditioned black-box distillation-evidence detection for commercial LLM APIs
 - A long-form bilingual Preliminary survey chapter with formal definitions, equations, historical evolution, sentence-level citations, and full-resolution English/Chinese overview figures
-- 65 curated papers, repositories, disclosures, reports, and policies with stable reference numbers `[1]`–`[65]`
+- 85 curated papers, repositories, model cards, datasets, disclosures, reports, and policies with stable reference numbers `[1]`–`[85]`
 - Inline, clickable citations from technical statements to the master bibliography
 - Searchable and evidence-filtered literature cards with bilingual summaries
 - English/Chinese interface, cross-page language persistence, reading-position preservation, and language-matched diagrams; original paper titles remain unchanged
