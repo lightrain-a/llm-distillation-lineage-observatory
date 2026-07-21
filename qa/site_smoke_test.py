@@ -96,26 +96,34 @@ def run_desktop_checks(base_url: str) -> None:
 
         driver.get(f"{base_url}/paper-problem.html")
         wait_until(driver, lambda d: d.find_element(By.CSS_SELECTOR, "h1").text == "候选条件黑盒蒸馏证据检测", "Next-paper problem page did not preserve Chinese")
-        require(len(driver.find_elements(By.CSS_SELECTOR, "#dynamic-page .topic-section")) == 6, "Paper problem page has the wrong section count")
+        require(len(driver.find_elements(By.CSS_SELECTOR, "#dynamic-page .topic-section")) == 8, "Paper problem page has the wrong section count")
         problem_text = driver.find_element(By.ID, "dynamic-page").text
         require("候选条件黑盒蒸馏证据检测" in problem_text, "Primary black-box task is missing")
-        require(all(label in problem_text for label in ["检测到证据", "未检测到证据", "结论不充分"]), "Three-state decision boundary is incomplete")
+        require(all(label in problem_text for label in ["检测到证据", "未检测到证据", "结论不充分", "等效性检验", "目标功效"]), "Three-state decision, equivalence, or power boundary is incomplete")
+        require(all(label in problem_text for label in ["按推断目标定位相关工作", "成员推断", "数据到模型关系", "模型间影响"]), "Related-work inferential-target comparison is incomplete")
 
         driver.get(f"{base_url}/paper-method.html")
         wait_until(driver, lambda d: d.find_element(By.CSS_SELECTOR, "h1").text == "机制条件蒸馏证据检验", "Paper method page did not load in Chinese")
         method_text = driver.find_element(By.ID, "dynamic-page").text
         require("匹配控制" in method_text, "Matched-control method core is missing")
-        require("留出检验" in method_text and "创新性门槛" in method_text, "Held-out inference or novelty gate is missing")
+        require("留出检验" in method_text and "创新性门槛" in method_text and "功效感知的查询预算" in method_text, "Held-out inference, power planning, or novelty gate is missing")
+        require(all(label in method_text for label in ["独立训练的学生 replica", "固定查询权重", "最不利控制层", "确认性检验族"]), "Prespecified estimand or confirmatory statistic is incomplete")
+        require(all(label in method_text for label in ["合成数据端到端审计示例", "T₁", "T₂", "T₃", "功效=0.46"]), "Worked end-to-end audit example is incomplete")
 
         driver.get(f"{base_url}/paper-benchmark.html")
         wait_until(driver, lambda d: d.find_element(By.CSS_SELECTOR, "h1").text == "基准与实验协议", "Paper benchmark page did not load in Chinese")
-        require("共同第三教师" in driver.find_element(By.ID, "dynamic-page").text, "Hard-negative benchmark is missing")
+        benchmark_text = driver.find_element(By.ID, "dynamic-page").text
+        require("共同第三教师" in benchmark_text, "Hard-negative benchmark is missing")
+        require(all(label in benchmark_text for label in ["同基础无蒸馏控制", "替代教师控制", "盲化候选面板", "留出污染筛查"]), "Identification-valid negative-control protocol is incomplete")
+        require(all(label in benchmark_text for label in ["重复实验层级与推断单位", "独立训练的学生 replica", "层级 bootstrap"]), "Replication hierarchy or inferential-unit specification is incomplete")
+        require(all(label in benchmark_text for label in ["带成本的实验设计矩阵", "45 次训练", "17,280 次调用", "52,650 次调用"]), "Costed experimental-design matrix is incomplete")
 
         driver.get(f"{base_url}/paper-roadmap.html")
         wait_until(driver, lambda d: d.find_element(By.CSS_SELECTOR, "h1").text == "推荐论文主张与执行路线", "Paper roadmap page did not load in Chinese")
         roadmap_text = driver.find_element(By.ID, "dynamic-page").text
         require("不能把行为证据包装成因果教师归因" in roadmap_text, "First-paper causal-claim boundary is missing")
         require("Candidate-Conditioned Black-box Distillation-Evidence Detection" in roadmap_text, "Recommended paper framing is missing")
+        require(all(label in roadmap_text for label in ["可直接用于投稿的汇报模板", "主要候选证据表", "有边界的结果表述", "结论不充分"]), "Publication-ready reporting templates are incomplete")
 
         driver.get(f"{base_url}/research-agenda.html")
         wait_until(driver, lambda d: d.find_element(By.CSS_SELECTOR, "h1").text == "长期研究议程", "Long-term agenda was not demoted")

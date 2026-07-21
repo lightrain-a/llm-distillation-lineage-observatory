@@ -1395,5 +1395,51 @@ window.RESOURCE_DATA=[
       "two-stage learning",
       "intermediate representations"
     ]
+  },
+  {
+    "id": "r64",
+    "title": "Membership Inference Attacks From First Principles",
+    "year": 2022,
+    "venue": "IEEE Symposium on Security and Privacy 2022",
+    "kind": "Paper",
+    "categories": [
+      "surveys-tools",
+      "datasets-benchmarks"
+    ],
+    "access": [
+      "Black-box or score access"
+    ],
+    "evidence": "C — controlled privacy-auditing experiments",
+    "url": "https://arxiv.org/abs/2112.03570",
+    "repo": "",
+    "summary": "Reframes membership-inference evaluation around true-positive rate at very low false-positive rates and introduces likelihood-ratio attacks, illustrating that sample-membership evidence is a different statistical target from model-to-model distillation evidence.",
+    "tags": [
+      "membership inference",
+      "low-FPR evaluation",
+      "likelihood ratio"
+    ]
+  },
+  {
+    "id": "r65",
+    "title": "Sampling-based Pseudo-Likelihood for Membership Inference Attacks",
+    "year": 2025,
+    "venue": "Findings of ACL 2025",
+    "kind": "Paper",
+    "categories": [
+      "surveys-tools",
+      "datasets-benchmarks"
+    ],
+    "access": [
+      "Output-only generated text"
+    ],
+    "evidence": "C — controlled black-box LLM privacy audit",
+    "url": "https://aclanthology.org/2025.findings-acl.465/",
+    "repo": "",
+    "summary": "Uses sampling-based pseudo-likelihood derived from generated text to test whether a target text was included in an LLM's training data, providing an output-only membership-inference comparator whose claim concerns data records rather than teacher-model influence.",
+    "tags": [
+      "membership inference",
+      "output-only auditing",
+      "pseudo-likelihood"
+    ]
   }
 ];
