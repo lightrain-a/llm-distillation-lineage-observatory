@@ -14,20 +14,20 @@ export const NEXT_PAPER_ZH = {
         body: `<table class="matrix"><thead><tr><th>签名</th><th>发现对象</th><th>留出接口</th><th>候选特异得分</th></tr></thead><tbody><tr><td><strong>B · 成对边界转移</strong></td><td>候选模型稳定改变有限答案、而匹配模型不跟随的变换规则</td><td>300 个全新 MCQ、下一子目标、A/B/平局或工具选择对</td><td>待审计模型复现候选 <em>a⁰→a¹</em> 转移的超额概率。</td></tr><tr><td><strong>S · 结构响应模式</strong></td><td>候选偏好的 POS n-gram、话语骨架、答案开头模板与步骤数区间</td><td>300 个按任务和输出长度平衡的全新开放式提示</td><td>候选偏好结构模板在待审计模型中的控制归一化频率或似然。</td></tr><tr><td><strong>E · 错误 / 推理 / 行动模式</strong></td><td>候选特异罕见错误标签、首错类别、可选子目标顺序或工具行动图 motif</td><td>300 个存在多种合理解法的全新困难任务</td><td>非任务必需的失败结构或行动结构相对于控制的超额一致性。</td></tr></tbody></table><p>三个家族都只使用候选模型进行发现，并在全新推断实例上评分。强制基线包括：原始答案一致率、BERTScore、教师困惑度、仅 POS、仅边界、仅错误/行动，以及通用 provenance 相似度。D0 只使用普通教师输出训练，不注入水印或人为签名。</p>`
       },
       {
-        title: "签名特异估计量与分层 omnibus",
-        body: `<p>受控实验中的独立统计单位是每一个独立训练出的学生模型。每个签名家族 <em>s</em> 预注册一个有界逐样本得分 <em>g</em><sub>s</sub>：边界家族使用成对转移事件，结构家族使用候选模板得分，错误/行动家族使用错误结构或行动图一致性。提示词和重复生成只是嵌套测量。</p><div class="equation">θ<sub>i,s</sub>=E<sub>k,x</sub>[g<sub>s</sub>(S<sub>k</sub>,T<sub>i</sub>;x)]−E<sub>C∈𝒞<sub>i</sub>,x</sub>[g<sub>s</sub>(C,T<sub>i</sub>;x)],\quad Z<sub>i,s</sub>=θ̂<sub>i,s</sub>/SE(θ̂<sub>i,s</sub>). <span class="eq-label">(3)</span></div><p>三个签名使用只来自控制开发集的尺度标准化，主要候选统计量为 <em>Z</em><sub>i,max</sub>=max<sub>s∈{B,S,E}</sub>Z<sub>i,s</sub>。校准对象是<strong>完整发现—检验算法</strong>，而不是已经为候选筛好的特征集合。在受控实验中，只在预注册种子和剂量区组内随机化处理臂标签；每次随机化都重新运行候选特异特征发现、重新选择模板或变换规则，并在未触碰的推断任务家族上重新计算全部签名统计量。零分布因此同时包含特征选择、签名选择和候选多重性，可使用 maxT 或 step-down 控制 FWER。</p><p>公开模型和商业案例没有随机教师分配，只能使用受控实验冻结的阈值与匹配的<strong>影子候选库</strong>。每个影子候选必须独立执行同一发现算法；禁止在已经选出的候选特征上直接置换。超出校准范围的案例返回结论不充分。</p>`
+        title: "两个估计目标：群体迁移与单模型检测",
+        body: `<p>整个研究计划包含两个不能混用的估计目标。<strong>D0 群体可行性</strong>检验：在冻结训练流程下，把教师 <em>Tᵢ</em> 的输出分配给学生，是否会在独立训练模型总体上造成平均签名变化：</p><div class="equation">τ<sub>i,s</sub>=E[g<sub>s</sub>(S(T<sub>i</sub>))]−E[g<sub>s</sub>(S(control))]. <span class="eq-label">(3)</span></div><p>D0 只能支持“该训练流程在总体上造成行为回声”，不能估计一个未知模型被误指控或正确检测的概率。</p><p><strong>D1 单模型检测</strong>则冻结针对一个未见待审计模型的判定规则 <em>δ</em><sub>i</sub>(S)，并在完全未触碰的模型上评价 sensitivity、specificity、false attribution、证据集合 precision 与 abstention。两类研究都以训练模型为重采样和置换单位，提示与重复生成只是嵌套测量。</p><p>D0 使用种子区组的因果对比，只检验任一签名是否在总体上传递。D1 把签名发现、阈值校准和最终确认分配给三个独立模型集合；D0 模型不能进入 D1 确认集。</p>`
       },
       {
         title: "选择有效的候选特异发现",
         body: `<p>在查询模型之前，把提示模板、任务生成器和语义家族划分为发现区与互不重叠的推断区。对每个候选和签名家族，发现阶段依据候选稳定性与控制差异选择变换规则、结构模板集合或错误/行动 motif：</p><div class="equation">A<sub>i,s</sub>(D<sub>disc</sub>)=argmax<sub>A∈𝒜<sub>s</sub></sub>[Specificity<sub>i</sub>(A)·Stability<sub>i</sub>(A)·(1−ControlTransfer(A))]. <span class="eq-label">(4)</span></div><p>选中的对象必须在推断区中使用全新的实体、数值、选项、响应提示或工具场景实例化；发现样本和近重复不得复用。每个有效随机化内部都要重跑 <em>A</em><sub>i,s</sub>。缓存发现响应可以让这一过程不增加模型查询。所有基线使用完全相同的发现和推断预算。</p>`
       },
       {
-        title: "候选结论、签名后续检验与机制边界",
-        body: `<p>对每个候选，联合检验边界、结构和错误/行动签名，并在全部候选之间控制 family-wise error。输出 omnibus p 值、签名效应与同时置信区间、稳定性诊断和三态结论：</p><div class="equation">d<sub>i</sub>∈{检测到,未检测到,结论不充分},\quad Ê<sub>α</sub>(S)={T<sub>i</sub>:d<sub>i</sub>=检测到}. <span class="eq-label">(5)</span></div><p><strong>检测到：</strong>联合 max-statistic 超过校正阈值。<strong>未检测到：</strong>三个签名的同时区间均位于预注册可忽略效应区间内，且各自功效充分。<strong>结论不充分：</strong>两者均不成立。分层后续检验只说明哪一种可观察签名存活。边界、POS 或行动签名<strong>不能唯一确定</strong>响应、推理或偏好监督；训练机制标签只在后续机制隔离实验中评价。证据支持候选集合仍是观察性摘要，不是因果来源证明 [[2,7]]。</p>`
+        title: "独立校准后的单模型判定规则",
+        body: `<p>三态候选结论属于 D1，而不是 D0。对一个完全未见的待审计模型，冻结规则输出：</p><div class="equation">d<sub>i</sub>(S)∈{检测到,未检测到,结论不充分},\quad Ê<sub>α</sub>(S)={T<sub>i</sub>:d<sub>i</sub>(S)=检测到}. <span class="eq-label">(5)</span></div><p><strong>检测到：</strong>冻结的 omnibus 得分超过在独立模型 replica 上校准的候选阈值，并通过多重比较校正。<strong>未检测到：</strong>三个签名在预注册分辨率下都可忽略，而且确认集能够支持相应模型级功效。<strong>结论不充分：</strong>两者均不成立，或待审计模型超出校准范围。</p><p>D1 分别报告候选缺失模型上的误指控率、单候选与集合值 precision、coverage、abstention 和 sensitivity。签名后续检验只能说明哪一种可观察回声参与了判定，不能唯一确定响应、推理或偏好监督；证据集合不是因果来源集合 [[2,7]]。</p>`
       },
       {
-        title: "功效感知的查询与训练预算",
-        body: `<p>发现调用和推断调用必须分开预算，但增加提示词不能替代增加独立训练模型。开发阶段需要估计训练 replica 方差、端点内方差、候选间方差、提示簇相关性、重复采样方差，以及在零分布中重跑发现引入的额外方差。</p><p>D0 将训练模型作为主要样本，采用八个配对种子区组，并以预注册配对效应 <em>d</em>=1.2 作为 demo 所能可靠识别的最小量级。更小效应应报告为尚未解决，而不能把 900 个提示当作 900 个独立样本制造显著性。</p>`
+        title: "模型级功效与查询预算",
+        body: `<p>增加提示只会提高单个模型的测量精度，不能增加独立模型数。D0 需要为配对种子区组的群体处理效应做功效规划；D1 则独立为未见模型上的 sensitivity、false attribution 与 abstention 精度规划模型数量。</p><p>发现查询、校准查询和确认查询必须分别预算。D1 确认开始前，冻结逐签名得分、候选集合、max-statistic、候选阈值、可忽略效应区间、拒绝判断规则、解码协议和全部排除规则。确认阶段不得自适应修改。</p><p>每个操作指标都报告模型级置信区间；提示簇和重复采样方差在模型内部按层级处理，不能替代独立训练模型。</p>`
       },
       {
         title: "分层审计数值示例",
@@ -51,7 +51,7 @@ export const NEXT_PAPER_ZH = {
       },
       {
         title: "推荐的方法边界",
-        body: `<div class="survey-note"><b>D0 通过后的论文核心</b>在边界、结构和错误/行动签名上执行候选特异发现；使用全新留出样本、选择有效 maxT、三态结论和签名后续检验。</div><div class="survey-note"><b>Demo 门槛</b>D0a 使用 32 个独立训练模型检验高剂量自然签名假设；只有 D0a 通过，D0b 才增加 32 个低剂量模型。</div><div class="survey-note"><b>有条件方向</b>若只有结构或行动签名通过，保留多签名审计并删除边界中心主张。</div><div class="survey-note"><b>NO-GO 后备方向</b>若全部自然签名在匹配控制下失败，停止被动谱系推断；只报告非因果行为收敛，或转向主动推理轨迹水印 / 提供方遥测方案 [[88,89]]。</div>`
+        body: `<div class="survey-note"><b>D0 群体主张</b>检验普通教师输出分配是否在随机化学生 replica 总体上造成候选特异行为回声。D0 不验证单个模型检测器。</div><div class="survey-note"><b>D1 检测器主张</b>只有独立发现、独立校准并在未触碰确认模型上评价后，才能报告 sensitivity、specificity、false attribution、集合 precision 与 abstention。</div><div class="survey-note"><b>有条件方向</b>若总体上只有结构或行动签名传递，在进入 D1 前删除边界中心主张。</div><div class="survey-note"><b>NO-GO 后备方向</b>若匹配控制下没有自然签名总体迁移，停止被动谱系推断，转向非因果收敛分析、主动轨迹水印或提供方遥测 [[88,89]]。</div>`
       }
     ]
   },
@@ -66,12 +66,16 @@ export const NEXT_PAPER_ZH = {
         body: `<p>受控模型提供已知教师—学生边，但拟议方法在评价时只能观察输出。D0 先检验普通输出蒸馏是否传递任意自然行为签名；D0 通过后，G0 才隔离响应、推理和偏好监督机制。</p><p>训练日志与检查点只用于真实关系和消融，不是最终黑盒规则输入。公开披露模型和商业端点不得与受控训练 replica 合并计算因果敏感性。</p>`
       },
       {
-        title: "D0 · 决定性自然签名 demo",
-        body: `<p>D0 只回答一个问题：普通输出蒸馏是否传递至少一种候选特异、非任务必需的行为签名。它先于更昂贵的机制隔离实验。</p><table class="matrix"><thead><tr><th>组成</th><th>冻结设计</th></tr></thead><tbody><tr><td>候选教师</td><td><code>Qwen/Qwen3-8B</code> 与 <code>meta-llama/Llama-3.1-8B-Instruct</code> [[92,93]]</td></tr><tr><td>学生</td><td><code>Qwen/Qwen3-1.7B-Base</code>，LoRA rank 16；四个处理臂在相同种子区组中共享初始化检查点 [[94]]</td></tr><tr><td>同家族影子教师</td><td><code>Qwen/Qwen3-1.7B</code>；控制合成输出训练与 Qwen 家族结构，但不包含两个候选教师 [[95]]</td></tr><tr><td>D0a 高剂量四臂</td><td>T₁ 普通输出、T₂ 普通输出、影子教师输出、公开参考目标；每臂 8 个匹配独立种子，共 <strong>32 个训练模型</strong></td></tr><tr><td>训练数据</td><td>完全相同的混合提示：40% 指令遵循、35% 重新生成的数学/推理、25% 有限工具选择；每个模型 <strong>8M 目标 token</strong></td></tr><tr><td>留出审计</td><td>300 个边界对、300 个结构/POS 提示、300 个罕见错误/推理/行动任务；候选特异发现和全新推断实例</td></tr><tr><td>强制基线</td><td>原始答案一致率、BERTScore、教师困惑度、仅 POS、仅边界、仅行动/错误、通用 provenance 相似度</td></tr></tbody></table><p>独立单位是训练模型，不是提示词。四个处理臂在同一种子编号下匹配初始化、数据顺序、优化器状态和更新日程，从而进行配对比较。八个配对种子对预注册标准化效应 <em>d</em>=1.2 的功效约为 0.83；更小效应只能报告为尚未解决，不能把 900 个提示当作独立样本。</p><h3>D0a 决策</h3><ul><li><strong>GO：</strong>影子教师臂和公开目标臂上的逐候选 FWER≤0.05；至少 13/16 个 T₁/T₂ 学生返回只包含正确候选的单元素证据集合；至少一个签名在两个教师上均达到配对 <em>d</em>≥1.2 且 95% 区间大于零；leave-one-seed-block-out 模型级 AUC 比原始答案一致率至少提高 0.10。</li><li><strong>有条件 GO：</strong>结构或行动/错误签名实现校准检测，但边界转移失败。保留多签名方法并删除边界中心主张。</li><li><strong>NO-GO：</strong>影子/公开目标臂出现候选证据、真实教师无法与替代教师和影子教师区分，或全部效应在全新任务家族上消失。停止被动谱系推断；只报告行为收敛，或转向主动轨迹水印。</li></ul><p><strong>D0b 剂量检验：</strong>只有 D0a GO 后，才在 <strong>2M 目标 token</strong> 下重复相同四臂 32 模型设计。只有两个教师的高剂量效应都显著高于低剂量，且配对置信区间为正，才能主张剂量响应。确认性 demo 最大训练量为 64 个模型。</p><p><strong>D0c 分解实验，不作为零控制：</strong>GO 后可增加少量“任务家族内打乱教师输出”模型。由于打乱仍保留教师措辞与句法，结构/POS 回声可能合理存在；若边界和输入条件行动签名依赖输入—目标关系，它们应明显减弱。该实验用于分解签名来源，绝不计入负控制 FWER。</p>`
+        title: "D0 · 群体层自然签名可行性",
+        body: `<p>D0 只回答一个群体层因果问题：在冻结训练流程下，把候选教师 T₁ 或 T₂ 的普通输出分配给学生，是否会在独立训练学生总体上造成正向行为回声效应。D0 <strong>不验证</strong>单个未知模型的检测器。</p><table class="matrix"><thead><tr><th>组成</th><th>冻结设计</th></tr></thead><tbody><tr><td>候选教师</td><td><code>Qwen/Qwen3-8B</code> 与 <code>meta-llama/Llama-3.1-8B-Instruct</code> [[92,93]]</td></tr><tr><td>学生</td><td><code>Qwen/Qwen3-1.7B-Base</code>，LoRA rank 16；四臂共享配对种子区组初始化 [[94]]</td></tr><tr><td>控制</td><td><code>Qwen/Qwen3-1.7B</code> 影子教师输出与公开参考目标 [[95]]</td></tr><tr><td>D0a 高剂量</td><td>T₁、T₂、影子和公开目标四臂；每臂 8 个匹配独立种子，共 <strong>32 个训练模型</strong></td></tr><tr><td>训练混合</td><td>每个模型使用完全相同提示和 <strong>8M 目标 token</strong>；精确数据集与划分在第 2 步单独冻结</td></tr><tr><td>留出测量</td><td>300 个边界、300 个结构/POS 和 300 个错误/推理/行动样本；提示只是嵌套测量</td></tr></tbody></table><p>主要估计量是配对模型级效应 τ<sub>T₁,s</sub> 与 τ<sub>T₂,s</sub>。在打开处理臂标签前冻结签名定义和最小群体效应 δ<sub>pop</sub>；种子区组才是随机化与重采样单位。</p><h3>D0a 决策</h3><ul><li><strong>群体 GO：</strong>多重比较校正后，至少一个签名在两个教师上的同时下置信界都超过预注册 δ<sub>pop</sub>，并在全新任务家族复现。δ<sub>pop</sub> 根据盲化 pilot/控制方差与计划查询预算在开标签前冻结。</li><li><strong>有条件 GO：</strong>结构或错误/行动签名在两个教师上迁移，但边界不迁移；进入下一阶段前删除边界中心主张。</li><li><strong>NO-GO：</strong>没有签名在两个教师上总体迁移、效应在全新任务上消失，或影子/公开控制可以同样解释效应。停止开发单模型检测器。</li></ul><p><strong>D0b 群体剂量研究：</strong>只有群体 GO 后，才在 <strong>2M 目标 token</strong> 下重复四臂 32 模型。剂量响应需要两个教师的高减低剂量配对效应均为正。D0a/D0b 只支持群体结论。</p><p><strong>D0c 分解：</strong>后续打乱教师输出用于区分教师风格与输入条件迁移，不属于零控制。</p>`
+      },
+      {
+        title: "D1 · 单模型检测器发现、校准与确认",
+        body: `<p>D1 仅在 D0 群体 GO 后启动。D0 模型不能进入 D1 确认集，D1 确认模型也不能参与特征或阈值选择。固定七个来源臂：T₁、T₂、公开目标，以及四个在家族、规模、指令训练、数据质量、能力或共同上游方面匹配的替代/影子教师。</p><table class="matrix"><thead><tr><th>集合</th><th>模型级设计</th><th>允许用途</th></tr></thead><tbody><tr><td><strong>D1a 发现</strong></td><td>7 来源臂 × 4 个全新种子区组 = <strong>28 个模型</strong></td><td>选择并简化 B/S/E 特征，删除不稳定签名；不能估计部署阈值。</td></tr><tr><td><strong>D1b 校准</strong></td><td>7 来源臂 × 8 个全新种子区组 = <strong>56 个模型</strong></td><td>在模型级零分布重采样中重放完整发现流程；冻结 maxT、候选阈值、等效区间和 abstention。</td></tr><tr><td><strong>D1c 未触碰确认</strong></td><td>30 个 T₁ + 30 个 T₂ + 五个候选缺失控制臂各 12 个 = <strong>120 个模型</strong></td><td>评价冻结检测器；不得改变特征、阈值、候选集合或排除规则。</td></tr></tbody></table><p>确认目标使用精确模型级置信区间：候选缺失误指控率的单侧 95% 上界低于 5%；每个候选 sensitivity 的单侧 95% 下界至少 80%；错误候选纳入率上界低于 5%；正例、负例与超出校准范围模型的 abstention 分开报告。60 个候选缺失模型在零误指控时可把上界压到约 5% 以下。</p><p>主要结果是冻结操作点，而不是在确认集上优化 AUC。样本量可在预注册精度计算后增加，但确认开始后不得减少或更改。</p>`
       },
       {
         title: "基准模型分层与精确模型",
-        body: `<table class="matrix"><thead><tr><th>证据层</th><th>精确模型</th><th>用途与允许解释</th></tr></thead><tbody><tr><td><strong>D0 · 自然签名 demo</strong></td><td>开放教师 <code>Qwen/Qwen3-8B</code>、<code>meta-llama/Llama-3.1-8B-Instruct</code>；学生 <code>Qwen/Qwen3-1.7B-Base</code></td><td>检验普通输出蒸馏是否保留任意教师特异自然签名，用于决定方法方向，不直接支撑最终商业主张 [[86,87,88,89,90,91,92,93,94]]。</td></tr><tr><td><strong>G0 · 受控因果基准</strong></td><td>教师 <code>deepseek/deepseek-v4-flash</code>、<code>qwen/qwen3.7-plus</code>；学生 <code>Qwen/Qwen3-8B-Base</code></td><td>D0 通过后隔离响应、推理和偏好监督，用于机制恢复真实关系 [[66,83,84,85]]。</td></tr><tr><td><strong>G1 · 公开输出/推理蒸馏</strong></td><td>DeepSeek-R1-Distill-Qwen-{1.5B,7B,14B,32B} 与 Distill-Llama-{8B,70B}</td><td>外部教师家族正例；当前可调用 R1 快照未必是原始生成器 [[44,69]]。</td></tr><tr><td><strong>G2 · 多教师 logit 蒸馏</strong></td><td>Llama-3.2-{1B,3B}-Instruct；候选集合 Llama-3.1-{8B,70B}-Instruct</td><td>只评价集合值候选证据，不能强制选唯一教师 [[81]]。</td></tr><tr><td><strong>G3 · 剪枝加蒸馏</strong></td><td>NVIDIA Llama-3.1-Minitron-4B Width/Depth；候选 Llama-3.1-8B</td><td>混合流程案例，不能把信号单独归因于蒸馏 [[82]]。</td></tr><tr><td><strong>G4 · 商业观察</strong></td><td>六个版本固定的 OpenRouter 端点</td><td>没有真实谱系，只报告有方向候选证据与时间稳定性 [[85]]。</td></tr></tbody></table><p>所有 Hugging Face 检查点按 commit hash 固定；API 请求记录精确 slug、provider route、响应元数据、日期与请求 schema。不同证据层不能混合计算因果准确率。</p>`
+        body: `<table class="matrix"><thead><tr><th>证据层</th><th>精确模型</th><th>用途与允许解释</th></tr></thead><tbody><tr><td><strong>D0 · 群体可行性</strong></td><td>开放教师 <code>Qwen/Qwen3-8B</code>、<code>meta-llama/Llama-3.1-8B-Instruct</code>；学生 <code>Qwen/Qwen3-1.7B-Base</code></td><td>检验自然签名在测试训练流程下是否具有正向平均因果效应；不能验证单模型检测器 [[86,87,88,89,90,91,92,93,94]]。</td></tr><tr><td><strong>D1 · 单模型检测器验证</strong></td><td>全新 Qwen3-1.7B-Base 学生，来源覆盖 T₁、T₂、公开目标和多个同家族/跨家族影子教师</td><td>把发现、校准和未触碰确认分开，评价 sensitivity、specificity、false attribution、集合 precision、coverage 与 abstention。</td></tr><tr><td><strong>G0 · 受控因果基准</strong></td><td>教师 <code>deepseek/deepseek-v4-flash</code>、<code>qwen/qwen3.7-plus</code>；学生 <code>Qwen/Qwen3-8B-Base</code></td><td>D0 通过后隔离响应、推理和偏好监督，用于机制恢复真实关系 [[66,83,84,85]]。</td></tr><tr><td><strong>G1 · 公开输出/推理蒸馏</strong></td><td>DeepSeek-R1-Distill-Qwen-{1.5B,7B,14B,32B} 与 Distill-Llama-{8B,70B}</td><td>外部教师家族正例；当前可调用 R1 快照未必是原始生成器 [[44,69]]。</td></tr><tr><td><strong>G2 · 多教师 logit 蒸馏</strong></td><td>Llama-3.2-{1B,3B}-Instruct；候选集合 Llama-3.1-{8B,70B}-Instruct</td><td>只评价集合值候选证据，不能强制选唯一教师 [[81]]。</td></tr><tr><td><strong>G3 · 剪枝加蒸馏</strong></td><td>NVIDIA Llama-3.1-Minitron-4B Width/Depth；候选 Llama-3.1-8B</td><td>混合流程案例，不能把信号单独归因于蒸馏 [[82]]。</td></tr><tr><td><strong>G4 · 商业观察</strong></td><td>六个版本固定的 OpenRouter 端点</td><td>没有真实谱系，只报告有方向候选证据与时间稳定性 [[85]]。</td></tr></tbody></table><p>所有 Hugging Face 检查点按 commit hash 固定；API 请求记录精确 slug、provider route、响应元数据、日期与请求 schema。不同证据层不能混合计算因果准确率。</p>`
       },
       {
         title: "G0 · D0 通过后的机制隔离 campaign",
@@ -79,7 +83,7 @@ export const NEXT_PAPER_ZH = {
       },
       {
         title: "重复实验层级与推断单位",
-        body: `<p>每个条件包含多个独立初始化和训练的学生 replica。提示、语义模板、重复生成和解码样本是嵌套测量，不能当作独立实验单位。D0 使用八个配对种子；G0 使用析因区组内的独立种子，并通过层级 bootstrap 或混合效应模型处理查询簇。</p><p>商业端点没有训练 replica；不同日期和 API 会话只能评价观察稳定性，不能替代受控模型级推断。</p>`
+        body: `<p>训练出的学生始终是独立实验单位。提示、任务模板、重复生成和解码样本属于嵌套测量。D0 在配对种子区组内随机四个处理臂，并跨区组估计群体因果效应。</p><p>D1 使用全新模型：发现模型可定义特征，校准模型可确定阈值，确认模型只能由冻结流程评分。确认重采样和精确二项区间都在模型层执行，不能用提示级 bootstrap 替代模型数量。</p><p>商业端点没有训练 replica；不同日期和 API 会话只评价观察稳定性，不能继承 D0/D1 的因果或误差保证。</p>`
       },
       {
         title: "困难负样本矩阵",
@@ -107,15 +111,15 @@ export const NEXT_PAPER_ZH = {
       },
       {
         title: "评价指标、等效性与功效",
-        body: `<p><strong>主要估计量：</strong>边界、结构和错误/行动效应 <em>θ</em><sub>i,s</sub> 与联合 <em>Z</em><sub>i,max</sub>。<strong>正向证据：</strong>固定 FWER 下的候选级 TPR。<strong>负向证据：</strong>三个签名的同时等效性、已知正例错误等效率和逐签名功效。<strong>签名后续：</strong>只在 omnibus 检测成立后报告。<strong>机制恢复：</strong>在 G0 中单独评价不同训练机制能否由签名画像区分。<strong>不确定性：</strong>功效不足、发现不稳定、接口缺失、端点漂移和签名冲突。</p><p>训练模型是推断单位。D0 报告配对种子效应和 leave-one-seed-block-out 模型级 AUC；提示级区间仅作次要结果。D0 与 G0–G4 必须分层报告校准。</p>`
+        body: `<p><strong>D0 群体指标：</strong>配对种子区组效应 τ<sub>i,s</sub>、同时模型级置信区间、校正后的群体 omnibus p 值，以及全新任务家族复现。D0 不报告 detector sensitivity、specificity 或 false attribution。</p><p><strong>D1 检测器指标：</strong>冻结操作点下的 sensitivity、specificity、候选缺失误指控、错误候选纳入、单元素/集合 precision、coverage、abstention 和实践等效性，全部使用精确模型级区间。AUC 只是次要诊断。</p><p><strong>G0 机制指标：</strong>响应、推理与偏好隔离学生之间的签名画像分离，独立于 D1 检测器可靠性评价。外部不确定性包括校准范围不匹配、接口缺失、端点漂移与签名冲突。</p>`
       },
       {
         title: "核心实验矩阵",
-        body: `<table class="matrix"><thead><tr><th>实验轴</th><th>必要取值</th></tr></thead><tbody><tr><td>研究阶段</td><td>D0 自然签名；G0 机制隔离；外部 G1–G4</td></tr><tr><td>签名家族</td><td>边界、结构/POS、罕见错误/推理/行动</td></tr><tr><td>训练关系</td><td>公开目标、影子教师、单一候选教师、有限双教师</td></tr><tr><td>G0 训练机制</td><td>响应、推理、偏好；安全/工具为扩展</td></tr><tr><td>候选池</td><td>2、5、10+，以及真实教师缺失</td></tr><tr><td>控制</td><td>公开目标、同家族影子教师、替代候选教师、共享基础、共享数据、共同第三教师</td></tr><tr><td>选择协议</td><td>候选特异发现、全新推断实例、嵌套重跑校准</td></tr><tr><td>后处理</td><td>继续 SFT、改写、量化、合并</td></tr></tbody></table>`
+        body: `<table class="matrix"><thead><tr><th>实验轴</th><th>必要取值</th></tr></thead><tbody><tr><td>研究阶段</td><td>D0 群体可行性；D1 发现/校准/确认；G0 机制隔离；外部 G1–G4</td></tr><tr><td>签名家族</td><td>边界、结构/POS、罕见错误/推理/行动</td></tr><tr><td>训练关系</td><td>公开目标、影子教师、单一候选教师、有限双教师</td></tr><tr><td>G0 训练机制</td><td>响应、推理、偏好；安全/工具为扩展</td></tr><tr><td>候选池</td><td>2、5、10+，以及真实教师缺失</td></tr><tr><td>控制</td><td>公开目标、同家族影子教师、替代候选教师、共享基础、共享数据、共同第三教师</td></tr><tr><td>选择协议</td><td>候选特异发现、全新推断实例、嵌套重跑校准</td></tr><tr><td>后处理</td><td>继续 SFT、改写、量化、合并</td></tr></tbody></table>`
       },
       {
         title: "带成本的实验设计矩阵",
-        body: `<p>成本用教师输出 token、训练运行数、本地生成与 API 调用表示。</p><table class="matrix"><thead><tr><th>阶段</th><th>工作量</th><th>训练 / 模型数</th><th>审计分配</th></tr></thead><tbody><tr><td>D0a 高剂量 demo</td><td>2 个候选教师 + 1 个同家族影子教师 + 公开目标；8 个配对种子；8M 目标 token</td><td><strong>32 个训练模型</strong></td><td>900 个留出对象：边界、结构、错误/行动各 300</td></tr><tr><td>D0b 剂量扩展</td><td>D0a GO 后，在 2M token 下重复四臂</td><td><strong>新增 32 个模型</strong>；D0 最大总计 64</td><td>复用冻结发现规则与留出任务家族，检验配对剂量效应</td></tr><tr><td>G0 机制隔离</td><td>2 个候选教师 + 公开目标与影子教师控制 × 3 机制 × 2 剂量 × 3 种子</td><td><strong>36 正例 + 36 平衡控制 = 72</strong></td><td>3,000 个发现对象；1,200 个机制评价留出对象</td></tr><tr><td>外部验证</td><td>先 R1-Distill Qwen/Llama，再 Llama 3.2 与 Minitron</td><td>不训练</td><td>候选发现只使用候选输出，受控阈值保持冻结</td></tr><tr><td>OpenRouter 观察</td><td>6 端点、两个温度、三个日期</td><td>不训练</td><td>保守上限 <strong>25,920 次调用</strong></td></tr></tbody></table><p>D0a 是第一道投入门槛。自然签名检测未控制 FWER、或未超过最强单签名基线时，不启动 G0 与商业观察。所有运行记录 GPU 小时、教师输出 token、墙钟时间、检查点 hash、数据清单和随机种子。</p>`
+        body: `<p>成本用教师输出 token、训练运行数、本地生成与 API 调用表示。</p><table class="matrix"><thead><tr><th>阶段</th><th>工作量</th><th>训练 / 模型数</th><th>允许结论</th></tr></thead><tbody><tr><td>D0a 群体可行性</td><td>2 候选教师 + 影子教师 + 公开目标；8 个配对种子；8M token</td><td><strong>32 个模型</strong></td><td>平均因果签名迁移</td></tr><tr><td>D0b 剂量扩展</td><td>群体 GO 后在 2M token 下重复四臂</td><td><strong>新增 32 个</strong>；D0 共 64</td><td>群体剂量响应</td></tr><tr><td>D1a 发现</td><td>7 来源臂 × 4 个新种子</td><td><strong>28 个模型</strong></td><td>只开发签名定义</td></tr><tr><td>D1b 校准</td><td>7 来源臂 × 8 个新种子</td><td><strong>56 个模型</strong></td><td>冻结 maxT、阈值、等效区间与 abstention</td></tr><tr><td>D1c 确认</td><td>60 个候选正例 + 60 个候选缺失控制</td><td><strong>120 个未触碰模型</strong></td><td>单模型操作指标</td></tr><tr><td>G0 机制隔离</td><td>2 候选教师 + 公开/影子控制 × 3 机制 × 2 剂量 × 3 种子</td><td><strong>72 次训练</strong></td><td>机制画像证据</td></tr><tr><td>外部与 OpenRouter</td><td>公开模型与六端点三日期</td><td>不训练</td><td>各证据层允许的外部/观察结论</td></tr></tbody></table><p>D0 是第一道科学门槛，D1 是检测器可靠性门槛，G0 与商业观察不能替代二者。所有运行记录 GPU 小时、教师输出 token、墙钟时间、检查点 hash、来源臂与随机种子。</p>`
       },
       {
         title: "派生、部署、反证与移除 campaign",
@@ -135,27 +139,27 @@ export const NEXT_PAPER_ZH = {
     sections: [
       {
         title: "推荐论文主张",
-        body: `<div class="definition-box"><b>D0 通过后的论文主张</b>普通输出蒸馏可能保留至少一种候选特异、非任务必需的行为签名——成对决策转移、结构响应模式或罕见错误/行动模式。审计器可以仅从候选输出发现这些签名，并在全新输入上使用选择有效的 max-statistic 输出“检测到 / 未检测到 / 结论不充分”。</div><p>该主张以 D0 为前提。若只有结构或行动签名通过，论文删除一般局部几何表述；若无自然签名通过，则停止被动谱系论文。</p>`
+        body: `<div class="definition-box"><b>D0 通过后的群体主张</b>在测试训练流程下，普通输出蒸馏会在独立训练学生总体上造成至少一种候选特异、非任务必需行为签名的平均迁移。</div><div class="definition-box"><b>D1 确认后的检测器主张</b>一个前瞻冻结的黑盒规则可以在其校准范围内，对完全未见模型达到预注册的 sensitivity、false attribution、错误候选和 abstention 保证。</div><p>第一个主张不自动推出第二个。D0 成功而 D1 失败时，只能报告群体层行为收敛，不能声称可靠单模型审计。若只有结构或行动签名迁移，在 D1 前删除一般边界主张。</p>`
       },
       {
         title: "贡献结构",
-        body: `<ol><li><strong>问题定义：</strong>候选条件黑盒蒸馏证据检测，采用三态结论并限制商业模型因果主张。</li><li><strong>签名家族：</strong>边界、结构/POS 和错误/推理/行动三个互补通道，每个通道有文献基础并可独立证伪。</li><li><strong>推断：</strong>候选特异发现、全新留出实例、算法级随机化和联合 max-statistic。</li><li><strong>评价：</strong>32→64 模型决定性 demo、后续 72 次机制隔离、分层公开蒸馏对、服务压力测试和 OpenRouter 观察。</li></ol>`
+        body: `<ol><li><strong>群体问题：</strong>随机分配教师输出是否在总体上造成候选特异行为回声？</li><li><strong>单模型检测：</strong>独立发现、校准和确认的规则能否控制误指控和拒绝判断？</li><li><strong>签名家族：</strong>边界、结构/POS 和错误/推理/行动三个互补通道，每个通道可独立证伪。</li><li><strong>评价：</strong>D0 群体可行性、D1 模型级检测器验证、G0 机制隔离、分层公开蒸馏对、服务压力测试和有边界的 OpenRouter 观察。</li></ol>`
       },
       {
         title: "建议论文结构",
-        body: `<div class="steps"><div class="step"><strong>Introduction：</strong>已有工作显示多类教师特异属性可以迁移，但没有自然签名被证明普遍存在。</div><div class="step"><strong>Problem：</strong>候选条件证据、三态结论、候选池缺失与因果/观察边界。</div><div class="step"><strong>Behavioral-echo method：</strong>三个签名家族、候选特异发现、全新实例、算法级零分布与 maxT。</div><div class="step"><strong>Decisive demo：</strong>32 个高剂量模型、单签名基线、配对种子与明确的有条件/停止结论；GO 后再补 32 个低剂量模型。</div><div class="step"><strong>Mechanism and external validation：</strong>G0 机制隔离、DeepSeek-R1、Llama 3.2、Minitron 与服务路径。</div><div class="step"><strong>Commercial API：</strong>只报告带版本和因果限制的观察性候选证据图。</div></div>`
+        body: `<div class="steps"><div class="step"><strong>Introduction：</strong>已有工作显示多类教师特异属性可以迁移，但没有自然签名被证明普遍存在。</div><div class="step"><strong>Problem：</strong>候选条件证据、三态结论、候选池缺失与因果/观察边界。</div><div class="step"><strong>Behavioral-echo method：</strong>三个签名家族、候选特异发现、全新实例、算法级零分布与 maxT。</div><div class="step"><strong>D0 群体可行性：</strong>配对种子区组估计平均因果迁移，不报告检测器准确率。</div><div class="step"><strong>D1 单模型验证：</strong>独立发现、独立校准与未触碰确认，评价误指控、灵敏度和 abstention。</div><div class="step"><strong>Mechanism and external validation：</strong>G0 机制隔离、DeepSeek-R1、Llama 3.2、Minitron 与服务路径。</div><div class="step"><strong>Commercial API：</strong>只报告带版本和因果限制的观察性候选证据图。</div></div>`
       },
       {
         title: "分阶段执行计划",
-        body: `<table class="matrix"><thead><tr><th>阶段</th><th>交付物</th><th>决策</th></tr></thead><tbody><tr><td>D0a · 高剂量自然签名</td><td>32 个 Qwen3-1.7B 模型：两个教师臂、两个匹配控制、八个配对种子；检验三个签名</td><td>按预注册模型级阈值得到 GO / 有条件 GO / NO-GO</td></tr><tr><td>D0b · 剂量响应</td><td>只有 D0a GO 后才增加 32 个 2M-token 模型</td><td>两个教师的高剂量减低剂量效应都必须具有正配对区间</td></tr><tr><td>G0 · 机制隔离</td><td>72 个 Qwen3-8B-Base 训练，覆盖教师/公开/打乱四臂、响应/推理/偏好、两个剂量和三个种子</td><td>机制恢复与自然签名检测分开评价</td></tr><tr><td>G1–G3 · 公开蒸馏对</td><td>先 R1 Qwen/Llama，再 Llama 3.2 与 Minitron</td><td>按披露流程分开报告，不计算混合因果准确率</td></tr><tr><td>服务与后训练</td><td>跨基础复现、全量 SFT、继续训练、量化、插值、改写和泄露移除</td><td>只保留明确测试路径下成立的主张</td></tr><tr><td>G4 · OpenRouter</td><td>六端点、三日期、有序模型对分析</td><td>只报告候选证据与拒绝判断</td></tr></tbody></table>`
+        body: `<table class="matrix"><thead><tr><th>阶段</th><th>交付物</th><th>决策</th></tr></thead><tbody><tr><td>D0a · 群体可行性</td><td>32 个高剂量模型，覆盖两个教师臂和两个控制臂</td><td>只有两个教师都在全新任务上超过预注册 δ<sub>pop</sub> 才继续</td></tr><tr><td>D0b · 群体剂量响应</td><td>群体 GO 后增加 32 个低剂量模型</td><td>只从正向高减低配对效应主张剂量响应</td></tr><tr><td>D1a · 检测器发现</td><td>七来源臂的 28 个全新模型</td><td>冻结候选特征定义，不报告准确率</td></tr><tr><td>D1b · 检测器校准</td><td>七来源臂的 56 个全新模型</td><td>冻结 maxT、阈值、等效区间与 abstention</td></tr><tr><td>D1c · 未触碰确认</td><td>120 个全新模型：60 候选正例和 60 候选缺失</td><td>要求预注册模型级误差与 coverage 区间</td></tr><tr><td>G0 · 机制隔离</td><td>72 次机制受控训练</td><td>机制画像与检测器可靠性分开评价</td></tr><tr><td>外部与商业</td><td>公开模型、服务压力与 OpenRouter</td><td>只报告各证据层能够支持的结论</td></tr></tbody></table>`
       },
       {
         title: "继续 / 停止标准",
-        body: `<div class="property-grid"><div class="property-card"><b>D0 GO</b>控制 FWER≤0.05；至少 13/16 个高剂量教师学生候选正确；至少一个签名在两个教师上配对 <em>d</em>≥1.2 且 95% 区间为正；omnibus AUC 比原始一致率高至少 0.10。</div><div class="property-card"><b>有条件 GO</b>只有结构或行动/错误签名实现校准检测。继续多签名论文，但删除边界迁移主张。</div><div class="property-card"><b>NO-GO</b>控制触发、教师无法分离、全新任务效应消失，或 omnibus 不优于最佳单签名。停止被动谱系推断。</div><div class="property-card"><b>后备方向</b>只报告非因果行为收敛，或转向主动推理轨迹水印 / 提供方遥测，而不是继续暗示发布后来源证明。</div></div>`
+        body: `<div class="property-grid"><div class="property-card"><b>D0 群体 GO</b>至少一个签名在两个教师上的同时下界均超过 δ<sub>pop</sub>，并在全新任务家族复现。只允许群体迁移主张。</div><div class="property-card"><b>D1 检测器 GO</b>未触碰模型上：候选缺失误指控率 95% 上界&lt;5%，每个候选 sensitivity 下界≥80%，错误候选纳入上界&lt;5%，且不修改阈值。</div><div class="property-card"><b>有条件方向</b>D0 仅通过结构或行动签名；进入 D1 前删除边界迁移主张。</div><div class="property-card"><b>NO-GO / 后备</b>D0 失败则停止被动审计；D1 失败则只能保留群体收敛结论。必要时转向主动水印或提供方遥测。</div></div>`
       },
       {
         title: "可直接用于投稿的汇报模板",
-        body: `<h3>主要候选证据表</h3><table class="matrix"><thead><tr><th>候选</th><th>边界 θ̂ / CI</th><th>结构 θ̂ / CI</th><th>错误/行动 θ̂ / CI</th><th>Z<sub>max</sub></th><th>maxT p<sub>adj</sub></th><th>全签名等效性 / 最小功效</th><th>结论</th><th>支持签名</th></tr></thead><tbody><tr><td>Tᵢ</td><td>效应 / [L,U]</td><td>效应 / [L,U]</td><td>效应 / [L,U]</td><td>统计量</td><td>p</td><td>是/否；min(1−β<sub>s</sub>)</td><td>检测到 / 未检测到 / 结论不充分</td><td>边界 / 结构 / 错误行动 / 无</td></tr></tbody></table><h3>必须配套的表格</h3><ul><li><strong>D0 种子区组：</strong>处理臂、剂量、种子、教师、三个签名效应、omnibus p、候选正确性、效用和基线分数。</li><li><strong>选择审计：</strong>候选发现对象、全新推断家族、随机化重跑、影子候选和校准范围。</li><li><strong>G0 机制表：</strong>响应/推理/偏好训练臂与观察签名画像；机制准确率以检测成立为条件。</li><li><strong>外部来源层：</strong>G1–G4 分开报告快照、披露流程、服务路径和结论边界。</li></ul><h3>有边界的结果表述</h3><div class="claim-box"><b>检测到</b>“选择有效的 maxT 检验检测到候选 Tᵢ 的行为回声证据（p<sub>adj</sub>=…）。后续检验支持 … 签名；该结论不能证明完整或因果隐藏训练配方。”</div><div class="claim-box"><b>未检测到</b>“三个签名的同时区间均位于预注册可忽略效应区域内，最小实际功效为 …；在该分辨率下未检测到 Tᵢ 证据。”</div><div class="claim-box"><b>结论不充分</b>“由于 …，联合正向检验与全签名等效性均未建立；当前证据不支持正向或负向谱系结论。”</div><div class="claim-box"><b>商业 API</b>“该有序端点对结果属于观察性并受版本限制；共享教师、数据、路由和间接影响仍无法排除。”</div>`
+        body: `<h3>D0 群体效应表</h3><table class="matrix"><thead><tr><th>教师</th><th>签名</th><th>配对效应 τ̂</th><th>同时区间</th><th>δ<sub>pop</sub></th><th>全新任务复现</th><th>群体结论</th></tr></thead><tbody><tr><td>Tᵢ</td><td>B / S / E</td><td>效应</td><td>[L,U]</td><td>边界</td><td>通过 / 失败</td><td>迁移 / 未解决 / 停止</td></tr></tbody></table><h3>D1 未触碰确认表</h3><table class="matrix"><thead><tr><th>指标</th><th>估计</th><th>精确 95% 区间</th><th>预注册目标</th><th>通过？</th></tr></thead><tbody><tr><td>候选缺失误指控</td><td>比例</td><td>[L,U]</td><td>上界&lt;5%</td><td>是/否</td></tr><tr><td>T₁ sensitivity</td><td>比例</td><td>[L,U]</td><td>下界≥80%</td><td>是/否</td></tr><tr><td>T₂ sensitivity</td><td>比例</td><td>[L,U]</td><td>下界≥80%</td><td>是/否</td></tr><tr><td>错误候选纳入</td><td>比例</td><td>[L,U]</td><td>上界&lt;5%</td><td>是/否</td></tr><tr><td>Abstention</td><td>正例 / 负例 / OOD</td><td>[L,U]</td><td>只报告，不在确认集事后优化</td><td>—</td></tr></tbody></table><h3>必须配套的表格</h3><ul><li><strong>D0 种子区组：</strong>处理臂、剂量、种子、三个签名效应、效用和全新任务复现。</li><li><strong>D1 开发审计：</strong>哪些模型用于发现、校准和确认；选中哪些特征；零分布如何重跑；冻结阈值与全部排除规则。</li><li><strong>D1 证据集合：</strong>每个确认模型的真实来源、候选集合、单元素/集合正确性、abstention 与校准范围状态。</li><li><strong>G0 与外部层：</strong>机制画像和 G1–G4 证据必须与 D1 操作指标分开报告。</li></ul><h3>有边界的结果表述</h3><div class="claim-box"><b>D0 群体结果</b>“随机分配 Tᵢ 输出使配对学生 replica 的 … 签名平均提高 …；这是测试训练流程下的群体效应，不是单模型检测器保证。”</div><div class="claim-box"><b>D1 检测到</b>“前瞻冻结的检测器在该未触碰模型上返回 Tᵢ；确认集的误指控与 sensitivity 区间达到预注册操作目标，且模型位于声明的校准范围内。”</div><div class="claim-box"><b>D1 结论不充分</b>“该模型未满足冻结的正向、负向或校准范围条件；当前证据不支持正向或负向谱系结论。”</div><div class="claim-box"><b>商业 API</b>“该端点结果属于观察性并受版本限制；D0/D1 的受控保证不能自动迁移到隐藏商业系统。”</div>`
       },
       {
         title: "网站如何服务这篇论文",
@@ -183,6 +187,7 @@ export const NEXT_PAPER_SECTION_REFS = {
   "paper-benchmark": [
     [3,6,36,38,39,44,47],
     [86,87,88,89,90,91,92,93,94,95],
+    [1,2,7,14,15,80,92,93,94,95],
     [44,66,67,69,81,82,83,84,85,92,93,94,95],
     [66,76,77,78,79,83,84,85],
     [],
@@ -212,38 +217,38 @@ export const NEXT_PAPER_SECTION_REFS = {
 export const NEXT_PAPER_PAGE_DETAILS = {
   "paper-method": {
     en: {
-      overview: "The recommended method audits candidate-specific behavioral echoes rather than assuming one universal boundary signal. It combines paired boundary transitions, structural/POS templates, and rare-error or action patterns with candidate-only discovery, fresh held-out scoring, and a selection-valid max-statistic.",
-      terms: ["behavioral echo", "boundary signature", "structural/POS signature", "error/action signature", "selection-valid maxT", "demo gate"],
-      questions: ["Which non-task-essential teacher property survives ordinary distillation?", "Does the omnibus improve over the strongest single signature?", "When should a failed boundary hypothesis change the paper direction?"]
+      overview: "The method now separates a D0 population-transfer estimand from a D1 individual-model detector. D0 asks whether randomized teacher-output assignment causes average behavioral echoes; D1 independently discovers, calibrates, and confirms a frozen multi-signature rule on untouched models.",
+      terms: ["population estimand", "individual detector", "behavioral echo", "selection-valid maxT", "false attribution", "abstention"],
+      questions: ["Which teacher property transfers on average?", "Can a frozen detector control false attribution on unseen models?", "When should population evidence remain separate from individual attribution?"]
     },
     zh: {
-      overview: "推荐方法审计候选教师特异的行为回声，而不预设某一种边界信号普遍存在。它联合成对边界转移、结构/POS 模板和罕见错误或行动模式，采用候选特异发现、全新留出评分与选择有效的 max-statistic。",
-      terms: ["行为回声", "边界签名", "结构/POS 签名", "错误/行动签名", "选择有效 maxT", "demo 门槛"],
-      questions: ["普通蒸馏会保留哪一种非任务必需教师属性？", "联合检验是否超过最强单签名？", "边界假设失败时何时必须换论文方向？"]
+      overview: "方法现在把 D0 群体迁移估计量与 D1 单模型检测器彻底分开。D0 检验随机教师输出分配是否造成平均行为回声；D1 使用独立模型完成发现、校准和未触碰确认。",
+      terms: ["群体估计量", "单模型检测器", "行为回声", "选择有效 maxT", "误指控", "拒绝判断"],
+      questions: ["哪些教师属性会在总体上传递？", "冻结检测器能否在未见模型上控制误指控？", "何时群体证据不能升级为单模型归因？"]
     }
   },
   "paper-benchmark": {
     en: {
-      overview: "The benchmark is gated by a 32-model high-dose demo and an optional 32-model low-dose extension. Only after natural teacher-specific signatures are detected with model-level replication does the project launch the 72-run mechanism-isolation campaign, disclosed public pairs, and commercial observation.",
-      terms: ["D0a", "paired seed block", "model-level inference", "conditional GO", "G0 mechanism isolation", "signature baseline"],
-      questions: ["Do natural signatures survive ordinary output distillation?", "Are control arms clean at model-level FWER?", "Does dose increase the signature for both teachers?"]
+      overview: "The benchmark has two gates: D0 estimates population-level transfer across paired student replicas, while D1 uses separate discovery, calibration, and untouched confirmation cohorts to validate a detector for one model. G0 mechanism isolation and commercial observation occur only after the relevant gate passes.",
+      terms: ["D0 population feasibility", "D1 discovery", "D1 calibration", "untouched confirmation", "false attribution", "G0 mechanism isolation"],
+      questions: ["Does a signature transfer on average?", "Does the frozen detector meet model-level error targets?", "Which later experiments require D0 versus D1 GO?"]
     },
     zh: {
-      overview: "基准首先运行 32 模型高剂量 demo，并仅在通过后增加 32 个低剂量模型。只有自然教师特异签名在模型级独立重复上成立，项目才启动 72 次机制隔离、公开蒸馏模型和商业观察。",
-      terms: ["D0a", "配对种子区组", "模型级推断", "有条件 GO", "G0 机制隔离", "单签名基线"],
-      questions: ["自然签名是否随普通输出蒸馏保留？", "控制臂的模型级 FWER 是否受控？", "两个教师是否都呈现剂量增强？"]
+      overview: "基准包含两道门槛：D0 跨配对学生 replica 估计群体迁移，D1 使用独立发现、校准和未触碰确认模型验证单模型检测器。G0 机制隔离与商业观察只在对应门槛通过后启动。",
+      terms: ["D0 群体可行性", "D1 发现", "D1 校准", "未触碰确认", "误指控", "G0 机制隔离"],
+      questions: ["签名是否在总体上传递？", "冻结检测器是否达到模型级误差目标？", "哪些后续实验要求 D0 或 D1 通过？"]
     }
   },
   "paper-roadmap": {
     en: {
-      overview: "The roadmap is falsification-first. D0 decides whether passive black-box lineage auditing is viable, whether only non-boundary signatures should remain, or whether the project should pivot to non-causal convergence analysis or active trace watermarking.",
-      terms: ["falsification-first", "D0 GO", "conditional direction", "passive audit no-go", "active trace watermark", "bounded claim"],
-      questions: ["What evidence justifies starting the full campaign?", "Which result deletes the boundary claim?", "Which failure stops passive lineage inference entirely?"]
+      overview: "The roadmap separates two claims: D0 may establish population-level behavioral transfer, while only D1 untouched confirmation can establish a reliable individual-model audit. Failure at either gate produces a different claim downgrade or stop decision.",
+      terms: ["population GO", "detector GO", "claim downgrade", "untouched confirmation", "passive audit no-go", "bounded commercial claim"],
+      questions: ["What does D0 allow us to claim?", "What model-level evidence is required for D1?", "Which failure stops attribution while preserving a population result?"]
     },
     zh: {
-      overview: "路线采用先证伪后扩展。D0 决定被动黑盒谱系审计是否可行、是否只保留非边界签名，或是否应转向非因果收敛分析与主动轨迹水印。",
-      terms: ["先证伪后扩展", "D0 GO", "有条件方向", "被动审计停止", "主动轨迹水印", "结论边界"],
-      questions: ["什么证据足以启动完整实验？", "什么结果要求删除边界主张？", "什么失败会彻底停止被动谱系推断？"]
+      overview: "路线区分两类主张：D0 可以建立群体层行为迁移，只有 D1 未触碰确认才能建立可靠单模型审计。两道门槛失败时对应不同的结论降级或停止条件。",
+      terms: ["群体 GO", "检测器 GO", "结论降级", "未触碰确认", "被动审计停止", "商业结论边界"],
+      questions: ["D0 允许支持什么结论？", "D1 需要什么模型级证据？", "什么失败会停止归因但保留群体结果？"]
     }
   }
 };
