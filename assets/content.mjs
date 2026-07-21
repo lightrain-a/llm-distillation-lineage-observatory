@@ -1,3 +1,5 @@
+import { NEXT_PAPER_PAGE_DETAILS, NEXT_PAPER_SECTION_REFS, NEXT_PAPER_ZH } from "./next-paper-zh.mjs";
+
 export const SITE_CONTENT = {
   ui: {
     en: {
@@ -305,7 +307,7 @@ export const SITE_CONTENT = {
       title: "大语言模型蒸馏与谱系研究观测站",
       lead: "以蒸馏机制为中心，系统整理大语言模型如何传递知识、这些依赖关系如何被审计，以及真实工业流程应如何评价。",
       callout: "网站的主分类轴是被传递的知识信号，而不是来源是否开源、闭源、学术或商业。访问权限、模型开放性、证据等级和代码可用性被视为正交属性。",
-      stats: [["85","篇论文、工具、官方披露、模型卡和数据集"],["4","个从问题定义到执行计划的论文工作区"],["5","级区分官方披露、实验和报道的证据体系"]],
+      stats: [["95","篇论文、工具、官方披露、模型卡和数据集"],["4","个从问题定义到执行计划的论文工作区"],["5","级区分官方披露、实验和报道的证据体系"]],
       sections: [
         { title: "下一篇论文工作区", body: `<div class="framework-grid"><a class="framework-card paper-card" href="paper-problem.html"><b>1. 黑盒审计问题</b><span>定义候选条件蒸馏证据检测，以及商业 API 上允许支持的结论。</span></a><a class="framework-card paper-card" href="paper-method.html"><b>2. 方法候选</b><span>留出机制探针、匹配控制残差和校准三态检验。</span></a><a class="framework-card paper-card" href="paper-benchmark.html"><b>3. 基准与实验</b><span>受控谱系、困难负样本、模拟 API 与商业观察性案例。</span></a><a class="framework-card paper-card" href="paper-roadmap.html"><b>4. 论文主张与路线</b><span>贡献边界、分阶段执行、负结果规则与继续/停止标准。</span></a></div>` },
         { title: "以机制为主线的研究地图", body: `<div class="framework-grid"><a class="framework-card" href="white-box-distillation.html"><b>1. 蒸馏方法</b><span>传递什么信号，教师具有何种访问条件？</span></a><a class="framework-card" href="output-only-auditing.html"><b>2. 蒸馏审计</b><span>输出、logit、表示、路由和权重中留下什么证据？</span></a><a class="framework-card" href="unauthorized-distillation.html"><b>3. 攻击与防御</b><span>能力如何被采集、保护、洗白或移除。</span></a><a class="framework-card" href="benchmarks.html"><b>4. 蒸馏评价</b><span>如何评价检测、归因、校准、鲁棒性和误指控。</span></a><a class="framework-card" href="model-family-compression.html"><b>5. 真实工业流程</b><span>模型家族、响应、推理和生产级蒸馏案例。</span></a><a class="framework-card" href="research-agenda.html"><b>6. 长期研究议程</b><span>在第一篇证据检测论文之后，再研究多教师、多角色和多阶段依赖重建。</span></a></div>` },
@@ -638,6 +640,20 @@ export const SITE_CONTENT = {
     r82: "NVIDIA 官方披露 Minitron Width/Depth 由 Llama 3.1 8B 剪枝并进行 94B-token 蒸馏式继续训练；适合作为剪枝加蒸馏外部案例。",
     r83: "OpenRouter 可蒸馏模型集合；汇总模型创建者明确允许把输出用于训练或蒸馏的端点。",
     r84: "OpenRouter 蒸馏合规文档；说明 is_trainable_text 元数据及人工核验具体模型条款的必要性。",
-    r85: "OpenRouter 当前模型目录；用于冻结黑盒模型 slug、provider route、上下文、价格和端点可用性。"
+    r85: "OpenRouter 当前模型目录；用于冻结黑盒模型 slug、provider route、上下文、价格和端点可用性。",
+    r86: "使用教师决策边界附近的对抗样本开展知识蒸馏，支持“决策边界是可迁移知识”的一般 KD 证据。",
+    r87: "使用能够最小改变教师预测的反事实解释进行少样本 LLM 蒸馏，为边界信息在任务型 LLM 中的传递提供直接但受限的证据。",
+    r88: "区分任务必须行为与非必须响应/行动图模式，并通过受控蒸馏验证教师特异行为收敛。",
+    r89: "通过重写教师推理轨迹影响学生学习并嵌入可黑盒检测签名，说明非任务必需轨迹属性能够随蒸馏迁移。",
+    r90: "系统显示多种 LLM 蒸馏方法会把教师的成员与记忆风险传递给学生，支持非效用属性也可能被继承。",
+    r91: "仅使用黑盒教师决策，通过估计到决策边界的距离构造监督并完成蒸馏，支持边界信息可由决策输出提取。",
+    r92: "Qwen3-8B 官方模型卡；在决定性行为签名 demo 中作为第一个开放教师。",
+    r93: "Llama 3.1 8B Instruct 官方模型卡；作为第二个开放教师，并明确允许在许可证约束下使用输出改进其他模型。",
+    r94: "Qwen3-1.7B-Base 官方模型卡；作为所有配对种子实验臂共享的学生初始化。",
+    r95: "Qwen3-1.7B 指令模型卡；在决定性 demo 中作为同家族影子教师控制。"
   },
 };
+
+Object.assign(SITE_CONTENT.zhPages, NEXT_PAPER_ZH);
+Object.assign(SITE_CONTENT.sectionRefs, NEXT_PAPER_SECTION_REFS);
+Object.assign(SITE_CONTENT.pageDetails, NEXT_PAPER_PAGE_DETAILS);
