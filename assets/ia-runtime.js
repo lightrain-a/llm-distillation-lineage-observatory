@@ -637,6 +637,23 @@
     });
   }
 
+  function enhanceTables(root) {
+    const zh = language() === "zh";
+    root.querySelectorAll(".section-body table.matrix").forEach((table) => {
+      if (table.closest(".table-scroll-shell")) return;
+      const columnCount = table.tHead?.rows?.[0]?.cells.length || table.rows?.[0]?.cells.length || 2;
+      const wrapper = document.createElement("div");
+      wrapper.className = `table-scroll-shell table-cols-${Math.min(Math.max(columnCount, 2), 6)}`;
+      wrapper.tabIndex = 0;
+      wrapper.setAttribute("role", "region");
+      const sectionTitle = table.closest(".subsection-block")?.querySelector(":scope > .subsection-title")?.textContent?.trim();
+      wrapper.setAttribute("aria-label", `${sectionTitle || (zh ? "数据表" : "Data table")}${zh ? "，可横向滚动" : ", horizontally scrollable"}`);
+      table.before(wrapper);
+      wrapper.appendChild(table);
+      table.dataset.columnCount = String(columnCount);
+    });
+  }
+
   function buildEnhancedToc(root) {
     const toc = document.getElementById("page-toc");
     if (!toc) return;
@@ -770,6 +787,7 @@
     buildBibliographyMethodMatrix(root);
     removeInternalCitations(root);
     removeTrailingDuplicateCitations(root);
+    enhanceTables(root);
     buildResourceTypeFilters(root);
     buildEnhancedToc(root);
     enhanceResourceCards();

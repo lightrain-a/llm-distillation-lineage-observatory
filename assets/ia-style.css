@@ -700,19 +700,56 @@ html[lang^="zh"] .subsection-block .section-body {
 
 .section-body table,
 .section-body .matrix {
+  max-width: none;
+}
+
+.table-scroll-shell {
   max-width: 100%;
-}
-
-.section-body:has(> table),
-.section-body:has(> .matrix) {
+  margin: 17px 0;
   overflow-x: auto;
+  overflow-y: visible;
+  border: 1px solid #dce3ec;
+  border-radius: 12px;
+  background: #fff;
+  scrollbar-gutter: stable;
 }
 
-.matrix th {
-  position: sticky;
-  top: 53px;
-  z-index: 1;
+.table-scroll-shell:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--section-accent) 26%, transparent);
+  outline-offset: 3px;
 }
+
+.table-scroll-shell .matrix {
+  width: max-content;
+  min-width: 100%;
+  max-width: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+  table-layout: auto;
+}
+
+.table-scroll-shell .matrix th {
+  position: static;
+  top: auto;
+  z-index: auto;
+}
+
+.table-scroll-shell .matrix th,
+.table-scroll-shell .matrix td {
+  min-width: 150px;
+  max-width: 380px;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  vertical-align: top;
+}
+
+.table-scroll-shell.table-cols-2 .matrix { min-width: 760px; }
+.table-scroll-shell.table-cols-3 .matrix { min-width: 980px; }
+.table-scroll-shell.table-cols-4 .matrix { min-width: 1160px; }
+.table-scroll-shell.table-cols-5 .matrix { min-width: 1360px; }
+.table-scroll-shell.table-cols-6 .matrix { min-width: 1520px; }
 
 .equation,
 pre,

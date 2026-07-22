@@ -82,6 +82,8 @@ def check_page(base_url: str, page: str, spec: dict[str, int | str], failures: l
     require(bool(soup.select_one("#mobile-page-toc")), f"{page}: mobile TOC missing", failures)
     require(len(soup.select("#page-toc .toc-group")) == len(soup.select("#dynamic-page > .chapter-panel")), f"{page}: desktop TOC does not match chapter count", failures)
     require(bool(soup.select_one(".reading-progress")), f"{page}: reading progress bar missing", failures)
+    ordinary_tables = soup.select(".section-body table.matrix")
+    require(all(table.find_parent("div", class_="table-scroll-shell") is not None for table in ordinary_tables), f"{page}: an ordinary table is missing its horizontal-scroll wrapper", failures)
 
     if spec["lang"] == "zh":
         require(soup.html and soup.html.get("lang") == "zh-CN", f"{page}: Chinese language state did not render", failures)
@@ -120,6 +122,8 @@ def main() -> int:
     require("可随时停止的低查询蒸馏审计" in agenda_text, "research-agenda: sequential-audit idea missing", failures)
     require("第二梯队：必须先通过可行性门槛" in agenda_text, "research-agenda: conditional directions missing", failures)
     require("只适合作为 benchmark 或观察性研究的方向" in agenda_text, "research-agenda: benchmark/observation boundary missing", failures)
+    require(not agenda.select(".section-reference-note"), "research-agenda: references should be placed inline rather than in section-end notes", failures)
+    require(len(agenda.select(".section-body .inline-citations")) >= 9, "research-agenda: insufficient inline citation placement", failures)
     for section in agenda.select(".subsection-block"):
         note = section.select_one(":scope > .section-reference-note")
         body = section.select_one(":scope > .section-body")
