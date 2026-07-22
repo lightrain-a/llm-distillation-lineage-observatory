@@ -1186,16 +1186,8 @@ async function init() {
   renderAll();
 }
 
-function loadIaEnhancements() {
-  const stylesheet = document.createElement("link");
-  stylesheet.rel = "stylesheet";
-  stylesheet.href = new URL("ia-style.css?v=20260722-ia-v1", APP_ASSET_BASE).href;
-  document.head.appendChild(stylesheet);
+const iaStylesheet = new URL("ia-style.css?v=20260722-ia-v2", APP_ASSET_BASE).href;
+const iaRuntime = new URL("ia-runtime.js?v=20260722-ia-v2", APP_ASSET_BASE).href;
+document.write(`<link rel="stylesheet" href="${iaStylesheet}"><script src="${iaRuntime}"><\/script>`);
 
-  const runtime = document.createElement("script");
-  runtime.src = new URL("ia-runtime.js?v=20260722-ia-v1", APP_ASSET_BASE).href;
-  runtime.async = false;
-  document.head.appendChild(runtime);
-}
-
-init().finally(loadIaEnhancements);
+init();
