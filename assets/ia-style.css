@@ -189,6 +189,12 @@ body.paper-page {
   border-top: 1px solid #e7ecf2;
 }
 
+/* The chapter title and subsection title already carry the hierarchy bars.
+   Remove the legacy full-height topic stripe to avoid a duplicated left rule. */
+.chapter-panel .topic-section::before {
+  display: none;
+}
+
 .subsection-title {
   margin: 0 0 13px;
   padding: 2px 0 2px 18px;
