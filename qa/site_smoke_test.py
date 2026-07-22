@@ -107,10 +107,11 @@ def run_desktop_checks(base_url: str) -> None:
         driver.get(f"{base_url}/paper-method.html")
         wait_until(driver, lambda d: d.find_element(By.CSS_SELECTOR, "h1").text == "候选特异行为回声检验", "Paper method page did not load in Chinese")
         method_text = driver.find_element(By.ID, "dynamic-page").text
-        require(len(driver.find_elements(By.CSS_SELECTOR, "#dynamic-page .topic-section")) == 12, "Paper method page has the wrong section count")
+        require(len(driver.find_elements(By.CSS_SELECTOR, "#dynamic-page .topic-section")) == 13, "Paper method page has the wrong section count")
         require("独立方法审查" not in method_text, "Internal review status should not precede the method")
         require(all(label in method_text for label in ["研究目标与核心直觉", "我们准备构建一个候选条件黑盒蒸馏证据检验", "行为回声", "不属于行为回声"]), "Formal method motivation is incomplete")
         require(all(label in method_text for label in ["为什么回声可能保留", "不仅传递教师", "决策边界", "错误恢复方式"]), "Behavioral-echo transfer mechanism is incomplete")
+        require(all(label in method_text for label in ["行为回声直觉的研究依据", "直接 LLM 行为迁移证据", "主动轨迹与属性迁移证据", "决策边界知识证据", "匹配控制下的超额转移"]), "Evidence basis or precise unresolved hypothesis is incomplete")
         require(all(label in method_text for label in ["候选特异证据 · 一个具体例子", "A→C", "相对于控制的超额规律"]), "Concrete behavioral-echo example is incomplete")
         require(all(label in method_text for label in ["行为回声签名家族", "边界回声", "结构回声", "错误 / 推理 / 行动回声", "端到端审计流程"]), "Echo families or audit workflow is incomplete")
         require(all(label in method_text for label in ["不同监督流程不一定保留教师行为的同一部分", "与模型指纹的关系", "ESF", "候选教师特异残余行为"]), "Multi-signature rationale or early fingerprint distinction is incomplete")

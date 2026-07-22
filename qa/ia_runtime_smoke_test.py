@@ -19,7 +19,7 @@ EDGE_CANDIDATES = (
 )
 
 PAGES = {
-    "paper-method": {"lang": "en", "subsections": 12, "chapters": 5},
+    "paper-method": {"lang": "en", "subsections": 13, "chapters": 5},
     "paper-benchmark": {"lang": "zh", "subsections": 17, "chapters": 7},
     "preliminary": {"lang": "en", "subsections": 6, "chapters": 3},
     "confounders-robustness": {"lang": "en", "subsections": 7, "chapters": 3},
@@ -113,6 +113,8 @@ def main() -> int:
     require("我们准备构建一个候选条件黑盒蒸馏证据检验" in method_text or "We aim to build a candidate-conditioned black-box distillation-evidence test" in method_text, "paper-method: opening motivation missing", failures)
     require("端到端审计流程" in method_text or "End-to-end audit workflow" in method_text, "paper-method: audit workflow missing", failures)
     require("研究动机与方法概览" in method_text or "Research Motivation and Method Overview" in method_text, "paper-method: formal first chapter title missing", failures)
+    require("行为回声直觉的研究依据" in method_text or "Evidence supporting the behavioral-echo hypothesis" in method_text, "paper-method: evidence basis for the core intuition missing", failures)
+    require("匹配控制下的超额转移" in method_text or "matched-control excess" in method_text, "paper-method: unresolved hypothesis is not stated precisely", failures)
     require("ESF" in method_text, "paper-method: ESF comparison missing", failures)
 
     benchmark = rendered["paper-benchmark"]

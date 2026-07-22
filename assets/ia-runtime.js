@@ -92,7 +92,7 @@
       [1, "commercial-claims", l("Commercial-API Claim Boundary", "商业 API 结论边界")]
     ],
     "paper-method": [
-      [4, "motivation-framework", l("Research Motivation and Method Overview", "研究动机与方法概览")],
+      [5, "motivation-framework", l("Research Motivation and Method Overview", "研究动机与方法概览")],
       [2, "identification-protocol", l("Candidate-Specific Identification Protocol", "候选特异识别协议")],
       [3, "statistical-inference", l("Statistical Calibration and Decision Rules", "统计校准与判定规则")],
       [2, "positioning-interpretation", l("Method Positioning and Interpretation Boundary", "方法定位与解释边界")],
