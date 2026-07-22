@@ -1181,7 +1181,7 @@ async function init() {
   try {
     const module = await import(new URL("content.mjs?v=20260722-research-agenda-v2", APP_ASSET_BASE).href);
     SITE_CONTENT = module.SITE_CONTENT || {};
-    const methodModule = await import(new URL("paper-method-page.mjs?v=20260722-reader-first-v3", APP_ASSET_BASE).href);
+    const methodModule = await import(new URL("paper-method-page.mjs?v=20260722-reader-first-v4", APP_ASSET_BASE).href);
     Object.assign(PAGE_CONFIG["paper-method"], methodModule.PAPER_METHOD_EN || {});
     Object.assign(SITE_CONTENT.zhPages["paper-method"], methodModule.PAPER_METHOD_ZH || {});
     SITE_CONTENT.sectionRefs["paper-method"] = methodModule.PAPER_METHOD_SECTION_REFS || [];
@@ -1195,8 +1195,8 @@ async function init() {
   renderAll();
 }
 
-const iaStylesheet = new URL("ia-style.css?v=20260722-ia-v14", APP_ASSET_BASE).href;
-const iaRuntime = new URL("ia-runtime.js?v=20260722-ia-v14", APP_ASSET_BASE).href;
+const iaStylesheet = new URL("ia-style.css?v=20260722-ia-v15", APP_ASSET_BASE).href;
+const iaRuntime = new URL("ia-runtime.js?v=20260722-ia-v15", APP_ASSET_BASE).href;
 document.write(`<link rel="stylesheet" href="${iaStylesheet}"><script src="${iaRuntime}"><\/script>`);
 
 init();

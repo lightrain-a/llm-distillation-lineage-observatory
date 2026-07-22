@@ -109,9 +109,10 @@ def main() -> int:
 
     method = rendered["paper-method"]
     method_text = method.get_text(" ", strip=True)
-    require("Independent method review" in method_text, "paper-method: review verdict panel missing", failures)
-    require("我们准备构建一个候选条件黑盒蒸馏证据检验" in method_text or "We aim to build a candidate-conditioned black-box distillation-evidence test" in method_text, "paper-method: reader-first opening paragraph missing", failures)
-    require("完整方法流程 · 五个步骤" in method_text or "The complete method in five steps" in method_text, "paper-method: five-step overview missing", failures)
+    require("Independent method review" not in method_text and "独立方法审查" not in method_text, "paper-method: internal review panel should not precede the method", failures)
+    require("我们准备构建一个候选条件黑盒蒸馏证据检验" in method_text or "We aim to build a candidate-conditioned black-box distillation-evidence test" in method_text, "paper-method: opening motivation missing", failures)
+    require("端到端审计流程" in method_text or "End-to-end audit workflow" in method_text, "paper-method: audit workflow missing", failures)
+    require("研究动机与方法概览" in method_text or "Research Motivation and Method Overview" in method_text, "paper-method: formal first chapter title missing", failures)
     require("ESF" in method_text, "paper-method: ESF comparison missing", failures)
 
     benchmark = rendered["paper-benchmark"]

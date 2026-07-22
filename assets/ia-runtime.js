@@ -92,11 +92,11 @@
       [1, "commercial-claims", l("Commercial-API Claim Boundary", "商业 API 结论边界")]
     ],
     "paper-method": [
-      [4, "reader-overview", l("Behavioral Echoes in Three Minutes", "三分钟理解行为回声")],
-      [2, "identification-design", l("Identification Design", "识别设计")],
-      [3, "calibration-decision", l("Calibration, Power, and Decision", "校准、功效与判定")],
-      [2, "neighboring-methods", l("Neighboring Methods and Interpretation", "相邻方法与解释边界")],
-      [1, "novelty-boundary", l("Novelty Gate and NO-GO Rules", "创新性门槛与停止条件")]
+      [4, "motivation-framework", l("Research Motivation and Method Overview", "研究动机与方法概览")],
+      [2, "identification-protocol", l("Candidate-Specific Identification Protocol", "候选特异识别协议")],
+      [3, "statistical-inference", l("Statistical Calibration and Decision Rules", "统计校准与判定规则")],
+      [2, "positioning-interpretation", l("Method Positioning and Interpretation Boundary", "方法定位与解释边界")],
+      [1, "novelty-validity", l("Novelty, Validity, and Stop Criteria", "创新性、有效性与停止条件")]
     ],
     "paper-benchmark": [
       [1, "stage-map", l("Stage Map and Evidence Levels", "阶段地图与证据层级")],
@@ -411,10 +411,6 @@
 
     if (key === "home") {
       return `<section class="ia-status-panel project-status" aria-label="${zh ? "项目状态" : "Project status"}"><div class="status-heading"><div><span class="status-kicker">${zh ? "当前进度" : "Current progress"}</span><h2>${zh ? "从研究审查到可执行实验" : "From research review to executable experiment"}</h2></div><span class="status-pill">P0</span></div><div class="phase-grid">${phase("1", zh ? "方向与方法审查" : "Direction and method review", "done")}${phase("2", zh ? "训练数据方案" : "Training-data plan", "done")}${phase("3", zh ? "参考文献核对" : "Reference audit", "done")}${phase("4", zh ? "页面层级重构" : "Page hierarchy", "done")}${phase("5", zh ? "数据清单与 D0 pilot 冻结" : "Dataset manifest and D0 pilot freeze", "next")}</div><p>${zh ? "尚未运行 D0 或验证单模型检测器。当前唯一可执行门槛是完成公开输出库的版本、许可、ID 与完整 user-turn 哈希对齐。" : "D0 has not run and no individual-model detector has been validated. The next executable gate is the version, license, ID, and complete user-turn-hash audit of the public output archives."}</p></section>`;
-    }
-
-    if (key === "paper-method") {
-      return `<section class="ia-status-panel review-status"><div class="status-heading"><div><span class="status-kicker">${zh ? "独立方法审查" : "Independent method review"}</span><h2>${zh ? "大幅修订后继续：先做小型 D0 pilot" : "Revise substantially, then proceed to a small D0 pilot"}</h2></div><span class="status-pill conditional">${zh ? "条件通过" : "Conditional pass"}</span></div><div class="status-columns"><div><strong>${zh ? "保留" : "Retain"}</strong><p>${zh ? "候选条件、三态判定、模型级推断单位、候选专属发现和联合 maxT 校准。" : "Candidate conditioning, three-state decisions, model-level inference, candidate-only discovery, and nested maxT calibration."}</p></div><div><strong>${zh ? "必须收紧" : "Must tighten"}</strong><p>${zh ? "边界迁移只作为可淘汰假设；每个签名冻结一个主分数；先证明 maxT 超过最强单签名基线。" : "Boundary transfer remains removable; freeze one primary score per signature; require maxT to beat the strongest single-signature baseline."}</p></div></div></section>`;
     }
 
     if (key === "paper-benchmark") {
