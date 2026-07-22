@@ -1064,7 +1064,7 @@ function renderPage() {
     const hasInlineCitations = citationTokenPattern.test(section.body);
     citationTokenPattern.lastIndex = 0;
     const renderedBody = expandCitationTokens(section.body);
-    return `<section class="panel topic-section"><h2>${section.title}</h2><div class="section-body">${renderedBody}${hasInlineCitations ? "" : citationHtml(refs)}</div>${refs.length && !hasInlineCitations ? `<div class="section-reference-note"><span>${esc(ui.citedReferences || "References")}</span>${citationHtml(refs)}</div>` : ""}</section>`;
+    return `<section class="panel topic-section"><h2>${section.title}</h2><div class="section-body">${renderedBody}</div>${refs.length && !hasInlineCitations ? `<div class="section-reference-note"><span>${esc(ui.citedReferences || "References")}</span>${citationHtml(refs)}</div>` : ""}</section>`;
   }).join("");
   const questions = details?.questions?.length ? `<section class="panel questions-panel"><h2>${esc(ui.researchQuestions || "Research questions")}</h2><ol>${details.questions.map((question) => `<li>${esc(question)}</li>`).join("")}</ol></section>` : "";
   const hasResources = Boolean(config.view);
