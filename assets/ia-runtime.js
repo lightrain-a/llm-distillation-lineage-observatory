@@ -572,12 +572,14 @@
   function enhance() {
     if (enhancing) return;
     enhancing = true;
+    observer.disconnect();
     try {
       ensureProgressBar();
       enhanceNavigation();
       enhanceRoot();
       updateProgressBar();
     } finally {
+      observer.observe(document.body, { childList: true, subtree: true });
       enhancing = false;
     }
   }
@@ -585,7 +587,7 @@
   function scheduleEnhance() {
     if (scheduled) return;
     scheduled = true;
-    requestAnimationFrame(() => {
+    queueMicrotask(() => {
       scheduled = false;
       enhance();
     });

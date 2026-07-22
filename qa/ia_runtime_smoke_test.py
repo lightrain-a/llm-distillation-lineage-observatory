@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
+import tempfile
 import threading
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -41,17 +42,20 @@ class QuietHandler(SimpleHTTPRequestHandler):
 def dump_dom(base_url: str, page: str, lang: str) -> BeautifulSoup:
     query = urlencode({"page": page, "lang": lang})
     url = f"{base_url}/qa/preview.html?{query}"
-    command = [
-        str(edge_path()),
-        "--headless=new",
-        "--disable-gpu",
-        "--no-first-run",
-        "--no-default-browser-check",
-        "--virtual-time-budget=18000",
-        "--dump-dom",
-        url,
-    ]
-    result = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=45)
+    with tempfile.TemporaryDirectory(prefix=f"distill-{page}-") as profile:
+        command = [
+            str(edge_path()),
+            "--headless=new",
+            "--disable-gpu",
+            "--disable-cache",
+            "--no-first-run",
+            "--no-default-browser-check",
+            f"--user-data-dir={profile}",
+            "--virtual-time-budget=24000",
+            "--dump-dom",
+            url,
+        ]
+        result = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=70)
     if result.returncode != 0:
         raise RuntimeError(f"Edge failed for {page}: {result.stderr[-1000:]}")
     return BeautifulSoup(result.stdout, "html.parser")
