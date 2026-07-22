@@ -246,7 +246,14 @@ html[lang^="zh"] .subsection-block .section-body {
 }
 
 .subsection-block .section-reference-note {
-  margin-top: 19px;
+  margin-top: 8px;
+  padding-top: 6px;
+  gap: 6px;
+  line-height: 1.3;
+}
+
+.subsection-block:has(> .section-reference-note) {
+  padding-bottom: 16px;
 }
 
 .scope-panel,
