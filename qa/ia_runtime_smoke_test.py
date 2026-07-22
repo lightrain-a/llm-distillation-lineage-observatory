@@ -23,6 +23,7 @@ PAGES = {
     "paper-benchmark": {"lang": "zh", "subsections": 17, "chapters": 7},
     "preliminary": {"lang": "en", "subsections": 6, "chapters": 3},
     "confounders-robustness": {"lang": "en", "subsections": 7, "chapters": 3},
+    "research-agenda": {"lang": "zh", "subsections": 5, "chapters": 3},
     "bibliography": {"lang": "en", "subsections": 1, "chapters": 1},
 }
 
@@ -111,6 +112,17 @@ def main() -> int:
     benchmark_text = benchmark.get_text(" ", strip=True)
     require("训练数据决策" in benchmark_text, "paper-benchmark: training-data decision panel missing", failures)
     require("许可与对齐待核验" in benchmark_text, "paper-benchmark: alignment/license gate missing", failures)
+
+    agenda = rendered["research-agenda"]
+    for section in agenda.select(".subsection-block"):
+        note = section.select_one(":scope > .section-reference-note")
+        body = section.select_one(":scope > .section-body")
+        if not note or not body:
+            continue
+        note_refs = sorted(link.get("href", "").split("#")[-1] for link in note.select('a[href*="#ref-"]'))
+        for citations in body.select(".inline-citations"):
+            body_refs = sorted(link.get("href", "").split("#")[-1] for link in citations.select('a[href*="#ref-"]'))
+            require(body_refs != note_refs, "research-agenda: duplicate trailing citations remain above the reference divider", failures)
 
     bibliography = rendered["bibliography"]
     cards = bibliography.select(".reference-card[id^='ref-']")

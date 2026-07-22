@@ -416,6 +416,45 @@
     });
   }
 
+  function citationSignature(container) {
+    return [...container.querySelectorAll('a[href*="#ref-"]')]
+      .map((link) => link.getAttribute("href")?.split("#").pop() || "")
+      .filter(Boolean)
+      .sort()
+      .join("|");
+  }
+
+  function isTrailingWithinBody(node, body) {
+    let current = node;
+    while (current && current !== body) {
+      for (let sibling = current.nextSibling; sibling; sibling = sibling.nextSibling) {
+        if (sibling.nodeType === Node.TEXT_NODE && !sibling.textContent.trim()) continue;
+        if (sibling.nodeType === Node.ELEMENT_NODE && (sibling.matches("br") || !sibling.textContent.trim())) continue;
+        return false;
+      }
+      current = current.parentNode;
+    }
+    return current === body;
+  }
+
+  function removeTrailingDuplicateCitations(root) {
+    root.querySelectorAll(".subsection-block, .topic-section").forEach((section) => {
+      const body = section.querySelector(":scope > .section-body");
+      const note = section.querySelector(":scope > .section-reference-note");
+      if (!body || !note) return;
+
+      const noteSignature = citationSignature(note);
+      if (!noteSignature) return;
+
+      [...body.querySelectorAll(".inline-citations")].forEach((citations) => {
+        if (citationSignature(citations) !== noteSignature || !isTrailingWithinBody(citations, body)) return;
+        const parent = citations.parentElement;
+        citations.remove();
+        if (parent && parent !== body && !parent.textContent.trim() && !parent.children.length) parent.remove();
+      });
+    });
+  }
+
   function buildEnhancedToc(root) {
     const toc = document.getElementById("page-toc");
     if (!toc) return;
@@ -547,6 +586,7 @@
     injectStatusPanel(root);
     enhanceLiteratureSection(root);
     removeInternalCitations(root);
+    removeTrailingDuplicateCitations(root);
     buildResourceTypeFilters(root);
     buildEnhancedToc(root);
     enhanceResourceCards();
