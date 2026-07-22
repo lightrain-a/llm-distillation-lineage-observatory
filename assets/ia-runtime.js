@@ -209,6 +209,8 @@
     bibliography: [[1, "bibliography-guide", l("Bibliography Search and Evidence Types", "文献检索与证据类型")]],
     "research-agenda": [
       [2, "open-questions", l("Open Questions and Structured Problems", "未解决问题与结构化任务")],
+      [2, "prioritized-directions", l("Agent Debate and Top-Tier Directions", "Agent 辩论与第一梯队方向")],
+      [2, "conditional-directions", l("Conditional and Supporting Directions", "条件性与支持性方向")],
       [2, "distillgraph-benchmark", l("DistillGraph and Benchmark Expansion", "DistillGraph 与基准扩展")],
       [1, "dependencies", l("Dependencies on the First Paper", "对第一篇论文的依赖")]
     ]

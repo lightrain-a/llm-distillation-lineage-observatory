@@ -23,7 +23,7 @@ PAGES = {
     "paper-benchmark": {"lang": "zh", "subsections": 17, "chapters": 7},
     "preliminary": {"lang": "en", "subsections": 6, "chapters": 3},
     "confounders-robustness": {"lang": "en", "subsections": 7, "chapters": 3},
-    "research-agenda": {"lang": "zh", "subsections": 5, "chapters": 3},
+    "research-agenda": {"lang": "zh", "subsections": 9, "chapters": 5},
     "bibliography": {"lang": "en", "subsections": 1, "chapters": 2},
 }
 
@@ -114,6 +114,12 @@ def main() -> int:
     require("许可与对齐待核验" in benchmark_text, "paper-benchmark: alignment/license gate missing", failures)
 
     agenda = rendered["research-agenda"]
+    agenda_text = agenda.get_text(" ", strip=True)
+    require("同教师、不同蒸馏机制的黑盒归因" in agenda_text, "research-agenda: top-ranked mechanism-attribution idea missing", failures)
+    require("教师混合比例或行为影响区间" in agenda_text, "research-agenda: influence-interval idea missing", failures)
+    require("可随时停止的低查询蒸馏审计" in agenda_text, "research-agenda: sequential-audit idea missing", failures)
+    require("第二梯队：必须先通过可行性门槛" in agenda_text, "research-agenda: conditional directions missing", failures)
+    require("只适合作为 benchmark 或观察性研究的方向" in agenda_text, "research-agenda: benchmark/observation boundary missing", failures)
     for section in agenda.select(".subsection-block"):
         note = section.select_one(":scope > .section-reference-note")
         body = section.select_one(":scope > .section-body")
