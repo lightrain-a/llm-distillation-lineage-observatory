@@ -109,8 +109,10 @@ def run_desktop_checks(base_url: str) -> None:
         method_text = driver.find_element(By.ID, "dynamic-page").text
         require(len(driver.find_elements(By.CSS_SELECTOR, "#dynamic-page .topic-section")) == 12, "Paper method page has the wrong section count")
         require(all(label in method_text for label in ["方法概览 · 我们准备做什么", "我们准备构建一个候选条件黑盒蒸馏证据检验", "行为回声", "不属于行为回声"]), "Reader-first method motivation is incomplete")
+        require(all(label in method_text for label in ["为什么回声可能保留", "不仅传递教师", "决策边界", "错误恢复方式"]), "Behavioral-echo transfer mechanism is incomplete")
         require(all(label in method_text for label in ["一个贯穿例子 · 什么才算证据", "A→C", "相对于控制的超额规律"]), "Concrete behavioral-echo example is incomplete")
         require(all(label in method_text for label in ["边界回声", "结构回声", "错误 / 推理 / 行动回声", "完整方法流程 · 五个步骤"]), "Three echo families or five-step method map is incomplete")
+        require(all(label in method_text for label in ["不同监督流程不一定保留教师行为的同一部分", "与模型指纹的关系", "ESF", "候选教师特异残余行为"]), "Multi-signature rationale or early fingerprint distinction is incomplete")
         require(all(label in method_text for label in ["D0 与 D1 · 先证明会传，再证明能判", "D0 · 群体迁移", "D1 · 单模型检测", "模型级"]), "Population-versus-individual estimands are incomplete")
         require(all(label in method_text for label in ["仅候选发现、匹配控制与反证", "打乱候选标签", "分数、maxT 联合校准与三态结论", "结论不充分"]), "Discovery, falsification, or calibrated decision rule is incomplete")
         require(all(label in method_text for label in ["与 ESF 等敏感指纹方法的区别", "已篡改 / 未篡改", "检测到 / 未检测到 / 结论不充分"]), "ESF comparison is incomplete")

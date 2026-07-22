@@ -1181,7 +1181,7 @@ async function init() {
   try {
     const module = await import(new URL("content.mjs?v=20260722-research-agenda-v2", APP_ASSET_BASE).href);
     SITE_CONTENT = module.SITE_CONTENT || {};
-    const methodModule = await import(new URL("paper-method-page.mjs?v=20260722-reader-first-v2", APP_ASSET_BASE).href);
+    const methodModule = await import(new URL("paper-method-page.mjs?v=20260722-reader-first-v3", APP_ASSET_BASE).href);
     Object.assign(PAGE_CONFIG["paper-method"], methodModule.PAPER_METHOD_EN || {});
     Object.assign(SITE_CONTENT.zhPages["paper-method"], methodModule.PAPER_METHOD_ZH || {});
     SITE_CONTENT.sectionRefs["paper-method"] = methodModule.PAPER_METHOD_SECTION_REFS || [];
