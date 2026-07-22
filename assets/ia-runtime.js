@@ -226,6 +226,47 @@
     internal: l("Excluded internal work", "已排除内部材料")
   };
 
+  const METHOD_GROUPS = [
+    {
+      id: "detection-attribution",
+      label: l("Distillation Detection & Teacher Attribution", "蒸馏检测与教师归因"),
+      refs: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    },
+    {
+      id: "lineage-fingerprinting",
+      label: l("Lineage, Provenance & Behavioral Fingerprints", "模型谱系、来源与行为指纹"),
+      refs: [10, 11, 12, 13, 14, 15, 16, 17, 20, 27, 88]
+    },
+    {
+      id: "distillation-mechanisms",
+      label: l("Distillation Methods & Training Mechanisms", "蒸馏方法与训练机制"),
+      refs: [36, 38, 39, 40, 41, 42, 43, 44, 54, 60, 61, 62, 63, 86, 87, 91]
+    },
+    {
+      id: "attacks-defenses",
+      label: l("Unauthorized Distillation, Extraction & Defenses", "未授权蒸馏、抽取攻击与来源防御"),
+      refs: [21, 22, 23, 24, 25, 26, 28, 29, 30, 31, 32, 33, 34, 35, 49, 50, 51, 52, 53, 89]
+    },
+    {
+      id: "evaluation-data",
+      label: l("Evaluation, Datasets & Statistical Protocols", "评测、数据集与统计协议"),
+      refs: [64, 65, 76, 77, 78, 79, 90]
+    },
+    {
+      id: "supporting-resources",
+      label: l("Model Cards, Tools, Disclosures & Policy", "模型卡、工具、官方披露与政策"),
+      refs: [18, 19, 37, 45, 46, 47, 48, 55, 56, 57, 58, 59, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 81, 82, 83, 84, 85, 92, 93, 94, 95]
+    }
+  ];
+
+  const YEAR_BUCKETS = [
+    { id: "pre-2023", label: "≤2022", test: (year) => year <= 2022 },
+    { id: "2023", label: "2023", test: (year) => year === 2023 },
+    { id: "2024", label: "2024", test: (year) => year === 2024 },
+    { id: "2025", label: "2025", test: (year) => year === 2025 },
+    { id: "2026", label: "2026", test: (year) => year >= 2026 }
+  ];
+
   let activeResourceType = "all";
   let scheduled = false;
   let enhancing = false;
@@ -409,6 +450,142 @@
     }
   }
 
+  function shortVenueName(venue) {
+    const value = String(venue || "").trim();
+    const rules = [
+      [/findings of acl/i, "Findings ACL"],
+      [/findings of emnlp/i, "Find. EMNLP"],
+      [/neurips.*workshop|nips.*workshop/i, "NeurIPS WS"],
+      [/neurips|nips/i, "NeurIPS"],
+      [/usenix security/i, "USENIX Sec."],
+      [/ieee.*security and privacy|ieee s&p/i, "IEEE S&P"],
+      [/artificial intelligence review/i, "AI Review"],
+      [/icml.*workshop/i, "ICML Wksp."],
+      [/iclr/i, "ICLR"],
+      [/icml/i, "ICML"],
+      [/aaai/i, "AAAI"],
+      [/acl/i, "ACL"],
+      [/emnlp/i, "EMNLP"],
+      [/kdd/i, "KDD"],
+      [/cvpr/i, "CVPR"],
+      [/icassp/i, "ICASSP"],
+      [/ase/i, "ASE"],
+      [/nature/i, "Nature"],
+      [/arxiv/i, "arXiv"],
+      [/hugging faceh4 dataset/i, "HF Dataset"],
+      [/hugging face|meta \/ hugging face|nvidia \/ hugging face/i, "Hugging Face"],
+      [/openai \/ dataset/i, "Dataset"],
+      [/openrouter documentation/i, "OpenRouter Docs"],
+      [/openrouter/i, "OpenRouter"],
+      [/platform documentation|api documentation|documentation|developers/i, "Official Docs"],
+      [/official release/i, "Official Release"],
+      [/official product/i, "Official Product"],
+      [/official report/i, "Official Report"],
+      [/policy/i, "Policy"],
+      [/github \/ whitepaper/i, "Whitepaper"],
+      [/github/i, "GitHub"],
+      [/reuters/i, "Reuters"],
+      [/financial times/i, "FT"],
+      [/project/i, "Project"]
+    ];
+    return rules.find(([pattern]) => pattern.test(value))?.[1] || value.replace(/\s+\d{4}\b/g, "").slice(0, 18);
+  }
+
+  function bibliographyRecordsByNumber() {
+    return new Map((window.RESOURCE_DATA || []).map((record, index) => [index + 1, { ...record, refNo: index + 1 }]));
+  }
+
+  function methodMapCell(records, bucket) {
+    const cellRecords = records.filter((record) => bucket.test(Number(record.year)));
+    if (!cellRecords.length) return `<td class="method-year-cell empty-year" data-year="${bucket.id}">—</td>`;
+
+    const venueGroups = new Map();
+    cellRecords.forEach((record) => {
+      const shortVenue = shortVenueName(record.venue);
+      if (!venueGroups.has(shortVenue)) venueGroups.set(shortVenue, { full: new Set(), records: [] });
+      const group = venueGroups.get(shortVenue);
+      group.full.add(record.venue || shortVenue);
+      group.records.push(record);
+    });
+
+    const clusters = [...venueGroups.entries()]
+      .sort(([a], [b]) => a.localeCompare(b, language() === "zh" ? "zh-CN" : "en"))
+      .map(([venue, group]) => {
+        const references = group.records
+          .sort((a, b) => a.refNo - b.refNo)
+          .map((record) => `<a class="method-ref-link" href="#ref-${record.refNo}" data-ref-no="${record.refNo}" title="[${record.refNo}] ${esc(record.title)}">[${record.refNo}]</a>`)
+          .join("");
+        return `<div class="venue-cluster"><span class="venue-name" title="${esc([...group.full].join(" / "))}">${esc(venue)}</span><span class="venue-refs">${references}</span></div>`;
+      }).join("");
+
+    return `<td class="method-year-cell" data-year="${bucket.id}">${clusters}</td>`;
+  }
+
+  function revealReference(refNo) {
+    const search = document.getElementById("site-search");
+    if (search && search.value) {
+      search.value = "";
+      search.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    document.querySelector('.filter-btn[data-grade="all"]')?.click();
+    activeResourceType = "all";
+    document.querySelectorAll("[data-resource-type-filter]").forEach((button) => button.classList.toggle("active", button.dataset.resourceTypeFilter === "all"));
+    applyResourceTypeFilter();
+    setTimeout(() => {
+      const target = document.getElementById(`ref-${refNo}`);
+      if (!target) return;
+      target.hidden = false;
+      history.replaceState(null, "", `#ref-${refNo}`);
+      target.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+    }, 0);
+  }
+
+  function buildBibliographyMethodMatrix(root) {
+    if (pageKey() !== "bibliography" || root.querySelector(":scope > .bibliography-method-map")) return;
+    const literature = root.querySelector(":scope > .literature-section");
+    if (!literature) return;
+
+    const recordsByNumber = bibliographyRecordsByNumber();
+    const listedRefs = METHOD_GROUPS.flatMap((group) => group.refs);
+    const uniqueRefs = new Set(listedRefs);
+    const publicRefs = [...recordsByNumber.values()].filter((record) => !record.hiddenFromPublic).map((record) => record.refNo);
+    const missing = publicRefs.filter((refNo) => !uniqueRefs.has(refNo));
+    const duplicateCount = listedRefs.length - uniqueRefs.size;
+    if (missing.length || duplicateCount) console.warn("Bibliography method map coverage issue", { missing, duplicateCount });
+
+    const zh = language() === "zh";
+    const section = document.createElement("section");
+    section.className = "chapter-panel bibliography-method-map";
+    section.dataset.publicReferenceCount = String(publicRefs.length);
+    section.innerHTML = `
+      <h2 class="chapter-title" id="bibliography-chapter-method-year-map"><span class="chapter-title-text">${zh ? "文献方法与发表时间地图" : "Method and Publication Timeline"}</span></h2>
+      <div class="method-map-body">
+        <p class="method-map-intro">${zh ? `按主要用途将 ${publicRefs.length} 条公开资源分为六类；每条资源只出现一次。会议名称使用统一简称，悬停可查看完整名称，点击编号跳转到下方完整文献。` : `${publicRefs.length} public resources are assigned to one primary use category. Venue names use consistent abbreviations; hover for the full venue and select a reference number to jump to its full entry.`}</p>
+        <div class="method-map-scroll" tabindex="0" aria-label="${zh ? "方法类别、年份与会议矩阵" : "Method category, year, and venue matrix"}">
+          <table class="method-year-table">
+            <colgroup>
+              <col class="method-col">
+              <col class="year-col pre-2023-col">
+              <col class="year-col year-2023-col">
+              <col class="year-col year-2024-col">
+              <col class="year-col year-2025-col">
+              <col class="year-col year-2026-col">
+            </colgroup>
+            <thead><tr><th scope="col">${zh ? "方法类别" : "Method category"}</th>${YEAR_BUCKETS.map((bucket) => `<th scope="col" data-year="${bucket.id}">${bucket.label}</th>`).join("")}</tr></thead>
+            <tbody>${METHOD_GROUPS.map((group) => {
+              const records = group.refs.map((refNo) => recordsByNumber.get(refNo)).filter(Boolean);
+              return `<tr data-method-group="${group.id}"><th scope="row"><span>${esc(text(group.label))}</span><small>${records.length}</small></th>${YEAR_BUCKETS.map((bucket) => methodMapCell(records, bucket)).join("")}</tr>`;
+            }).join("")}</tbody>
+          </table>
+        </div>
+      </div>`;
+    literature.before(section);
+    section.querySelectorAll(".method-ref-link").forEach((link) => link.addEventListener("click", (event) => {
+      event.preventDefault();
+      revealReference(Number(link.dataset.refNo));
+    }));
+  }
+
   function removeInternalCitations(root) {
     root.querySelectorAll('a[href$="#ref-80"], a[href="bibliography.html#ref-80"]').forEach((link) => {
       const wrapper = link.closest(".citation, .citation-link");
@@ -585,6 +762,7 @@
     applyHierarchy(root);
     injectStatusPanel(root);
     enhanceLiteratureSection(root);
+    buildBibliographyMethodMatrix(root);
     removeInternalCitations(root);
     removeTrailingDuplicateCitations(root);
     buildResourceTypeFilters(root);

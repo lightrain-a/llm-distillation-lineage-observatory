@@ -24,7 +24,7 @@ PAGES = {
     "preliminary": {"lang": "en", "subsections": 6, "chapters": 3},
     "confounders-robustness": {"lang": "en", "subsections": 7, "chapters": 3},
     "research-agenda": {"lang": "zh", "subsections": 5, "chapters": 3},
-    "bibliography": {"lang": "en", "subsections": 1, "chapters": 1},
+    "bibliography": {"lang": "en", "subsections": 1, "chapters": 2},
 }
 
 
@@ -137,6 +137,17 @@ def main() -> int:
     require("NeurIPS 2025" in bibliography.select_one("#ref-2").get_text(" ", strip=True), "bibliography: r2 venue correction missing", failures)
     require("Nature" in bibliography.select_one("#ref-44").get_text(" ", strip=True), "bibliography: r44 Nature correction missing", failures)
     require("25" in bibliography.select_one(".audit-numbers").get_text(" ", strip=True), "bibliography: correction/exclusion total missing", failures)
+
+    method_map = bibliography.select_one(".bibliography-method-map")
+    method_links = bibliography.select(".bibliography-method-map .method-ref-link")
+    method_targets = [link.get("href") for link in method_links]
+    require(method_map is not None, "bibliography: method × year matrix missing", failures)
+    require(len(bibliography.select(".method-year-table tbody tr")) == 6, "bibliography: method matrix should contain six categories", failures)
+    require(len(method_links) == 94, f"bibliography: expected 94 public references in method matrix, found {len(method_links)}", failures)
+    require(len(set(method_targets)) == 94, "bibliography: method matrix contains duplicated reference numbers", failures)
+    require("#ref-80" not in method_targets, "bibliography: excluded internal reference r80 appears in method matrix", failures)
+    require(all(bibliography.select_one(target) is not None for target in method_targets), "bibliography: a method-map link has no detailed reference target", failures)
+    require(len(bibliography.select(".method-year-table thead th")) == 6, "bibliography: method matrix has the wrong year-column count", failures)
 
     if failures:
         print("IA runtime smoke test: FAIL")

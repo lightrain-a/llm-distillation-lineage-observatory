@@ -841,3 +841,216 @@ pre {
     transition: none !important;
   }
 }
+
+/* Bibliography method × year × venue map */
+.bibliography-method-map {
+  overflow: visible;
+}
+
+.method-map-body {
+  padding: 21px 24px 26px;
+}
+
+.method-map-intro {
+  max-width: 900px;
+  margin: 0 0 16px;
+  color: #667387;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.method-map-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid #dce3ec;
+  border-radius: 12px;
+  background: #fff;
+  scrollbar-gutter: stable;
+}
+
+.method-map-scroll:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--section-accent) 28%, transparent);
+  outline-offset: 3px;
+}
+
+.method-year-table {
+  width: 100%;
+  min-width: 962px;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+  color: #354257;
+  font-size: 11px;
+}
+
+.method-year-table col.method-col { width: 220px; }
+.method-year-table col.pre-2023-col { width: 92px; }
+.method-year-table col.year-2023-col { width: 105px; }
+.method-year-table col.year-2024-col { width: 120px; }
+.method-year-table col.year-2025-col { width: 205px; }
+.method-year-table col.year-2026-col { width: 220px; }
+
+.method-year-table th,
+.method-year-table td {
+  padding: 12px 11px;
+  border-right: 1px solid #e3e8ef;
+  border-bottom: 1px solid #e3e8ef;
+  vertical-align: top;
+  text-align: left;
+}
+
+.method-year-table tr:last-child > * {
+  border-bottom: 0;
+}
+
+.method-year-table tr > *:last-child {
+  border-right: 0;
+}
+
+.method-year-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: #eef3f8;
+  color: #526177;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.method-year-table thead th:first-child {
+  left: 0;
+  z-index: 5;
+  text-align: left;
+}
+
+.method-year-table tbody th {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: #f8fafc;
+  color: #2f3c50;
+}
+
+.method-year-table tbody th > span {
+  display: block;
+  font-size: 13px;
+  font-weight: 760;
+  line-height: 1.45;
+}
+
+.method-year-table tbody th > small {
+  display: inline-flex;
+  margin-top: 7px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #e9eef5;
+  color: #6c788b;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.method-year-table td[data-year="2025"],
+.method-year-table td[data-year="2026"] {
+  background: #fcfdff;
+}
+
+.method-year-cell.empty-year {
+  color: #b2bac6;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.venue-cluster {
+  min-width: 0;
+  padding: 1px 0 8px;
+}
+
+.venue-cluster + .venue-cluster {
+  margin-top: 7px;
+  padding-top: 8px;
+  border-top: 1px dashed #e0e5ec;
+}
+
+.venue-name {
+  display: block;
+  overflow: hidden;
+  color: #4b5870;
+  font-size: 10.5px;
+  font-weight: 760;
+  line-height: 1.25;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.method-year-cell[data-year="pre-2023"] .venue-name,
+.method-year-cell[data-year="2023"] .venue-name,
+.method-year-cell[data-year="2024"] .venue-name {
+  font-size: 9.5px;
+}
+
+.method-year-cell[data-year="2025"] .venue-name,
+.method-year-cell[data-year="2026"] .venue-name {
+  font-size: 10.5px;
+}
+
+.venue-refs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 5px;
+}
+
+.method-ref-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 29px;
+  min-height: 23px;
+  padding: 2px 5px;
+  border: 1px solid #dbe2f3;
+  border-radius: 5px;
+  background: #f3f6fd;
+  color: #4354b3;
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.method-ref-link:hover,
+.method-ref-link:focus-visible {
+  border-color: var(--section-accent);
+  background: var(--section-accent);
+  color: #fff;
+  text-decoration: none;
+}
+
+.method-year-cell[data-year="pre-2023"] .method-ref-link,
+.method-year-cell[data-year="2023"] .method-ref-link,
+.method-year-cell[data-year="2024"] .method-ref-link {
+  min-width: 26px;
+  padding-inline: 4px;
+  font-size: 9.5px;
+}
+
+@media (max-width: 820px) {
+  .method-map-body {
+    padding: 17px 18px 20px;
+  }
+
+  .method-map-intro {
+    font-size: 12px;
+  }
+
+  .method-year-table col.method-col {
+    width: 190px;
+  }
+
+  .method-year-table {
+    min-width: 932px;
+  }
+}
