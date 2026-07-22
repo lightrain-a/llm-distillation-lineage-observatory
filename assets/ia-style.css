@@ -933,6 +933,37 @@ pre {
   text-align: left;
 }
 
+.year-head-label,
+.year-head-count {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.year-head-count {
+  justify-content: center;
+  min-width: 21px;
+  height: 18px;
+  margin-left: 5px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #dce6f1;
+  color: #526177;
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 850;
+  line-height: 1;
+}
+
+.method-year-table thead th[data-year="pre-2023"] .year-head-count,
+.method-year-table thead th[data-year="2023"] .year-head-count,
+.method-year-table thead th[data-year="2024"] .year-head-count {
+  min-width: 18px;
+  margin-left: 3px;
+  padding-inline: 4px;
+  font-size: 8.5px;
+}
+
 .method-year-table tbody th {
   position: sticky;
   left: 0;

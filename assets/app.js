@@ -1186,8 +1186,8 @@ async function init() {
   renderAll();
 }
 
-const iaStylesheet = new URL("ia-style.css?v=20260722-ia-v10", APP_ASSET_BASE).href;
-const iaRuntime = new URL("ia-runtime.js?v=20260722-ia-v10", APP_ASSET_BASE).href;
+const iaStylesheet = new URL("ia-style.css?v=20260722-ia-v11", APP_ASSET_BASE).href;
+const iaRuntime = new URL("ia-runtime.js?v=20260722-ia-v11", APP_ASSET_BASE).href;
 document.write(`<link rel="stylesheet" href="${iaStylesheet}"><script src="${iaRuntime}"><\/script>`);
 
 init();

@@ -549,7 +549,9 @@
     const recordsByNumber = bibliographyRecordsByNumber();
     const listedRefs = METHOD_GROUPS.flatMap((group) => group.refs);
     const uniqueRefs = new Set(listedRefs);
-    const publicRefs = [...recordsByNumber.values()].filter((record) => !record.hiddenFromPublic).map((record) => record.refNo);
+    const publicRecords = [...recordsByNumber.values()].filter((record) => !record.hiddenFromPublic);
+    const publicRefs = publicRecords.map((record) => record.refNo);
+    const yearCounts = new Map(YEAR_BUCKETS.map((bucket) => [bucket.id, publicRecords.filter((record) => bucket.test(Number(record.year))).length]));
     const missing = publicRefs.filter((refNo) => !uniqueRefs.has(refNo));
     const duplicateCount = listedRefs.length - uniqueRefs.size;
     if (missing.length || duplicateCount) console.warn("Bibliography method map coverage issue", { missing, duplicateCount });
@@ -572,7 +574,7 @@
               <col class="year-col year-2025-col">
               <col class="year-col year-2026-col">
             </colgroup>
-            <thead><tr><th scope="col">${zh ? "方法类别" : "Method category"}</th>${YEAR_BUCKETS.map((bucket) => `<th scope="col" data-year="${bucket.id}">${bucket.label}</th>`).join("")}</tr></thead>
+            <thead><tr><th scope="col">${zh ? "方法类别" : "Method category"}</th>${YEAR_BUCKETS.map((bucket) => `<th scope="col" data-year="${bucket.id}" aria-label="${bucket.label} · ${yearCounts.get(bucket.id)} ${zh ? "条资源" : "resources"}"><span class="year-head-label">${bucket.label}</span><small class="year-head-count">${yearCounts.get(bucket.id)}</small></th>`).join("")}</tr></thead>
             <tbody>${METHOD_GROUPS.map((group) => {
               const records = group.refs.map((refNo) => recordsByNumber.get(refNo)).filter(Boolean);
               return `<tr data-method-group="${group.id}"><th scope="row"><span>${esc(text(group.label))}</span><small>${records.length}</small></th>${YEAR_BUCKETS.map((bucket) => methodMapCell(records, bucket)).join("")}</tr>`;

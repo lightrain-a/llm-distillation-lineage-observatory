@@ -148,6 +148,10 @@ def main() -> int:
     require("#ref-80" not in method_targets, "bibliography: excluded internal reference r80 appears in method matrix", failures)
     require(all(bibliography.select_one(target) is not None for target in method_targets), "bibliography: a method-map link has no detailed reference target", failures)
     require(len(bibliography.select(".method-year-table thead th")) == 6, "bibliography: method matrix has the wrong year-column count", failures)
+    year_headers = bibliography.select(".method-year-table thead th[data-year]")
+    year_counts = {header.get("data-year"): int(header.select_one(".year-head-count").get_text(strip=True)) for header in year_headers}
+    require(year_counts == {"pre-2023": 16, "2023": 6, "2024": 15, "2025": 27, "2026": 30}, f"bibliography: unexpected year counts {year_counts}", failures)
+    require(sum(year_counts.values()) == 94, "bibliography: year-header counts do not sum to 94 public resources", failures)
 
     if failures:
         print("IA runtime smoke test: FAIL")
