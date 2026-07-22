@@ -108,7 +108,11 @@ def main() -> int:
         server.server_close()
 
     method = rendered["paper-method"]
-    require("Independent method review" in method.get_text(" ", strip=True), "paper-method: review verdict panel missing", failures)
+    method_text = method.get_text(" ", strip=True)
+    require("Independent method review" in method_text, "paper-method: review verdict panel missing", failures)
+    require("我们准备构建一个候选条件黑盒蒸馏证据检验" in method_text or "We aim to build a candidate-conditioned black-box distillation-evidence test" in method_text, "paper-method: reader-first opening paragraph missing", failures)
+    require("完整方法流程 · 五个步骤" in method_text or "The complete method in five steps" in method_text, "paper-method: five-step overview missing", failures)
+    require("ESF" in method_text, "paper-method: ESF comparison missing", failures)
 
     benchmark = rendered["paper-benchmark"]
     benchmark_text = benchmark.get_text(" ", strip=True)
@@ -138,8 +142,8 @@ def main() -> int:
     cards = bibliography.select(".reference-card[id^='ref-']")
     public_cards = [card for card in cards if not card.has_attr("hidden")]
     internal = bibliography.select_one("#ref-80")
-    require(len(cards) == 95, f"bibliography: expected 95 stable reference slots, found {len(cards)}", failures)
-    require(len(public_cards) == 94, f"bibliography: expected 94 public resources, found {len(public_cards)}", failures)
+    require(len(cards) == 96, f"bibliography: expected 96 stable reference slots, found {len(cards)}", failures)
+    require(len(public_cards) == 95, f"bibliography: expected 95 public resources, found {len(public_cards)}", failures)
     require(internal is not None and internal.has_attr("hidden"), "bibliography: r80 internal record was not excluded", failures)
     require(bool(bibliography.select_one(".resource-type-controls")), "bibliography: resource-type filters missing", failures)
     require(len(bibliography.select("[data-resource-type-filter]")) == 9, "bibliography: unexpected resource-type filter count", failures)
@@ -153,15 +157,15 @@ def main() -> int:
     method_targets = [link.get("href") for link in method_links]
     require(method_map is not None, "bibliography: method × year matrix missing", failures)
     require(len(bibliography.select(".method-year-table tbody tr")) == 6, "bibliography: method matrix should contain six categories", failures)
-    require(len(method_links) == 94, f"bibliography: expected 94 public references in method matrix, found {len(method_links)}", failures)
-    require(len(set(method_targets)) == 94, "bibliography: method matrix contains duplicated reference numbers", failures)
+    require(len(method_links) == 95, f"bibliography: expected 95 public references in method matrix, found {len(method_links)}", failures)
+    require(len(set(method_targets)) == 95, "bibliography: method matrix contains duplicated reference numbers", failures)
     require("#ref-80" not in method_targets, "bibliography: excluded internal reference r80 appears in method matrix", failures)
     require(all(bibliography.select_one(target) is not None for target in method_targets), "bibliography: a method-map link has no detailed reference target", failures)
     require(len(bibliography.select(".method-year-table thead th")) == 6, "bibliography: method matrix has the wrong year-column count", failures)
     year_headers = bibliography.select(".method-year-table thead th[data-year]")
     year_counts = {header.get("data-year"): int(header.select_one(".year-head-count").get_text(strip=True)) for header in year_headers}
-    require(year_counts == {"pre-2023": 16, "2023": 6, "2024": 15, "2025": 27, "2026": 30}, f"bibliography: unexpected year counts {year_counts}", failures)
-    require(sum(year_counts.values()) == 94, "bibliography: year-header counts do not sum to 94 public resources", failures)
+    require(year_counts == {"pre-2023": 16, "2023": 6, "2024": 15, "2025": 28, "2026": 30}, f"bibliography: unexpected year counts {year_counts}", failures)
+    require(sum(year_counts.values()) == 95, "bibliography: year-header counts do not sum to 95 public resources", failures)
 
     if failures:
         print("IA runtime smoke test: FAIL")
@@ -170,7 +174,7 @@ def main() -> int:
         return 1
 
     print("IA runtime smoke test: PASS")
-    print("Checked page hierarchy, bilingual rerendering, status panels, TOCs, 95 stable reference slots, 94 public resources, and publication metadata corrections.")
+    print("Checked page hierarchy, bilingual rerendering, status panels, TOCs, 96 stable reference slots, 95 public resources, and publication metadata corrections.")
     return 0
 
 

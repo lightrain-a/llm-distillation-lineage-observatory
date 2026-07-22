@@ -9,7 +9,7 @@ export const SITE_CONTENT = {
       onThisPage: "On this page",
       coreFraming: "Core framing.",
       selectedLiterature: "Selected literature and evidence",
-      literatureIntro: "Reference numbers are stable across the entire site. This search filters only the literature set shown on the current page; use Master Bibliography to search all 63 records. Each methodological statement links to the papers, official disclosures, or reports on which it is based.",
+      literatureIntro: "Reference numbers are stable across the entire site. This search filters only the literature set shown on the current page; use Master Bibliography to search all 96 records. Each methodological statement links to the papers, official disclosures, or reports on which it is based.",
       allEvidence: "All evidence",
       evidenceA: "A · official",
       evidenceB: "B · source-grounded",
@@ -35,7 +35,7 @@ export const SITE_CONTENT = {
       onThisPage: "本页目录",
       coreFraming: "核心框架。",
       selectedLiterature: "相关文献与证据",
-      literatureIntro: "全站使用固定参考文献编号。搜索框只筛选当前页面展示的文献集合；如需检索全部 63 条记录，请进入“参考文献总表”。正文中的方法性陈述会链接到对应论文、官方披露或行业报告。",
+      literatureIntro: "全站使用固定参考文献编号。搜索框只筛选当前页面展示的文献集合；如需检索全部 96 条记录，请进入“参考文献总表”。正文中的方法性陈述会链接到对应论文、官方披露或行业报告。",
       allEvidence: "全部证据",
       evidenceA: "A · 官方披露",
       evidenceB: "B · 可追溯公开材料",
@@ -307,7 +307,7 @@ export const SITE_CONTENT = {
       title: "大语言模型蒸馏与谱系研究观测站",
       lead: "以蒸馏机制为中心，系统整理大语言模型如何传递知识、这些依赖关系如何被审计，以及真实工业流程应如何评价。",
       callout: "网站的主分类轴是被传递的知识信号，而不是来源是否开源、闭源、学术或商业。访问权限、模型开放性、证据等级和代码可用性被视为正交属性。",
-      stats: [["95","篇论文、工具、官方披露、模型卡和数据集"],["4","个从问题定义到执行计划的论文工作区"],["5","级区分官方披露、实验和报道的证据体系"]],
+      stats: [["96","篇论文、工具、官方披露、模型卡和数据集"],["4","个从问题定义到执行计划的论文工作区"],["5","级区分官方披露、实验和报道的证据体系"]],
       sections: [
         { title: "下一篇论文工作区", body: `<div class="framework-grid"><a class="framework-card paper-card" href="paper-problem.html"><b>1. 黑盒审计问题</b><span>定义候选条件蒸馏证据检测，以及商业 API 上允许支持的结论。</span></a><a class="framework-card paper-card" href="paper-method.html"><b>2. 方法候选</b><span>留出机制探针、匹配控制残差和校准三态检验。</span></a><a class="framework-card paper-card" href="paper-benchmark.html"><b>3. 基准与实验</b><span>受控谱系、困难负样本、模拟 API 与商业观察性案例。</span></a><a class="framework-card paper-card" href="paper-roadmap.html"><b>4. 论文主张与路线</b><span>贡献边界、分阶段执行、负结果规则与继续/停止标准。</span></a></div>` },
         { title: "以机制为主线的研究地图", body: `<div class="framework-grid"><a class="framework-card" href="white-box-distillation.html"><b>1. 蒸馏方法</b><span>传递什么信号，教师具有何种访问条件？</span></a><a class="framework-card" href="output-only-auditing.html"><b>2. 蒸馏审计</b><span>输出、logit、表示、路由和权重中留下什么证据？</span></a><a class="framework-card" href="unauthorized-distillation.html"><b>3. 攻击与防御</b><span>能力如何被采集、保护、洗白或移除。</span></a><a class="framework-card" href="benchmarks.html"><b>4. 蒸馏评价</b><span>如何评价检测、归因、校准、鲁棒性和误指控。</span></a><a class="framework-card" href="model-family-compression.html"><b>5. 真实工业流程</b><span>模型家族、响应、推理和生产级蒸馏案例。</span></a><a class="framework-card" href="research-agenda.html"><b>6. 长期研究议程</b><span>在第一篇证据检测论文之后，再研究多教师、多角色和多阶段依赖重建。</span></a></div>` },
@@ -654,7 +654,8 @@ export const SITE_CONTENT = {
     r92: "Qwen3-8B 官方模型卡；在决定性行为签名 demo 中作为第一个开放教师。",
     r93: "Llama 3.1 8B Instruct 官方模型卡；作为第二个开放教师，并明确允许在许可证约束下使用输出改进其他模型。",
     r94: "Qwen3-1.7B-Base 官方模型卡；作为所有配对种子实验臂共享的学生初始化。",
-    r95: "Qwen3-1.7B 指令模型卡；在决定性 demo 中作为同家族影子教师控制。"
+    r95: "Qwen3-1.7B 指令模型卡；在决定性 demo 中作为同家族影子教师控制。",
+    r96: "ESF 通过白盒敏感指纹生成与黑盒随机集合一致性检查检测 LLM 是否被微调、压缩、后门注入或替换；它研究模型完整性，而不是候选教师蒸馏证据。"
   },
 };
 

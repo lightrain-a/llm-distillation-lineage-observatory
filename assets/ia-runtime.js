@@ -92,11 +92,11 @@
       [1, "commercial-claims", l("Commercial-API Claim Boundary", "商业 API 结论边界")]
     ],
     "paper-method": [
-      [2, "hypothesis-signatures", l("Hypothesis and Signature Families", "研究假设与签名家族")],
-      [2, "estimands-discovery", l("Estimands and Held-Out Discovery", "估计目标与留出发现")],
-      [3, "calibration-power", l("Calibration, Power, and Decision", "校准、功效与判定")],
-      [3, "mechanism-diagnostics", l("Mechanism Interpretation and Diagnostics", "机制解释与诊断")],
-      [2, "novelty-fallback", l("Novelty Gate and Fallback", "创新性门槛与回退方案")]
+      [4, "reader-overview", l("Behavioral Echoes in Three Minutes", "三分钟理解行为回声")],
+      [2, "identification-design", l("Identification Design", "识别设计")],
+      [3, "calibration-decision", l("Calibration, Power, and Decision", "校准、功效与判定")],
+      [2, "neighboring-methods", l("Neighboring Methods and Interpretation", "相邻方法与解释边界")],
+      [1, "novelty-boundary", l("Novelty Gate and NO-GO Rules", "创新性门槛与停止条件")]
     ],
     "paper-benchmark": [
       [1, "stage-map", l("Stage Map and Evidence Levels", "阶段地图与证据层级")],
@@ -237,7 +237,7 @@
     {
       id: "lineage-fingerprinting",
       label: l("Lineage, Provenance & Behavioral Fingerprints", "模型谱系、来源与行为指纹"),
-      refs: [10, 11, 12, 13, 14, 15, 16, 17, 20, 27, 88]
+      refs: [10, 11, 12, 13, 14, 15, 16, 17, 20, 27, 88, 96]
     },
     {
       id: "distillation-mechanisms",

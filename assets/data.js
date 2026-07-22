@@ -1861,6 +1861,20 @@ window.RESOURCE_DATA=[
     "repo": "https://huggingface.co/Qwen/Qwen3-1.7B",
     "summary": "Official Qwen3 1.7B instruction-tuned checkpoint used as a same-family shadow teacher control in the decisive demo.",
     "tags": ["Qwen3-1.7B", "shadow teacher", "same-family control"]
+  },
+  {
+    "id": "r96",
+    "title": "ESF: Efficient Sensitive Fingerprinting for Black-Box Tamper Detection of Large Language Models",
+    "year": 2025,
+    "venue": "Findings of ACL 2025",
+    "kind": "Paper",
+    "categories": ["lineage-fingerprinting", "datasets-benchmarks"],
+    "access": ["White-box fingerprint generation; black-box detection"],
+    "evidence": "C — controlled LLM tamper-detection experiments",
+    "url": "https://aclanthology.org/2025.findings-acl.546/",
+    "repo": "",
+    "summary": "Optimizes white-box sensitivity probes for black-box integrity checking, handles output randomness with Randomness-Set Consistency Checking, and selects a compact probe set with a Max Coverage Strategy. It detects whether a protected reference LLM has been modified, rather than whether a suspect exhibits candidate-teacher-specific distillation evidence.",
+    "tags": ["LLM fingerprinting", "tamper detection", "sensitive probes", "integrity checking"]
   }
 ];
 
