@@ -1863,3 +1863,5 @@ window.RESOURCE_DATA=[
     "tags": ["Qwen3-1.7B", "shadow teacher", "same-family control"]
   }
 ];
+
+document.write(`<script src="${new URL("data-patch.js?v=20260722-reference-audit", document.currentScript.src).href}"><\/script>`);

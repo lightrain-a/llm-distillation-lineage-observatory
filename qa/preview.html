@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>IA Preview</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-page="paper-method">
+  <div class="layout">
+    <aside class="sidebar">
+      <a class="brand" href="../index.html"><div class="logo">DL</div><div><strong>Distillation Lineage</strong><span>Research Observatory</span></div></a>
+      <nav class="nav"></nav>
+      <div id="page-toc" class="page-toc"></div>
+      <div class="sidebar-note"><a href="../taxonomy.html">Evidence grades A–E</a><br>Mechanism-first classification with access and openness as attributes.</div>
+    </aside>
+    <main class="main">
+      <div class="topbar"><button class="mobile-toggle" aria-label="Toggle navigation">☰</button><div class="search"><input id="site-search" type="search" placeholder="Search references…"></div><div class="counter" id="result-count">Research guide</div></div>
+      <div class="content" id="dynamic-page"></div>
+      <footer class="footer">Local IA preview</footer>
+    </main>
+  </div>
+  <script>
+    const previewParams = new URLSearchParams(location.search);
+    document.body.dataset.page = previewParams.get("page") || "paper-method";
+    const previewLanguage = previewParams.get("lang");
+    if (previewLanguage === "zh" || previewLanguage === "en") {
+      localStorage.setItem("distill-observatory-language", previewLanguage);
+    }
+  </script>
+  <script src="../assets/data.js"></script>
+  <script src="../assets/app.js"></script>
+</body>
+</html>
