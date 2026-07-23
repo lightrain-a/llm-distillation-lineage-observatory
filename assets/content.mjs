@@ -1,4 +1,4 @@
-import { NEXT_PAPER_PAGE_DETAILS, NEXT_PAPER_SECTION_REFS, NEXT_PAPER_ZH } from "./next-paper-zh.mjs";
+import { NEXT_PAPER_PAGE_DETAILS, NEXT_PAPER_SECTION_REFS, NEXT_PAPER_ZH } from "./next-paper-zh.mjs?v=20260723-benchmark-demo-v1";
 
 export const SITE_CONTENT = {
   ui: {

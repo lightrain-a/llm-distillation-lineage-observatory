@@ -123,7 +123,10 @@ def run_desktop_checks(base_url: str) -> None:
         driver.get(f"{base_url}/paper-benchmark.html")
         wait_until(driver, lambda d: d.find_element(By.CSS_SELECTOR, "h1").text == "基准与实验协议", "Paper benchmark page did not load in Chinese")
         benchmark_text = driver.find_element(By.ID, "dynamic-page").text
-        require(len(driver.find_elements(By.CSS_SELECTOR, "#dynamic-page .topic-section")) == 17, "Paper benchmark page has the wrong section count")
+        require(len(driver.find_elements(By.CSS_SELECTOR, "#dynamic-page .topic-section")) == 19, "Paper benchmark page has the wrong section count")
+        require("训练数据决策" not in benchmark_text, "Internal training-data status should not precede the experiment design")
+        require(all(label in benchmark_text for label in ["推荐实验路线 · 公开模型筛选、单卡 pilot 与正式 D0", "P0-public", "P0-local", "D0-confirm", "单张 A100"]), "Recommended staged demo plan is incomplete")
+        require(all(label in benchmark_text for label in ["相关工作的设备配置与实验规模参考", "2× NVIDIA A100", "4× RTX A6000", "2× NVIDIA H20", "独立训练学生的数量"]), "Related-work compute precedent is incomplete")
         require(all(label in benchmark_text for label in ["D0 · 群体层自然签名可行性", "Qwen/Qwen3-8B", "Llama-3.1-8B-Instruct", "Qwen/Qwen3-1.7B-Base", "影子教师输出"]), "Exact D0 population-feasibility manifest is incomplete")
         require(all(label in benchmark_text for label in ["32 个训练模型", "8M 目标 token", "种子区组才是随机化与重采样单位", "δpop"]), "D0 population estimand or replication design is incomplete")
         require(all(label in benchmark_text for label in ["群体 GO", "有条件 GO", "NO-GO", "全新任务家族"]), "D0 population go/no-go criteria are incomplete")

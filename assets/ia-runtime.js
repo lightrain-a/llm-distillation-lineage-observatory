@@ -99,6 +99,7 @@
       [1, "novelty-validity", l("Novelty, Validity, and Stop Criteria", "创新性、有效性与停止条件")]
     ],
     "paper-benchmark": [
+      [2, "recommended-demo", l("Recommended Demo and Compute Rationale", "推荐 Demo 与算力依据")],
       [1, "stage-map", l("Stage Map and Evidence Levels", "阶段地图与证据层级")],
       [2, "d0-d1", l("D0 Population Study and D1 Detector", "D0 群体研究与 D1 检测器")],
       [3, "models-g0-replication", l("Model Strata, G0, and Replication", "模型分层、G0 与重复实验")],
@@ -411,10 +412,6 @@
 
     if (key === "home") {
       return `<section class="ia-status-panel project-status" aria-label="${zh ? "项目状态" : "Project status"}"><div class="status-heading"><div><span class="status-kicker">${zh ? "当前进度" : "Current progress"}</span><h2>${zh ? "从研究审查到可执行实验" : "From research review to executable experiment"}</h2></div><span class="status-pill">P0</span></div><div class="phase-grid">${phase("1", zh ? "方向与方法审查" : "Direction and method review", "done")}${phase("2", zh ? "训练数据方案" : "Training-data plan", "done")}${phase("3", zh ? "参考文献核对" : "Reference audit", "done")}${phase("4", zh ? "页面层级重构" : "Page hierarchy", "done")}${phase("5", zh ? "数据清单与 D0 pilot 冻结" : "Dataset manifest and D0 pilot freeze", "next")}</div><p>${zh ? "尚未运行 D0 或验证单模型检测器。当前唯一可执行门槛是完成公开输出库的版本、许可、ID 与完整 user-turn 哈希对齐。" : "D0 has not run and no individual-model detector has been validated. The next executable gate is the version, license, ID, and complete user-turn-hash audit of the public output archives."}</p></section>`;
-    }
-
-    if (key === "paper-benchmark") {
-      return `<section class="ia-status-panel data-status"><div class="status-heading"><div><span class="status-kicker">${zh ? "训练数据决策" : "Training-data decision"}</span><h2>${zh ? "优先复用同一 Open-PerfectBlend 提示上的公开教师输出" : "Reuse public teacher outputs on matched Open-PerfectBlend prompts"}</h2></div><span class="status-pill conditional">${zh ? "许可与对齐待核验" : "License and alignment gate"}</span></div><div class="status-columns"><div><strong>T1 · Qwen3-8B</strong><p><code>heiheiha798/perfectblend-regen-qwen3-8b-non-thinking</code></p></div><div><strong>T2 · Llama-3.1-8B-Instruct</strong><p><code>frankleeeee/PerfectBlend-Regenerated-Llama-3.1-8B-Instruct</code></p></div><div><strong>${zh ? "控制臂" : "Controls"}</strong><p>${zh ? "原始 public-mixture 监督 + 本地同家族 shadow teacher；不再称为 gold/reference。" : "Original public-mixture supervision plus a local same-family shadow teacher; do not label the public arm gold/reference."}</p></div></div><p>${zh ? "任何训练行必须同时通过原始 ID 与完整 user-turn 规范化 SHA-256；D0a 的 8 个配对种子只作为大效应 pilot，并允许按盲化方差规则扩展。" : "Every training row must pass both original-ID and complete user-turn canonical SHA-256 agreement. The eight paired D0a blocks are a large-effect pilot with a preregistered blinded-variance expansion rule."}</p></section>`;
     }
 
     if (key === "paper-roadmap") {

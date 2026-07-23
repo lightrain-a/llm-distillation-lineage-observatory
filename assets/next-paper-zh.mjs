@@ -58,9 +58,17 @@ export const NEXT_PAPER_ZH = {
   "paper-benchmark": {
     eyebrow: "下一篇论文 · 基准",
     title: "基准与实验协议",
-    lead: "先用决定性 D0 验证自然行为签名是否存在，再进入机制隔离、公开蒸馏模型与商业 API 观察。",
-    callout: "D0 是第一道算力与科学门槛。若自然签名无法在独立训练模型层面区分教师学生与匹配控制，72 模型 G0 和商业 API 审计均不启动。",
+    lead: "先用公开蒸馏关系模型做零训练筛选，再用单张 A100 完成四臂可行性实验；只有候选特异回声通过匹配控制后，才扩展到多种子因果验证。",
+    callout: "不要一开始就投入 32 模型 D0 或 72 次机制实验。先低成本证伪信号：公开 checkpoint 检验外部可行性，单 A100 pilot 检验训练与审计闭环，独立学生 replica 才用于建立群体因果效应。",
     sections: [
+      {
+        title: "推荐实验路线 · 公开模型筛选、单卡 pilot 与正式 D0",
+        body: `<p>当前最合适的 demo 不是直接训练完整基准，而是分三道门槛逐步增加证据强度。先检查已知公开蒸馏关系中是否存在候选特异方向性回声，再用受控四臂训练排除基础模型、替代教师和一般合成数据训练，最后才增加独立学生数量。</p><table class="matrix"><thead><tr><th>阶段</th><th>具体设计</th><th>算力</th><th>决策与允许结论</th></tr></thead><tbody><tr><td><strong>P0-public · 零训练筛选</strong></td><td>评价公开披露的推理蒸馏学生及其基础 checkpoint，例如 DeepSeek-R1-Distill 系列与 OpenThoughts 衍生模型。探针发现只使用候选和匹配控制，在全新实例上检查候选对角选择性 [[58,69]]。</td><td>不训练学生；本地顺序推理 7B 级 checkpoint，必要时通过固定候选端点获得教师输出。</td><td>只有公开正例的基础归一化候选回声高于替代教师和基础控制时才继续。这只能支持外部可行性，不能验证检测器。</td></tr><tr><td><strong>P0-local · 单 A100 pilot</strong></td><td>以 <code>Qwen/Qwen3-1.7B-Base</code> 为学生，使用 response-only LoRA-r16 训练四臂：T₁ 输出、T₂ 输出、同家族影子教师输出和公开目标。先跑 1 个 smoke seed，闭环正确后再跑 4 个配对种子区组 [[92,93,94,95]]。</td><td>单张 A100 顺序训练；主要探针采用有限答案与短输出。Smoke 使用 0.2–0.5M 目标 token；决定性 pilot 可提高到每学生 8M token。</td><td>要求两个教师都出现正向 hardest-control 残差、教师对角选择性、全新任务复现，并在候选—探针打乱后消失。4 个种子只支持方向判断。</td></tr><tr><td><strong>D0-confirm · 群体验证</strong></td><td>把冻结的四臂协议扩展到每臂 8 个配对种子区组，共 32 个独立训练学生。开标签后不能修改探针、分数、排除规则或最小关注效应。</td><td>单 A100 可以顺序完成；增加 GPU 只缩短墙钟时间，不改变推断单位。</td><td>只有这一阶段可以支持平均因果迁移主张。D1 单模型检测必须等待 D0 群体 GO。</td></tr></tbody></table><p>Demo 的主要统计量是教师学生的候选方向转移率减去最困难匹配控制。第一轮边界通道冻结 240 个留出成对探针，并报告 20/40/80/120/240 对查询预算曲线；结构签名作为次要正控制。有限答案信号建立前，不运行大规模自由推理协议。</p><div class="claim-box"><b>实际停止规则</b>如果公开模型对没有候选选择性，或四臂 pilot 与影子/公开控制相当，就停止边界中心方向，不投入 32 或 72 次训练。</div>`
+      },
+      {
+        title: "相关工作的设备配置与实验规模参考",
+        body: `<p>已有工作表明，上述可行性实验在单张 A100 的能力范围内。真正的成本瓶颈不是单个模型能否装入显存，而是是否训练了足够多的独立学生，以区分教师效应和随机种子波动。</p><table class="matrix"><thead><tr><th>工作</th><th>报告设备</th><th>实验规模</th><th>对本文的设计启示</th></tr></thead><tbody><tr><td><strong>Who Taught You That?</strong> [[1]]</td><td>2× NVIDIA A100，未说明 40GB/80GB。</td><td>5 个候选教师，GPT-2/OLMo-1B 学生，多种摘要、QA 与指令任务；使用 10k Alpaca 提示，学习率 3e-5，batch 随任务变化。</td><td>中等设备即可完成教师候选实验，但静态 POS/输出聚合应作为基线，而不是我们的创新点。</td></tr><tr><td><strong>AgentEcho</strong> [[88]]</td><td>未披露具体 GPU；大量主实验使用提供方 API。</td><td>用 200 条教师轨迹对 Qwen2.5-14B-Instruct 做 LoRA，rank 16、学习率 2e-5、10 epochs。</td><td>少量轨迹即可移动非任务必需行为，但必须加入替代教师，而不能只比较训练前 checkpoint。</td></tr><tr><td><strong>Trace Rewriting</strong> [[89]]</td><td>节点配置为 4× A100 或 H100；作者说明单个实验一张同类 GPU 即可完成。</td><td>1B–8B 学生，vLLM 生成，LoRA rank/alpha 128，batch 32，4 epochs，最长输出约 1k–2k token。</td><td>单 A100 足以支持更轻量的 1.7B/7B 有限答案实验；长推理应放到后续次要协议。</td></tr><tr><td><strong>Counterfactual KD</strong> [[87]]</td><td>4× RTX A6000。</td><td>Qwen2.5-1.5B 教师到 0.5B 学生，使用成对反事实输入，预算从 8 到 512，进行 5 次独立运行。</td><td>应使用受控输入对、查询预算曲线和多次独立运行；不能用一次随机输出判断边界。</td></tr><tr><td><strong>ESF</strong> [[96]]</td><td>敏感指纹生成实验使用 2× NVIDIA H20。</td><td>覆盖 0.5B–8B LLM；构造微调、LoRA、后门、INT4/INT8 和替换模型；每种篡改类型训练 10 个独立派生模型。</td><td>模型级误差可信度来自独立派生模型，而不是把数千提示当作独立样本。</td></tr><tr><td><strong>Membership and Memorization in KD</strong> [[90]]</td><td>未报告精确 GPU 配置。</td><td>覆盖 GPT-2、OPT 和 Llama 的教师/学生家族，多种 KD 方法和 Dolly-15k 隐私攻击。</td><td>对未披露硬件应如实标注，并把机制网格与核心可行性结论分开。</td></tr><tr><td><strong>仅决策/边界蒸馏</strong> [[86,91]]</td><td>未报告精确 GPU 配置。</td><td>多数据集、多网络组合，通过重复边界搜索或边界支持样本传递教师决策信息。</td><td>这些工作支持方向性转移直觉，但图像连续扰动必须替换为语义受控文本编辑。</td></tr></tbody></table><div class="survey-note"><b>资源结论</b>单张 A100 可以顺序完成公开 checkpoint 筛选和 1.7B 四臂可行性实验。额外 GPU 主要缩短运行时间；科学上不能省略的是独立训练学生的数量。</div>`
+      },
       {
         title: "第一层 · 受控开源谱系",
         body: `<p>受控模型提供已知教师—学生边，但拟议方法在评价时只能观察输出。D0 先检验普通输出蒸馏是否传递任意自然行为签名；D0 通过后，G0 才隔离响应、推理和偏好监督机制。</p><p>训练日志与检查点只用于真实关系和消融，不是最终黑盒规则输入。公开披露模型和商业端点不得与受控训练 replica 合并计算因果敏感性。</p>`
@@ -185,6 +193,8 @@ export const NEXT_PAPER_SECTION_REFS = {
     [1,2,3,6,7,80,88,89]
   ],
   "paper-benchmark": [
+    [],
+    [],
     [3,6,36,38,39,44,47],
     [86,87,88,89,90,91,92,93,94,95],
     [1,2,7,14,15,80,92,93,94,95],
@@ -229,14 +239,14 @@ export const NEXT_PAPER_PAGE_DETAILS = {
   },
   "paper-benchmark": {
     en: {
-      overview: "The benchmark has two gates: D0 estimates population-level transfer across paired student replicas, while D1 uses separate discovery, calibration, and untouched confirmation cohorts to validate a detector for one model. G0 mechanism isolation and commercial observation occur only after the relevant gate passes.",
-      terms: ["D0 population feasibility", "D1 discovery", "D1 calibration", "untouched confirmation", "false attribution", "G0 mechanism isolation"],
-      questions: ["Does a signature transfer on average?", "Does the frozen detector meet model-level error targets?", "Which later experiments require D0 versus D1 GO?"]
+      overview: "The experiment plan begins with a zero-training public-checkpoint screen, proceeds to a single-A100 four-arm pilot, and expands to multi-seed D0 only after candidate-specific echoes survive matched controls. D1 then uses independent discovery, calibration, and untouched confirmation cohorts.",
+      terms: ["public-checkpoint screen", "single-A100 pilot", "D0 population feasibility", "paired student replicas", "untouched confirmation", "false attribution"],
+      questions: ["Do public distillation pairs show candidate selectivity?", "Does the controlled four-arm pilot survive the hardest controls?", "When is the signal strong enough to justify D0 and D1 scale-up?"]
     },
     zh: {
-      overview: "基准包含两道门槛：D0 跨配对学生 replica 估计群体迁移，D1 使用独立发现、校准和未触碰确认模型验证单模型检测器。G0 机制隔离与商业观察只在对应门槛通过后启动。",
-      terms: ["D0 群体可行性", "D1 发现", "D1 校准", "未触碰确认", "误指控", "G0 机制隔离"],
-      questions: ["签名是否在总体上传递？", "冻结检测器是否达到模型级误差目标？", "哪些后续实验要求 D0 或 D1 通过？"]
+      overview: "实验先用公开蒸馏 checkpoint 做零训练筛选，再用单张 A100 运行四臂 pilot；只有候选特异回声通过最困难匹配控制后，才扩展到多种子 D0，并继续独立的 D1 发现、校准与未触碰确认。",
+      terms: ["公开 checkpoint 筛选", "单 A100 pilot", "D0 群体可行性", "配对学生 replica", "未触碰确认", "误指控"],
+      questions: ["公开蒸馏模型对是否表现候选选择性？", "受控四臂 pilot 能否通过最困难控制？", "信号达到什么门槛才值得扩展 D0 与 D1？"]
     }
   },
   "paper-roadmap": {

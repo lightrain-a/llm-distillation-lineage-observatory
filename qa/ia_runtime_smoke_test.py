@@ -20,7 +20,7 @@ EDGE_CANDIDATES = (
 
 PAGES = {
     "paper-method": {"lang": "en", "subsections": 13, "chapters": 5},
-    "paper-benchmark": {"lang": "zh", "subsections": 17, "chapters": 7},
+    "paper-benchmark": {"lang": "zh", "subsections": 19, "chapters": 8},
     "preliminary": {"lang": "en", "subsections": 6, "chapters": 3},
     "confounders-robustness": {"lang": "en", "subsections": 7, "chapters": 3},
     "research-agenda": {"lang": "zh", "subsections": 9, "chapters": 5},
@@ -119,8 +119,11 @@ def main() -> int:
 
     benchmark = rendered["paper-benchmark"]
     benchmark_text = benchmark.get_text(" ", strip=True)
-    require("训练数据决策" in benchmark_text, "paper-benchmark: training-data decision panel missing", failures)
-    require("许可与对齐待核验" in benchmark_text, "paper-benchmark: alignment/license gate missing", failures)
+    require("训练数据决策" not in benchmark_text and "Training-data decision" not in benchmark_text, "paper-benchmark: internal data-status panel should not precede the experiment plan", failures)
+    require("推荐实验路线 · 公开模型筛选、单卡 pilot 与正式 D0" in benchmark_text or "Recommended execution plan for the behavioral-echo demo" in benchmark_text, "paper-benchmark: recommended demo plan missing", failures)
+    require("相关工作的设备配置与实验规模参考" in benchmark_text or "Compute and experimental precedent in related work" in benchmark_text, "paper-benchmark: compute precedent missing", failures)
+    require("P0-public" in benchmark_text and "P0-local" in benchmark_text and "D0-confirm" in benchmark_text, "paper-benchmark: staged public/pilot/confirm plan incomplete", failures)
+    require("单张 A100" in benchmark_text or "single A100" in benchmark_text, "paper-benchmark: single-A100 feasibility statement missing", failures)
 
     agenda = rendered["research-agenda"]
     agenda_text = agenda.get_text(" ", strip=True)
