@@ -1495,7 +1495,7 @@ window.RESOURCE_DATA=[
     "evidence": "A/B — official disclosed distillation artifact",
     "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
     "repo": "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
-    "summary": "Officially disclosed dense student distilled from DeepSeek-R1 on a Qwen base, used as an external positive validation case rather than a training replica.",
+    "summary": "Officially disclosed dense student distilled from DeepSeek-R1 on a Qwen base. It is an external positive case, but one released checkpoint cannot replace multiple independently trained comparison models.",
     "tags": ["DeepSeek-R1", "disclosed positive", "reasoning distillation"]
   },
   {
