@@ -120,17 +120,18 @@ def main() -> int:
     benchmark = rendered["paper-benchmark"]
     benchmark_text = benchmark.get_text(" ", strip=True)
     require("训练数据决策" not in benchmark_text and "Training-data decision" not in benchmark_text, "paper-benchmark: internal data-status panel should not precede the experiment plan", failures)
-    require("推荐实验路线 · 公开模型筛选、单卡 pilot 与正式 D0" in benchmark_text or "Recommended execution plan for the behavioral-echo demo" in benchmark_text, "paper-benchmark: recommended demo plan missing", failures)
+    require("推荐实验执行方案 · 公开模型检查、小规模受控实验与正式 D0" in benchmark_text or "Recommended experimental sequence for candidate-specific behavior" in benchmark_text, "paper-benchmark: recommended experiment plan missing", failures)
     require("相关工作的设备配置与实验规模参考" in benchmark_text or "Compute and experimental precedent in related work" in benchmark_text, "paper-benchmark: compute precedent missing", failures)
-    require("P0-public" in benchmark_text and "P0-local" in benchmark_text and "D0-confirm" in benchmark_text, "paper-benchmark: staged public/pilot/confirm plan incomplete", failures)
+    require(all(label in benchmark_text for label in ["步骤1", "步骤2", "步骤3", "4种训练条件", "32个独立学生"]), "paper-benchmark: concrete three-step plan incomplete", failures)
     require("单张 A100" in benchmark_text or "single A100" in benchmark_text, "paper-benchmark: single-A100 feasibility statement missing", failures)
+    require(not any(term in benchmark_text for term in ["四臂 pilot", "实验臂", "处理臂", "来源臂", "群体 GO", "有条件 GO", "NO-GO"]), "paper-benchmark: ambiguous experimental shorthand remains", failures)
 
     agenda = rendered["research-agenda"]
     agenda_text = agenda.get_text(" ", strip=True)
     require("同教师、不同蒸馏机制的黑盒归因" in agenda_text, "research-agenda: top-ranked mechanism-attribution idea missing", failures)
     require("教师混合比例或行为影响区间" in agenda_text, "research-agenda: influence-interval idea missing", failures)
     require("可随时停止的低查询蒸馏审计" in agenda_text, "research-agenda: sequential-audit idea missing", failures)
-    require("第二梯队：必须先通过可行性门槛" in agenda_text, "research-agenda: conditional directions missing", failures)
+    require("第二梯队：必须先完成可行性验证" in agenda_text, "research-agenda: conditional directions missing", failures)
     require("只适合作为 benchmark 或观察性研究的方向" in agenda_text, "research-agenda: benchmark/observation boundary missing", failures)
     require(not agenda.select(".section-reference-note"), "research-agenda: references should be placed inline rather than in section-end notes", failures)
     require(len(agenda.select(".section-body .inline-citations")) >= 9, "research-agenda: insufficient inline citation placement", failures)

@@ -13,7 +13,7 @@
         ["paper-problem", l("Question & Claim Boundary", "研究问题与结论边界")],
         ["paper-method", l("Behavioral-Echo Method", "行为回声方法")],
         ["paper-benchmark", l("Data & Experiments", "数据与实验协议")],
-        ["paper-roadmap", l("Decisions & Paper Plan", "决策门槛与论文计划")]
+        ["paper-roadmap", l("Criteria and Paper Plan", "继续条件、停止条件与论文计划")]
       ]
     },
     {
@@ -99,7 +99,7 @@
       [1, "novelty-validity", l("Novelty, Validity, and Stop Criteria", "创新性、有效性与停止条件")]
     ],
     "paper-benchmark": [
-      [2, "recommended-demo", l("Recommended Demo and Compute Rationale", "推荐 Demo 与算力依据")],
+      [2, "recommended-demo", l("Recommended Experiment and Compute Rationale", "推荐实验与算力依据")],
       [1, "stage-map", l("Stage Map and Evidence Levels", "阶段地图与证据层级")],
       [2, "d0-d1", l("D0 Population Study and D1 Detector", "D0 群体研究与 D1 检测器")],
       [3, "models-g0-replication", l("Model Strata, G0, and Replication", "模型分层、G0 与重复实验")],
@@ -111,7 +111,7 @@
     "paper-roadmap": [
       [2, "thesis-contributions", l("Thesis and Contributions", "论文主张与贡献")],
       [2, "outline-execution", l("Paper Outline and Execution Plan", "论文结构与执行计划")],
-      [2, "gates-reporting", l("Decision Gates and Reporting", "决策门槛与结果汇报")],
+      [2, "gates-reporting", l("Continuation, Stop, and Reporting Criteria", "继续条件、停止条件与结果汇报")],
       [1, "site-support", l("How the Observatory Supports the Paper", "网站如何服务论文")]
     ],
     preliminary: [
@@ -408,14 +408,14 @@
 
   function statusMarkup(key) {
     const zh = language() === "zh";
-    const phase = (n, label, state) => `<div class="phase-card ${state}"><span class="phase-index">${n}</span><div><strong>${label}</strong><span>${state === "done" ? (zh ? "已完成" : "Complete") : (zh ? "下一门槛" : "Next gate")}</span></div></div>`;
+    const phase = (n, label, state) => `<div class="phase-card ${state}"><span class="phase-index">${n}</span><div><strong>${label}</strong><span>${state === "done" ? (zh ? "已完成" : "Complete") : (zh ? "下一步" : "Next step")}</span></div></div>`;
 
     if (key === "home") {
-      return `<section class="ia-status-panel project-status" aria-label="${zh ? "项目状态" : "Project status"}"><div class="status-heading"><div><span class="status-kicker">${zh ? "当前进度" : "Current progress"}</span><h2>${zh ? "从研究审查到可执行实验" : "From research review to executable experiment"}</h2></div><span class="status-pill">P0</span></div><div class="phase-grid">${phase("1", zh ? "方向与方法审查" : "Direction and method review", "done")}${phase("2", zh ? "训练数据方案" : "Training-data plan", "done")}${phase("3", zh ? "参考文献核对" : "Reference audit", "done")}${phase("4", zh ? "页面层级重构" : "Page hierarchy", "done")}${phase("5", zh ? "数据清单与 D0 pilot 冻结" : "Dataset manifest and D0 pilot freeze", "next")}</div><p>${zh ? "尚未运行 D0 或验证单模型检测器。当前唯一可执行门槛是完成公开输出库的版本、许可、ID 与完整 user-turn 哈希对齐。" : "D0 has not run and no individual-model detector has been validated. The next executable gate is the version, license, ID, and complete user-turn-hash audit of the public output archives."}</p></section>`;
+      return `<section class="ia-status-panel project-status" aria-label="${zh ? "项目状态" : "Project status"}"><div class="status-heading"><div><span class="status-kicker">${zh ? "当前进度" : "Current progress"}</span><h2>${zh ? "从研究审查到可执行实验" : "From research review to executable experiment"}</h2></div><span class="status-pill">P0</span></div><div class="phase-grid">${phase("1", zh ? "方向与方法审查" : "Direction and method review", "done")}${phase("2", zh ? "训练数据方案" : "Training-data plan", "done")}${phase("3", zh ? "参考文献核对" : "Reference audit", "done")}${phase("4", zh ? "页面层级重构" : "Page hierarchy", "done")}${phase("5", zh ? "数据清单与 D0 小规模实验方案冻结" : "Freeze the dataset manifest and D0 preliminary-experiment specification", "next")}</div><p>${zh ? "尚未运行 D0 或验证单模型检测器。当前必须完成的步骤是核对公开输出库的版本、许可、ID 与完整 user-turn 哈希。" : "D0 has not run and no individual-model detector has been validated. The next required step is to verify the versions, licenses, IDs, and complete user-turn hashes of the public output archives."}</p></section>`;
     }
 
     if (key === "paper-roadmap") {
-      return `<section class="ia-status-panel roadmap-status"><div class="status-heading"><div><span class="status-kicker">${zh ? "执行状态" : "Execution status"}</span><h2>${zh ? "研究框架已审查；实验尚未开始" : "Research framework reviewed; experiments have not started"}</h2></div><span class="status-pill">P0</span></div><ol class="compact-steps"><li>${zh ? "冻结数据来源、commit、许可、清洗和哈希对齐规则。" : "Freeze data sources, commits, licenses, cleaning, and hash-alignment rules."}</li><li>${zh ? "冻结 B/S/E 每个家族的一个主分数与 maxT 重采样算法。" : "Freeze one primary B/S/E score and the nested maxT resampling algorithm."}</li><li>${zh ? "只在 P0 通过后启动 D0 大效应 pilot。" : "Start the large-effect D0 pilot only after P0 passes."}</li></ol></section>`;
+      return `<section class="ia-status-panel roadmap-status"><div class="status-heading"><div><span class="status-kicker">${zh ? "执行状态" : "Execution status"}</span><h2>${zh ? "研究框架已审查；实验尚未开始" : "Research framework reviewed; experiments have not started"}</h2></div><span class="status-pill">P0</span></div><ol class="compact-steps"><li>${zh ? "冻结数据来源、commit、许可、清洗和哈希对齐规则。" : "Freeze data sources, commits, licenses, cleaning, and hash-alignment rules."}</li><li>${zh ? "冻结 B/S/E 每个家族的一个主分数与 maxT 重采样算法。" : "Freeze one primary B/S/E score and the nested maxT resampling algorithm."}</li><li>${zh ? "完成 P0 的数据与方法检查后，才启动 D0 的小规模受控实验。" : "Start the small controlled D0 experiment only after the P0 data and method checks are complete."}</li></ol></section>`;
     }
 
     if (key === "bibliography") {
