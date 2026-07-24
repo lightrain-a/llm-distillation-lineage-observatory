@@ -2,12 +2,12 @@
   "meta": {
     "project": "TransFP",
     "paper": "Efficient Hard-Label Ownership Verification via Adversarial Transferability",
-    "lastUpdated": "2026-07-24 10:21 CST",
+    "lastUpdated": "2026-07-24 11:17 CST",
     "snapshotType": "manual verified snapshot",
     "visibility": "unlisted, noindex"
   },
-  "progress": {"total": 10, "completed": 7, "running": 1, "queued": 1, "limited": 1},
-  "hero": {"summary": "固定模型池上的查询预算、校准、anchor 消融和感知质量实验已经完成。常规验证在 5–100 queries 下保持较高 AUC，但 PGD adversarial training 将 TransFP score 从 1.00 降至 0.02–0.03；TRADES、MART 与跨架构实验仍在执行或排队。"},
+  "progress": {"total": 10, "completed": 7, "running": 2, "queued": 0, "limited": 1},
+  "hero": {"summary": "固定模型池上的查询预算、校准、anchor 消融和感知质量实验已经完成。TRADES seed 1 已到 18/20 epochs，seeds 2/3 已到 5/20；稳定版 MART seeds 1–3 队列已启动。跨架构 ViT→VGG seed 1 已完成，ViT→WRN seed 1 正在运行。67、232 暂不纳入本轮资源。"},
   "headlineMetrics": [
     {"label": "Matched AUC @ 100 queries", "value": "0.9987", "detail": "98-model pool · 200 repeats", "tone": "good"},
     {"label": "Matched AUC @ 5 queries", "value": "0.9571", "detail": "low-query verification", "tone": "info"},
@@ -18,8 +18,8 @@
     {"id": "threshold", "title": "验证池依赖与固定阈值可靠性", "concern": "阈值是否依赖同一批 validation models，以及跨数据集、跨派生类型时 FPR/FNR 是否稳定。", "experiment": "Disjoint calibration/test split、cross-dataset threshold transfer、KD-proxy-to-unseen、leave-one-family-out、threshold sensitivity。", "status": "completed", "evidence": "同数据集 AUC 为 0.950–0.999；跨数据集 AUC 仍高，但部分方向的 FPR 达 28%–53%，说明 AUC 与可部署固定阈值不能混为一谈。", "owner": "Server 69", "artifact": "calibration"},
     {"id": "budget", "title": "查询预算公平性与完整运行时间", "concern": "不同方法是否使用相同 hard-label query budget，以及少量 queries 下是否仍能验证。", "experiment": "同一 per-query hit matrix 上匹配 5/10/20/30/50/100 queries，重复 200 次并记录推理时间。", "status": "completed", "evidence": "AUC 从 5-query 的 0.9571 提升至 100-query 的 0.9987；98 个模型总推理约 46.6 秒。", "owner": "Server 69", "artifact": "query-budget"},
     {"id": "false-claim", "title": "False ownership claims", "concern": "独立 claimant 是否能针对任意目标模型构造一组指纹并越过所有权阈值。", "experiment": "3 个 claimant-specific fingerprint sets × 10 个目标模型，构成交叉声明矩阵。", "status": "completed", "evidence": "当前阈值下 derived、independent、protected groups 的 false-claim rate 分别为 20.0%、25.0%、33.3%。需要限制性讨论和更严格的 claimant authentication。", "owner": "Server 69", "artifact": "false-claim"},
-    {"id": "robust-training", "title": "强对抗训练移除攻击", "concern": "仅测试常规 fine-tuning 是否低估了专门面向鲁棒性的移除攻击。", "experiment": "PGD adversarial training、TRADES、MART，各 3 seeds；逐 epoch 记录 clean accuracy、PGD-20 accuracy、TransFP score。", "status": "running", "evidence": "PGD-AT 三种子已完成，TransFP score 降至 0.02–0.03，同时 clean accuracy 约 80.5%–80.8%。TRADES/MART 正在运行。", "owner": "Servers 231 + 60", "artifact": "robust-training"},
-    {"id": "architecture", "title": "强架构错配", "concern": "保护模型与派生模型架构显著不同时，adversarial transferability 是否仍足以支撑所有权判断。", "experiment": "Protected ViT → VGG/WRN derived models，3 seeds；与独立 VGG/DenseNet/ResNet/WRN controls 构成 architecture matrix。", "status": "queued", "evidence": "ViT checkpoint、兼容加载器和训练 YAML 已就绪；等待 69 的后续执行槽。", "owner": "Server 69", "artifact": "architecture-matrix"},
+    {"id": "robust-training", "title": "强对抗训练移除攻击", "concern": "仅测试常规 fine-tuning 是否低估了专门面向鲁棒性的移除攻击。", "experiment": "PGD adversarial training、TRADES、MART，各 3 seeds；逐 epoch 记录 clean accuracy、PGD-20 accuracy、TransFP score。", "status": "running", "evidence": "PGD-AT 三种子已完成。TRADES seed 1 在 epoch 18 的 clean/PGD-20/TransFP 分别为 69.77%/30.90%/0.02；seeds 2/3 在 epoch 5 的 TransFP 均为 0.07。MART 原实现出现 NaN，数值稳定版已越过故障点并正式启动。", "owner": "Servers 231 + 60", "artifact": "robust-training"},
+    {"id": "architecture", "title": "强架构错配", "concern": "保护模型与派生模型架构显著不同时，adversarial transferability 是否仍足以支撑所有权判断。", "experiment": "Protected ViT → VGG/WRN derived models，3 seeds；与独立 VGG/DenseNet/ResNet/WRN controls 构成 architecture matrix。", "status": "running", "evidence": "100 个 ViT fingerprints 已生成；ViT→VGG seed 1 已完成，派生模型 test accuracy 为 42.74%；ViT→WRN seed 1 正在训练，后续 seeds 将串行执行。", "owner": "Server 69", "artifact": "architecture-matrix"},
     {"id": "anchor", "title": "Anchor selection 是否影响结论", "concern": "随机 anchor 是否偶然有利，或依赖特定置信度、margin、类别分布。", "experiment": "Random、confidence-stratified、margin-stratified、class-balanced；4 strategies × 3 seeds。", "status": "completed", "evidence": "12 组实验 qualification yield 均为 97.4%–99.1%，保存的 fingerprint source hit 全部为 100%；AUC@100 均值 0.9993。", "owner": "Server 69", "artifact": "anchor-selection"},
     {"id": "perceptual", "title": "严格同图感知质量", "concern": "不同方法的 PSNR/SSIM/LPIPS 是否基于同一原图，避免跨图比较产生虚假优势。", "experiment": "按 manifest source index 精确匹配原图；逐 fingerprint 计算 L∞、PSNR、SSIM、LPIPS-Alex。", "status": "completed", "evidence": "12 组均值：PSNR 33.195 dB、SSIM 0.9623、LPIPS 0.00173；1200/1200 样本满足 ε 约束。", "owner": "Server 69", "artifact": "perceptual"},
     {"id": "large-scale", "title": "更大数据集与 foundation architecture 覆盖", "concern": "结论是否只建立在 CIFAR-10，且是否缺少 ViT 等现代架构。", "experiment": "审计 CIFAR-10、CIFAR-100、Tiny-ImageNet、ImageNet-200 的正式结果与攻击覆盖，并核对 ViT checkpoint。", "status": "completed", "evidence": "共发现 314 个 artifacts，其中 300 个正式候选；覆盖 5 类数据集分组与 ViT checkpoint。结果质量仍需按实验来源逐项筛选。", "owner": "Server 69", "artifact": "large-scale-audit"},
@@ -27,14 +27,14 @@
     {"id": "reporting", "title": "统一结果与失败台账", "concern": "多服务器实验是否可能混入 smoke、错误归一化或不完整输出。", "experiment": "按 seed/method 记录 args、epoch metrics、summary、日志和 normalization；完成项原子同步到统一结果目录。", "status": "completed", "evidence": "PGD-AT 正确归一化的三种子已独立核对；错误归一化目录单独保留并明确排除。Anchor 12 组均包含 generation、query-budget、perceptual 三类产物。", "owner": "Cross-server audit", "artifact": "status-ledger"}
   ],
   "servers": [
-    {"name": "A100 · 69", "role": "统计分析、PGD-AT、anchor、后续跨架构", "status": "ready", "tag": "Ready", "gpu": [{"name": "A100 80GB", "memory": "2.5 / 80 GB", "percent": 3, "utilization": "0%"}], "task": "PGD-AT 3 seeds 与 anchor 12 runs 已完成；等待启动 ViT→VGG/WRN architecture matrix。"},
-    {"name": "A100 · 231", "role": "TRADES seed 1 专用通道", "status": "running", "tag": "Running", "gpu": [{"name": "A100 80GB", "memory": "37.9 / 80 GB", "percent": 47, "utilization": "100%"}], "task": "TRADES seed 1 正在训练；后续 seeds 已分流到 60，避免串行等待。"},
-    {"name": "3×3090 · 60", "role": "TRADES/MART 并行训练", "status": "running", "tag": "3 jobs active", "gpu": [{"name": "GPU 0 · RTX 3090", "memory": "15.4 / 24 GB", "percent": 63, "utilization": "100%"}, {"name": "GPU 1 · RTX 3090", "memory": "11.7 / 24 GB", "percent": 48, "utilization": "100%"}, {"name": "GPU 2 · RTX 3090 Ti", "memory": "15.8 / 24 GB", "percent": 64, "utilization": "100%"}], "task": "当前：TRADES seeds 2/3、MART seed 1。Worker queues 将继续 MART seeds 2/3。"}
+    {"name": "A100 · 69", "role": "统计分析、PGD-AT、anchor、跨架构", "status": "running", "tag": "Running", "gpu": [{"name": "A100 80GB", "memory": "6.0 / 80 GB", "percent": 7, "utilization": "90%"}], "task": "PGD-AT 与 anchor 已完成；跨架构队列正在运行：VGG seed 1 完成，WRN seed 1 运行中。"},
+    {"name": "A100 · 231", "role": "TRADES seed 1 专用通道", "status": "running", "tag": "Running", "gpu": [{"name": "A100 80GB", "memory": "40.7 / 80 GB", "percent": 50, "utilization": "100%"}], "task": "TRADES seed 1 已到 epoch 18/20；父队列已冻结，完成后不会重复启动 seeds 2/3 或 MART。"},
+    {"name": "3×3090 · 60", "role": "TRADES/MART 并行训练", "status": "running", "tag": "3 jobs active", "gpu": [{"name": "GPU 0 · RTX 3090", "memory": "15.4 / 24 GB", "percent": 63, "utilization": "100%"}, {"name": "GPU 1 · RTX 3090", "memory": "2.7 / 24 GB", "percent": 11, "utilization": "99%"}, {"name": "GPU 2 · RTX 3090 Ti", "memory": "15.8 / 24 GB", "percent": 64, "utilization": "100%"}], "task": "TRADES seeds 2/3 已到 epoch 5/20；独立稳定版 MART queue 正在 GPU1 上运行 seeds 1–3。"}
   ],
   "schedule": [
-    {"priority": "P0", "experiment": "TRADES seeds 1–3", "resource": "231 + 60", "status": "running", "next": "完成后汇总 clean/robust/TransFP trajectory，并同步到统一结果目录。"},
-    {"priority": "P0", "experiment": "MART seeds 1–3", "resource": "60 · 3 GPUs", "status": "running", "next": "seed 1 运行中；seeds 2/3 已进入 worker queues。"},
-    {"priority": "P1", "experiment": "ViT→VGG / ViT→WRN cross-architecture", "resource": "69 · A100", "status": "queued", "next": "先运行兼容 smoke，再执行 2 architecture × 3 seeds 和最终矩阵。"},
+    {"priority": "P0", "experiment": "TRADES seeds 1–3", "resource": "231 + 60", "status": "running", "next": "seed 1：18/20；seeds 2/3：5/20。完成后汇总 clean/robust/TransFP trajectory。"},
+    {"priority": "P0", "experiment": "MART seeds 1–3", "resource": "60 · GPU1", "status": "running", "next": "原 MART 在 batch 140 出现 NaN；稳定版通过 160-batch 验证，正式 seed 1 已启动，seeds 2/3 串行排队。"},
+    {"priority": "P1", "experiment": "ViT→VGG / ViT→WRN cross-architecture", "resource": "69 · A100", "status": "running", "next": "VGG seed 1 已完成，WRN seed 1 运行中；继续剩余 5 个模型后生成最终矩阵。"},
     {"priority": "P1", "experiment": "Unified robust-training report", "resource": "69 · CPU/GPU", "status": "queued", "next": "PGD-AT/TRADES/MART 各 3 seeds 完整后生成统一表格与轨迹图。"},
     {"priority": "Done", "experiment": "Anchor selection + query budget + perceptual metrics", "resource": "69", "status": "completed", "next": "12/12 generation、12/12 query-budget、12/12 LPIPS summaries 已核对。"},
     {"priority": "Done", "experiment": "Calibration / false-claim / availability audits", "resource": "69", "status": "completed", "next": "转化为 rebuttal 表格与 limitations 文字。"}
