@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="description" content="TransFP review experiment dashboard: reviewer concerns, experiment schedule, execution status, and verified results.">
+  <title>TransFP Review Experiment Dashboard</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <div class="page-shell">
+    <aside class="sidebar" aria-label="页面导航">
+      <a class="brand" href="#overview" aria-label="返回概览">
+        <span class="brand-mark">TF</span>
+        <span class="brand-copy"><strong>TransFP Review</strong><small>Experiment Dashboard</small></span>
+      </a>
+      <nav class="side-nav">
+        <a href="#overview" class="active">概览</a><a href="#review-map">审稿问题映射</a><a href="#schedule">实验安排</a><a href="#results">核心结果</a><a href="#anchors">Anchor 分析</a><a href="#calibration">校准与误报</a><a href="#reproducibility">复现性审计</a>
+      </nav>
+      <div class="privacy-note"><strong>Unlisted snapshot</strong><span>页面未加入主站导航，并设置 noindex。审稿意见仅作摘要展示。</span></div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <button id="menuToggle" class="menu-toggle" type="button" aria-label="打开导航">☰</button>
+        <div><div class="eyebrow">Efficient Hard-Label Ownership Verification via Adversarial Transferability</div><h1>Review Experiment Dashboard</h1></div>
+        <div class="snapshot"><span class="live-dot" aria-hidden="true"></span><span id="lastUpdated">加载中…</span></div>
+      </header>
+      <div id="loadError" class="load-error" hidden>状态数据加载失败。请刷新页面或检查 data/status.json。</div>
+      <section id="overview" class="section hero-section">
+        <div class="hero-copy"><div class="section-kicker">当前结论</div><h2>常规验证性能强，但强对抗训练暴露出明确的移除风险。</h2><p id="heroSummary">正在汇总服务器结果…</p><div class="hero-actions"><a class="button primary" href="#review-map">查看审稿问题</a><a class="button secondary" href="#schedule">查看运行队列</a></div></div>
+        <div class="hero-panel"><div class="progress-label"><span>Review tracks</span><strong id="progressText">—</strong></div><div class="progress-track"><span id="progressBar"></span></div><div class="mini-grid" id="statusCounters"></div></div>
+      </section>
+      <section class="metric-grid" id="headlineMetrics" aria-label="核心指标"></section>
+      <section id="review-map" class="section">
+        <div class="section-heading"><div><div class="section-kicker">Reviewer concern → evidence</div><h2>审稿问题与对应实验</h2></div><div class="filter-group" role="group" aria-label="状态筛选"><button class="filter-button active" data-filter="all" type="button">全部</button><button class="filter-button" data-filter="completed" type="button">已完成</button><button class="filter-button" data-filter="running" type="button">运行中</button><button class="filter-button" data-filter="queued" type="button">排队</button><button class="filter-button" data-filter="limited" type="button">受限</button></div></div>
+        <div id="reviewCards" class="review-grid"></div>
+      </section>
+      <section id="schedule" class="section">
+        <div class="section-heading"><div><div class="section-kicker">Execution plan</div><h2>服务器与实验安排</h2></div><span class="section-note">GPU 使用量为状态快照，不自动轮询。</span></div>
+        <div id="serverCards" class="server-grid"></div>
+        <div class="table-card"><div class="table-title"><h3>任务队列</h3><span>完成项不会重复运行</span></div><div class="table-wrap"><table><thead><tr><th>优先级</th><th>实验</th><th>资源</th><th>状态</th><th>下一步</th></tr></thead><tbody id="scheduleRows"></tbody></table></div></div>
+      </section>
+      <section id="results" class="section">
+        <div class="section-heading"><div><div class="section-kicker">Verified findings</div><h2>核心实验结果</h2></div></div>
+        <div class="result-layout">
+          <article class="chart-card"><div class="card-heading"><div><span class="card-label">Matched query budget</span><h3>查询数量与验证 AUC</h3></div><span class="tag completed">Completed</span></div><div id="queryChart" class="chart" aria-label="查询预算 AUC 曲线"></div><div id="queryLegend" class="chart-legend"></div></article>
+          <article class="result-card critical"><div class="card-heading"><div><span class="card-label">Strong removal stress test</span><h3>PGD adversarial training</h3></div><span class="tag risk">Key risk</span></div><p id="pgdNarrative"></p><div id="pgdMetrics" class="triple-metric"></div><div class="table-wrap compact-table"><table><thead><tr><th>Seed</th><th>Clean Acc.</th><th>PGD-20 Acc.</th><th>TransFP score</th></tr></thead><tbody id="pgdRows"></tbody></table></div></article>
+        </div>
+      </section>
+      <section id="anchors" class="section">
+        <div class="section-heading"><div><div class="section-kicker">Anchor-selection ablation</div><h2>Anchor 策略、查询效率与感知质量</h2></div><span class="section-note">4 strategies × 3 seeds × 100 fingerprints</span></div>
+        <div id="anchorSummary" class="metric-grid compact"></div>
+        <div class="table-card"><div class="table-title"><h3>三种子均值</h3><span>同一 98-model pool</span></div><div class="table-wrap"><table><thead><tr><th>Strategy</th><th>Qualification</th><th>AUC@5</th><th>AUC@10</th><th>AUC@100</th><th>PSNR</th><th>SSIM</th><th>LPIPS</th></tr></thead><tbody id="anchorRows"></tbody></table></div></div>
+      </section>
+      <section id="calibration" class="section">
+        <div class="section-heading"><div><div class="section-kicker">Threshold reliability</div><h2>固定阈值、外推与 false-claim</h2></div></div>
+        <div class="two-column"><article class="result-card"><div class="card-heading"><h3>校准协议摘要</h3><span class="tag completed">Completed</span></div><div id="calibrationCards" class="stack-list"></div></article><article class="result-card warning"><div class="card-heading"><h3>False ownership claims</h3><span class="tag warning">Needs response</span></div><p>在 claimant-specific fingerprint 的交叉声明矩阵中，部分非所有者模型仍能越过当前固定阈值。该结果应作为限制与阈值设计问题明确讨论。</p><div id="falseClaimBars" class="bar-list"></div></article></div>
+      </section>
+      <section id="reproducibility" class="section">
+        <div class="section-heading"><div><div class="section-kicker">Availability audit</div><h2>基线与大规模实验复现性</h2></div></div>
+        <div class="two-column"><article class="result-card"><div class="card-heading"><h3>现有覆盖</h3><span class="tag completed">Audited</span></div><div id="coverageList" class="coverage-list"></div></article><article class="result-card"><div class="card-heading"><h3>新增 baseline 可执行性</h3><span class="tag limited">Limited</span></div><div id="baselineList" class="stack-list"></div></article></div>
+      </section>
+      <footer class="footer"><span>TransFP review experiment snapshot</span><span>Public page contains summaries only · no raw reviewer text or internal paths</span></footer>
+    </main>
+  </div>
+  <script src="assets/app.js" defer></script>
+</body>
+</html>
