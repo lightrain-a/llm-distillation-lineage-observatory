@@ -210,11 +210,20 @@
   }
 
   function renderBaselines(items) {
-    document.getElementById('baselineList').innerHTML = items.map(item => `
+    const labels = {
+      partial: ['limited', 'Artifacts incomplete'],
+      code_found: ['running', 'Official code found'],
+      community_code: ['queued', 'Public implementation'],
+      missing: ['limited', 'No public code found']
+    };
+    document.getElementById('baselineList').innerHTML = items.map(item => {
+      const [tone, label] = labels[item.status] || ['limited', item.status];
+      return `
       <div class="stack-item">
         <div><strong>${escapeHtml(item.name)}</strong><p>${escapeHtml(item.description)}</p></div>
-        ${statusTag('limited', item.status === 'partial' ? 'Partial' : 'Unavailable')}
-      </div>`).join('');
+        ${statusTag(tone, label)}
+      </div>`;
+    }).join('');
   }
 
   function setupNavigation() {
